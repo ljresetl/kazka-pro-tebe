@@ -391,6 +391,11 @@ img {
 .footer-grid a {
   text-decoration: none;
 }
+.footer-bottom a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .footer-grid a:hover {
   color: #fff;
   text-decoration: underline;
@@ -403,6 +408,10 @@ img {
   max-width: 32ch;
 }
 .footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
   border-top: 1px solid rgb(255 255 255 / 0.1);
   padding-top: 20px;
   padding-bottom: 32px;

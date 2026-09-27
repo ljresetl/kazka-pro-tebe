@@ -38,6 +38,8 @@ export type StoryPage = {
   scene: SceneId;
   /** Якщо є — показується замість намальованої сцени. */
   image?: Illustration;
+  /** Опис ілюстрації англійською для генератора картинок (від ШІ). */
+  illustration?: string;
 };
 
 export type Story = {

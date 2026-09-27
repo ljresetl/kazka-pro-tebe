@@ -81,6 +81,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
                 alt=""
                 className="reader-img"
                 priority={spread === 0}
+                unoptimized={image.src.startsWith("blob:")}
                 draggable={false}
                 sizes="(max-width: 760px) 100vw, 460px"
               />
