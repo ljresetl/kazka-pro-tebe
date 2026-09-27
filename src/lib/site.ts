@@ -6,7 +6,7 @@
 export const SITE = {
   name: "Казкарня",
   tagline: "Казка, де головний герой — твоя дитина",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://ljresetl.github.io/kazka-pro-tebe",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://kazka-pro-tebe.vercel.app",
   description:
     "Іменні казки українською, де головний герой — ваша дитина. Безкоштовний перегляд, PDF для друку вдома або книжка в палітурці.",
 
@@ -30,7 +30,11 @@ export const hasSellerDetails = Boolean(SITE.sellerName && SITE.sellerCode && SI
 /** Повна адреса сторінки для canonical, Open Graph і sitemap. */
 export function abs(path = "/") {
   const clean = path.startsWith("/") ? path : `/${path}`;
-  return `${SITE.url}${clean === "/" ? "/" : clean.endsWith("/") ? clean : `${clean}/`}`;
+  if (clean === "/") return `${SITE.url}/`;
+  // Статична версія (GitHub Pages) має адреси зі скісною рискою в кінці, серверна (Vercel) — без неї.
+  const trailing = process.env.NEXT_PUBLIC_STATIC_SITE === "1";
+  const bare = clean.replace(/\/+$/, "");
+  return `${SITE.url}${trailing ? `${bare}/` : bare}`;
 }
 
 /** Адреса файлу з public/ з урахуванням підпапки сайту. */
