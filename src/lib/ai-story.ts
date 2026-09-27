@@ -46,6 +46,9 @@ export async function aiStory(req: StoryRequest): Promise<{
     `Риса характеру, яка допомагає в пригоді: ${req.trait}`,
     req.friend ? `Найкращий друг або улюбленець, який може з'явитися в казці: ${req.friend}` : null,
     req.message ? `Звернення батьків для присвяти: ${req.message}` : null,
+    req.wish
+      ? `Побажання батьків до сюжету (побудуй казку навколо цього, якщо це безпечно й доречно для дитини; інакше м'яко обійди): ${req.wish}`
+      : null,
   ]
     .filter(Boolean)
     .join("\n");

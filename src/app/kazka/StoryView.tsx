@@ -3,20 +3,24 @@
 import { BookOpen, Shuffle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import BackLink from "@/components/BackLink";
 import BookReader from "@/components/BookReader";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
+import { AI_ENABLED, STATIC_SITE } from "@/lib/features";
 import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
 import { formatUah, PRICES } from "@/lib/prices";
 import { saveStory, useStory } from "@/lib/storage";
 import { plotCount, yearsWord } from "@/lib/template-story";
 import { getTheme } from "@/lib/themes";
+import type { Story } from "@/lib/types";
 
 const FREE_PAGES = 3;
 
 export default function StoryView({ id }: { id: string }) {
   const story = useStory(id);
   const router = useRouter();
+  const [regenerating, setRegenerating] = useState(false);
 
   if (story === undefined) return <div className="writing" />;
 
@@ -47,11 +51,27 @@ export default function StoryView({ id }: { id: string }) {
   const theme = getTheme(story.theme);
   const paid = Boolean(story.paid);
   const printPages = paid ? story.pages : story.pages.slice(0, FREE_PAGES);
-  const canRegenerate = !paid && story.source === "template" && plotCount(story.theme) > 1;
+  const aiMode = AI_ENABLED && !STATIC_SITE;
+  const canRegenerate = !paid && (aiMode || plotCount(story.theme) > 1);
 
-  function anotherPlot() {
+  async function anotherPlot() {
     if (!story) return;
-    const next = makeTemplateStory(requestFromStory(story), story.plotId);
+    const req = requestFromStory(story);
+    let next: Story = makeTemplateStory(req, story.plotId);
+    if (aiMode) {
+      setRegenerating(true);
+      try {
+        const res = await fetch("/api/story", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(req),
+        });
+        if (res.ok) next = (await res.json()) as Story;
+      } catch {
+        // Лишаємо шаблонний варіант.
+      }
+      setRegenerating(false);
+    }
     saveStory(next);
     router.push(`/kazka?id=${next.id}`);
   }
@@ -80,9 +100,9 @@ export default function StoryView({ id }: { id: string }) {
           </div>
           <div className="button-row">
             {canRegenerate && (
-              <button type="button" className="btn btn-soft btn-small" onClick={anotherPlot}>
+              <button type="button" className="btn btn-soft btn-small" onClick={anotherPlot} disabled={regenerating}>
                 <Shuffle size={16} aria-hidden="true" />
-                Інший сюжет
+                {regenerating ? "Пишемо…" : "Інший сюжет"}
               </button>
             )}
             <Link href="/stvoryty" className="btn btn-ghost btn-small">
