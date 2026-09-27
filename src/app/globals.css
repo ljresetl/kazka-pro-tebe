@@ -1,26 +1,1005 @@
 @import "tailwindcss";
 
+/* Палітра різографії: плашкові фарби на білому папері */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #fdfcf9;
+  --paper-deep: #f3f1ff;
+  --ink: #1c2140;
+  --ink-soft: #545a7a;
+  --riso-blue: #3255e6;
+  --riso-pink: #ff6fa5;
+  --riso-yellow: #ffc92e;
+  --riso-green: #1faa7f;
+  --line: #e2e0ec;
+  --radius-lg: 20px;
+  --radius-sm: 10px;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), Georgia, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--riso-blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Кнопки ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  padding: 16px 24px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn-primary {
+  background: var(--riso-blue);
+  color: #fff;
+  border-color: var(--riso-blue);
+  box-shadow: 4px 4px 0 var(--riso-pink);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 var(--riso-pink);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--riso-pink);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--paper-deep);
+}
+.btn-small {
+  white-space: nowrap;
+  padding: 10px 16px;
+  font-size: 14px;
+  box-shadow: 3px 3px 0 var(--riso-pink);
+}
+
+/* ---------- Шапка й підвал ---------- */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+}
+.logo-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--riso-yellow);
+  box-shadow: 3px 2px 0 var(--riso-pink);
+  font-weight: 900;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 16px;
+}
+.site-nav a:not(.btn) {
+  text-decoration: none;
+}
+.site-nav a:not(.btn):hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.site-footer {
+  max-width: 1120px;
+  margin: 96px auto 0;
+  padding: 32px 24px 48px;
+  border-top: 2px solid var(--ink);
+  font-size: 15px;
+}
+.site-footer p {
+  margin: 4px 0;
+}
+
+@media (max-width: 760px) {
+  .site-nav a:not(.btn) {
+    display: none;
+  }
+  .site-header {
+    padding: 16px;
+  }
+  .logo {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .logo-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .hide-sm {
+    display: none;
+  }
+}
+
+/* ---------- Ефект різографії для заголовків ---------- */
+.riso-type {
+  color: var(--ink);
+  text-shadow:
+    3px 2px 0 var(--riso-pink),
+    -2px -1px 0 color-mix(in srgb, var(--riso-yellow) 90%, transparent);
+}
+
+/* ---------- Головна: перший екран ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 56px;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.hero h1 {
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 900;
+}
+.hero-lead {
+  font-size: 20px;
+  max-width: 34em;
+  margin: 24px 0 32px;
+  color: var(--ink-soft);
+}
+.hero-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hero-form input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.hero-note {
+  font-size: 15px;
+  margin-top: 16px;
+}
+
+.field-input,
+.hero-form input,
+select.field-input {
+  font: inherit;
+  font-size: 18px;
+  padding: 14px 18px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+}
+.field-input::placeholder,
+.hero-form input::placeholder {
+  color: #9a9db3;
+}
+
+/* Обкладинка, що оживає, коли вводять ім'я */
+.live-cover {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px 24px 24px 8px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--riso-blue);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: rotate(1.5deg);
+}
+.live-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 14px;
+  background: var(--riso-pink);
+  mix-blend-mode: multiply;
+  z-index: 2;
+}
+.live-cover .scene {
+  flex: 1;
+  width: 100%;
+  display: block;
+}
+.live-cover-title {
+  padding: 22px 28px 26px 36px;
+  border-top: 2px solid var(--ink);
+}
+.live-cover-title h2 {
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+.live-cover-title p {
+  margin: 8px 0 0;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .live-cover {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* ---------- Секції головної ---------- */
+.section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+.section h2 {
+  font-size: clamp(28px, 3.6vw, 40px);
+  font-weight: 900;
+  max-width: 22em;
+}
+.section-lead {
+  max-width: 36em;
+  color: var(--ink-soft);
+  margin: 16px 0 40px;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  counter-reset: step;
+}
+.steps li {
+  counter-increment: step;
+  padding-top: 24px;
+  border-top: 2px solid var(--ink);
+}
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  background: var(--riso-yellow);
+  box-shadow: 3px 2px 0 var(--riso-pink);
+}
+.steps h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.steps p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.theme-card {
+  display: block;
+  text-decoration: none;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #fff;
+}
+.theme-card .scene {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-bottom: 2px solid var(--ink);
+}
+.card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center 30%;
+  border-bottom: 2px solid var(--ink);
+}
+.theme-card-body {
+  padding: 16px 20px 20px;
+}
+.theme-card h3 {
+  font-size: 18px;
+}
+.theme-card p {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.theme-card:hover h3 {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.prices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+.price {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.price.is-main {
+  background: var(--paper-deep);
+  box-shadow: 8px 8px 0 var(--riso-blue);
+}
+.price h3 {
+  font-size: 20px;
+}
+.price-amount {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 40px;
+  margin: 16px 0 4px;
+}
+.price-amount small {
+  font-size: 18px;
+  font-weight: 500;
+}
+.price ul {
+  padding-left: 20px;
+  margin: 16px 0 24px;
+  flex: 1;
+  font-size: 16px;
+}
+.price li {
+  margin: 6px 0;
+}
+
+.faq {
+  max-width: 760px;
+}
+.faq details {
+  border-bottom: 2px solid var(--line);
+  padding: 18px 0;
+}
+.faq summary {
+  cursor: pointer;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+.faq details p {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 860px) {
+  .steps,
+  .themes,
+  .prices {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Форма створення ---------- */
+.create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 56px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+  align-items: start;
+}
+.create h1 {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 900;
+}
+.create-form {
+  display: grid;
+  gap: 28px;
+  margin-top: 32px;
+}
+.field {
+  display: grid;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.field > label,
+.field > legend {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 0;
+}
+.field .field-input {
+  border-radius: var(--radius-sm);
+}
+.field-help {
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.choice {
+  position: relative;
+}
+.choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.choice span {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 16px;
+}
+.choice input:checked + span {
+  background: var(--riso-yellow);
+  box-shadow: 3px 3px 0 var(--riso-pink);
+}
+.choice input:focus-visible + span {
+  outline: 3px solid var(--riso-blue);
+  outline-offset: 3px;
+}
+.theme-choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.theme-choice {
+  position: relative;
+  display: block;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+}
+.theme-choice input {
+  position: absolute;
+  opacity: 0;
+}
+.theme-choice .scene {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+.theme-choice span {
+  display: block;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-top: 2px solid var(--ink);
+}
+.theme-choice:has(input:checked) {
+  box-shadow: 5px 5px 0 var(--riso-blue);
+  outline: 3px solid var(--riso-yellow);
+}
+.theme-choice:has(input:focus-visible) {
+  outline: 3px solid var(--riso-blue);
+  outline-offset: 3px;
+}
+.form-error {
+  color: #b3163f;
+  font-weight: 600;
+  margin: 0;
+}
+.create-aside {
+  position: sticky;
+  top: 24px;
+}
+@media (max-width: 900px) {
+  .create {
+    grid-template-columns: 1fr;
+  }
+  .create-aside {
+    display: none;
+  }
+  .theme-choices {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Стан очікування, поки пишеться казка */
+.writing {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 16px;
+  padding: 48px 24px;
+  min-height: 50vh;
+}
+.writing p {
+  margin: 0;
+}
+.writing-dots {
+  display: flex;
+  gap: 10px;
+}
+.writing-dots span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  animation: bob 1s ease-in-out infinite;
+}
+.writing-dots span:nth-child(1) {
+  background: var(--riso-pink);
+}
+.writing-dots span:nth-child(2) {
+  background: var(--riso-blue);
+  animation-delay: 0.15s;
+}
+.writing-dots span:nth-child(3) {
+  background: var(--riso-yellow);
+  animation-delay: 0.3s;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ---------- Читалка ---------- */
+.reader {
+  display: grid;
+  gap: 16px;
+}
+.reader-book {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 2px solid var(--ink);
+  border-radius: 8px var(--radius-lg) var(--radius-lg) 8px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 8px 8px 0 var(--riso-blue);
+  min-height: 380px;
+}
+.reader-art {
+  border-right: 2px solid var(--ink);
+  background: var(--paper-deep);
+}
+.reader-art .scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+}
+/* Книжка з готовими картинками: вертикальна ілюстрація показується повністю */
+.reader-book.has-images {
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+}
+.reader-book.has-images .reader-art {
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+}
+.reader-img {
+  display: block;
+  height: 520px;
+  width: auto;
+  max-width: 100%;
+}
+.reader-text {
+  position: relative;
+  padding: 40px 36px 48px;
+  display: flex;
+  align-items: center;
+}
+.story-text {
+  font-size: 21px;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 30em;
+}
+.page-no {
+  position: absolute;
+  bottom: 16px;
+  right: 24px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.reader-cover {
+  display: grid;
+  gap: 16px;
+}
+.cover-title {
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 900;
+  font-family: var(--font-display), sans-serif;
+  line-height: 1.12;
+  margin: 0;
+}
+.cover-dedication {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.reader-text.is-locked .story-text {
+  filter: blur(6px);
+  user-select: none;
+}
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: color-mix(in srgb, #fff 55%, transparent);
+}
+.reader-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.reader-count {
+  font-family: var(--font-display), sans-serif;
+  font-size: 15px;
+}
+@media (max-width: 760px) {
+  .reader-book {
+    grid-template-columns: 1fr;
+  }
+  .reader-art {
+    border-right: 0;
+    border-bottom: 2px solid var(--ink);
+  }
+  .reader-art .scene {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+  }
+  .reader-book.has-images {
+    grid-template-columns: 1fr;
+  }
+  .reader-img {
+    width: 100%;
+    height: auto;
+  }
+  .reader-text {
+    padding: 28px 24px 44px;
+  }
+  .story-text {
+    font-size: 19px;
+  }
+}
+
+/* ---------- Сторінка книжки ---------- */
+.book-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+.book-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.book-head h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+}
+.book-meta {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+}
+.book-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+  align-items: start;
+}
+.panel {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  background: #fff;
+}
+.panel h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.panel p {
+  margin: 0 0 16px;
+}
+.offer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: grid;
+  gap: 10px;
+}
+.offer-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--line);
+}
+.offer-list strong {
+  font-family: var(--font-display), sans-serif;
+  white-space: nowrap;
+}
+.print-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.hint {
+  flex-basis: 100%;
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 4px 0 0;
+}
+.badge {
+  display: inline-block;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+}
+@media (max-width: 860px) {
+  .book-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Бібліотека ---------- */
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 860px) {
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Приклади ---------- */
+.filter-bar {
+  margin-bottom: 32px;
+}
+.filter {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 16px;
+  text-decoration: none;
+}
+.filter:hover {
+  background: var(--paper-deep);
+}
+.filter.is-active {
+  background: var(--riso-yellow);
+  box-shadow: 3px 3px 0 var(--riso-pink);
+}
+
+/* ---------- Оплата ---------- */
+.checkout {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+}
+.checkout h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  margin-bottom: 24px;
+}
+.demo-note {
+  border-left: 6px solid var(--riso-yellow);
+  background: #fff8e1;
+  padding: 16px 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 16px;
+  margin: 24px 0;
+}
+
+/* ---------- Друк ---------- */
+.print-book {
+  display: none;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 14mm;
+}
+
+@media print {
+  body > header,
+  body > footer,
+  main > *:not(.print-root) {
+    display: none !important;
+  }
+  .print-root > *:not(.print-book) {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-book {
+    display: block;
+  }
+  .print-page {
+    position: relative;
+    height: 262mm;
+    display: flex;
+    flex-direction: column;
+    gap: 10mm;
+    break-after: page;
+    page-break-after: always;
+  }
+  .print-page:last-child {
+    break-after: auto;
+  }
+  .print-page .scene {
+    width: 100%;
+    height: 150mm;
+    border: 0.6mm solid var(--ink);
+    border-radius: 4mm;
+  }
+  .print-page .story-text {
+    font-size: 17pt;
+    line-height: 1.6;
+    max-width: none;
+  }
+  .print-cover {
+    justify-content: flex-start;
+  }
+  .print-cover .cover-title {
+    font-size: 30pt;
+  }
+  .print-page .page-no {
+    bottom: 0;
+    right: 0;
+  }
+  .watermark {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-family: var(--font-display), sans-serif;
+    font-size: 10pt;
+    color: #9a9db3;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Розмальовка: фігури стають контурами */
+.coloring .scene .riso *,
+.print-coloring .print-book .scene .riso * {
+  fill: #fff !important;
+  fill-opacity: 1 !important;
+  stroke: var(--ink) !important;
+  stroke-width: 2px !important;
+  mix-blend-mode: normal !important;
+}
+.coloring .scene .scene-bg,
+.print-coloring .print-book .scene .scene-bg {
+  fill: #fff !important;
+}
+
+/* Плашки накладаються, як фарби різографа */
+.scene .riso > * {
+  mix-blend-mode: multiply;
 }

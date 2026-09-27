@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Казка про тебе
 
-## Getting Started
+Сайт іменних казок українською: батьки вводять ім'я дитини, обирають пригоду — і отримують ілюстровану казку, яку можна читати з екрана, друкувати вдома або розмальовувати.
 
-First, run the development server:
+## Запуск
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Відкрийте http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Щоб казки писав Claude, скопіюйте `.env.example` у `.env.local` і вставте ключ `ANTHROPIC_API_KEY`. Без ключа сайт генерує казки за вбудованими шаблонами (6 тем).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Що є
 
-## Learn More
+| Сторінка | Що робить |
+| --- | --- |
+| `/` | Головна: жива обкладинка з іменем дитини, теми, ціни, питання |
+| `/stvoryty` | Форма: ім'я, стать, вік, пригода, риса характеру, друг |
+| `/kazka/[id]` | Читалка казки; перші 3 сторінки безкоштовні, друк і розмальовка |
+| `/kazka/[id]/oplata` | Оплата — **поки в тестовому режимі**, просто відкриває казку |
+| `/biblioteka` | Безкоштовні казки: «Рукавичка», «Колобок», «Зайчик і зірочка» |
+| `/api/story` | Генерація казки (Claude або шаблон) |
 
-To learn more about Next.js, take a look at the following resources:
+## Як влаштовано
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `src/lib/ai-story.ts` — запит до Claude (`claude-opus-5`, структурована відповідь JSON).
+- `src/lib/template-story.ts` — запасні шаблонні казки без ШІ.
+- `src/components/Scene.tsx` — 8 ілюстрацій-сцен у SVG; у режимі розмальовки стають контурами.
+- `src/components/PrintBook.tsx` — версія для друку (A4, одна сторінка казки на аркуш).
+- Казки зберігаються в `localStorage` браузера — акаунтів і бази даних поки немає.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Що далі
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Підключити оплату (LiqPay, WayForPay або monobank) замість тестової.
+2. Зберігати казки в базі даних і надсилати PDF на пошту.
+3. Ілюстрації від моделі для малювання з одним і тим самим героєм.
+4. Обмеження кількості безкоштовних переглядів, щоб не витрачати гроші на ШІ.
