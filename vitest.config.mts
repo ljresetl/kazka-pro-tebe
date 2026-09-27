@@ -1,0 +1,16 @@
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // Пакет server-only кидає помилку поза Next.js, тож у тестах підміняємо його заглушкою.
+      "server-only": fileURLToPath(new URL("./tests/server-only-stub.ts", import.meta.url)),
+    },
+  },
+  test: {
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+  },
+});

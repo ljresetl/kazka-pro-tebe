@@ -25,6 +25,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm test
       # На Pages немає сервера: серверний генератор казок не потрібен,
       # казки складаються прямо в браузері.
       - run: rm -rf src/app/api

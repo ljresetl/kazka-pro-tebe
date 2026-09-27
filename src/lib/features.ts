@@ -6,3 +6,6 @@ export const AI_ENABLED = process.env.NEXT_PUBLIC_AI_ENABLED === "1";
 
 /** Сайт зібрано як статичний (GitHub Pages) — сервера немає. */
 export const STATIC_SITE = process.env.NEXT_PUBLIC_STATIC_SITE === "1";
+
+/** Ілюстрації до казок малює Gemini (потрібен сервер і GEMINI_API_KEY). */
+export const AI_IMAGES = process.env.NEXT_PUBLIC_AI_IMAGES === "1";

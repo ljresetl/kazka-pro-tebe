@@ -81,8 +81,16 @@ export default function SiteFooter() {
         </div>
       </div>
       <div className="wrap footer-bottom">
-        © {new Date().getFullYear()} {SITE.sellerName || SITE.name}. Народні казки в бібліотеці — наш власний
-        переказ.
+        <span>
+          © {new Date().getFullYear()} {SITE.sellerName || SITE.name}. Народні казки в бібліотеці — наш власний
+          переказ.
+        </span>
+        <span>
+          Сайт створено командою{" "}
+          <a href="https://webdevcompass.com" target="_blank" rel="noopener">
+            webdevcompass.com
+          </a>
+        </span>
       </div>
     </footer>
   );

@@ -7,7 +7,9 @@ import { useState } from "react";
 import BackLink from "@/components/BackLink";
 import BookReader from "@/components/BookReader";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
-import { AI_ENABLED, STATIC_SITE } from "@/lib/features";
+import IllustrationsPanel from "@/components/IllustrationsPanel";
+import { AI_ENABLED, AI_IMAGES, STATIC_SITE } from "@/lib/features";
+import { useStoryImages } from "@/lib/image-store";
 import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
 import { formatUah, PRICES } from "@/lib/prices";
 import { saveStory, useStory } from "@/lib/storage";
@@ -21,6 +23,7 @@ export default function StoryView({ id }: { id: string }) {
   const story = useStory(id);
   const router = useRouter();
   const [regenerating, setRegenerating] = useState(false);
+  const images = useStoryImages(id);
 
   if (story === undefined) return <div className="writing" />;
 
@@ -50,7 +53,10 @@ export default function StoryView({ id }: { id: string }) {
 
   const theme = getTheme(story.theme);
   const paid = Boolean(story.paid);
-  const printPages = paid ? story.pages : story.pages.slice(0, FREE_PAGES);
+  const pages = story.pages.map((p, i) => ({ ...p, image: images.pages[i] ?? p.image }));
+  const printPages = paid ? pages : pages.slice(0, FREE_PAGES);
+  const hasAiImages = Boolean(images.cover || images.pages.some(Boolean));
+  const canIllustrate = AI_IMAGES && !STATIC_SITE && paid;
   const aiMode = AI_ENABLED && !STATIC_SITE;
   const canRegenerate = !paid && (aiMode || plotCount(story.theme) > 1);
 
@@ -115,7 +121,8 @@ export default function StoryView({ id }: { id: string }) {
           title={story.title}
           dedication={story.dedication}
           cover={theme.scene}
-          pages={story.pages}
+          coverImage={images.cover}
+          pages={pages}
           lockedFrom={paid ? undefined : FREE_PAGES}
           lockedMessage={
             <div>
@@ -126,6 +133,12 @@ export default function StoryView({ id }: { id: string }) {
             </div>
           }
         />
+
+        {canIllustrate && (
+          <div style={{ marginTop: 24 }}>
+            <IllustrationsPanel story={story} hasImages={hasAiImages} />
+          </div>
+        )}
 
         <div className="book-actions">
           {paid ? (
@@ -177,6 +190,7 @@ export default function StoryView({ id }: { id: string }) {
         title={story.title}
         dedication={story.dedication}
         cover={theme.scene}
+        coverImage={images.cover}
         pages={printPages}
         watermark={paid ? undefined : "Перегляд · Казкарня"}
       />
