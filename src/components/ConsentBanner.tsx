@@ -7,7 +7,7 @@ import { useSyncExternalStore } from "react";
 // Згода на обробку персональних даних.
 // Показується при першому відвідуванні й знову, якщо змінилася політика
 // (тоді треба збільшити CONSENT_VERSION). Кукі й аналітики сайт не використовує.
-const CONSENT_VERSION = "2026-09-27";
+const CONSENT_VERSION = "2026-09-28";
 const KEY = "kazka:consent";
 const EVENT = "kazka:consent";
 

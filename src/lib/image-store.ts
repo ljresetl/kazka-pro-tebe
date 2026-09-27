@@ -24,6 +24,9 @@ function open(): Promise<IDBDatabase> {
   });
 }
 
+/** Фото дитини від батьків (лише для малювання, потім видаляється). */
+const PHOTO = -2;
+
 /** index: -1 — обкладинка, 0… — сторінки. */
 export async function saveImage(storyId: string, index: number, base64: string, mimeType: string) {
   const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
@@ -77,6 +80,7 @@ export function useStoryImages(storyId: string) {
             const src = URL.createObjectURL(it.blob);
             urls.push(src);
             const ill = { src, width: W, height: H };
+            if (it.index === PHOTO) continue;
             if (it.index === -1) next.cover = ill;
             else next.pages[it.index] = ill;
           }
@@ -93,4 +97,36 @@ export function useStoryImages(storyId: string) {
   }, [storyId]);
 
   return images;
+}
+
+/** Зменшує фото до 1024 px (JPEG) — так воно легке й придатне для генератора. */
+export async function shrinkPhoto(file: File): Promise<{ data: string; mimeType: string; preview: string }> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const preview = canvas.toDataURL("image/jpeg", 0.85);
+  return { data: preview.split(",")[1], mimeType: "image/jpeg", preview };
+}
+
+export async function savePhoto(storyId: string, data: string, mimeType: string) {
+  await saveImage(storyId, PHOTO, data, mimeType);
+}
+
+/** Фото героя в base64, якщо батьки його завантажили. */
+export async function loadPhoto(storyId: string): Promise<{ data: string; mimeType: string } | null> {
+  const item = (await loadImages(storyId).catch(() => [])).find((it) => it.index === PHOTO);
+  if (!item) return null;
+  const buf = new Uint8Array(await item.blob.arrayBuffer());
+  let bin = "";
+  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  return { data: btoa(bin), mimeType: item.blob.type || "image/jpeg" };
+}
+
+export async function deletePhoto(storyId: string) {
+  const db = await open();
+  const tx = db.transaction(STORE, "readwrite");
+  tx.objectStore(STORE).delete(`${storyId}:${PHOTO}`);
 }

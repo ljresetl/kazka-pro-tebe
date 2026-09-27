@@ -17,9 +17,11 @@ type Props = {
   /** Сторінки з цим індексом і далі показуються розмитими. */
   lockedFrom?: number;
   lockedMessage?: ReactNode;
+  /** CSS-клас шрифту книжки (крок «Шрифт» у конструкторі). */
+  fontClass?: string;
 };
 
-export default function BookReader({ title, dedication, cover, coverImage, pages, lockedFrom, lockedMessage }: Props) {
+export default function BookReader({ title, dedication, cover, coverImage, pages, lockedFrom, lockedMessage, fontClass = "" }: Props) {
   // 0 — обкладинка, далі сторінки казки
   const [[spread, dir], setSpread] = useState<[number, number]>([0, 0]);
   const total = pages.length + 1;
@@ -52,7 +54,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
   const offset = reduce ? 0 : 40;
 
   return (
-    <div className="reader">
+    <div className={`reader ${fontClass}`}>
       <AnimatePresence mode="wait" initial={false} custom={dir}>
         <motion.div
           key={spread}

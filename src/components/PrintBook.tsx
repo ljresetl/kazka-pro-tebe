@@ -12,6 +12,7 @@ type Props = {
   pages: { text: string; scene: SceneId; image?: Illustration }[];
   /** Текст водяного знака для неоплаченого перегляду. */
   watermark?: string;
+  fontClass?: string;
 };
 
 function Art({ scene, image }: { scene: SceneId; image?: Illustration }) {
@@ -20,9 +21,9 @@ function Art({ scene, image }: { scene: SceneId; image?: Illustration }) {
 }
 
 // Версія книжки лише для друку: одна сторінка казки на аркуш A4.
-export default function PrintBook({ title, dedication, cover, coverImage, pages, watermark }: Props) {
+export default function PrintBook({ title, dedication, cover, coverImage, pages, watermark, fontClass = "" }: Props) {
   return (
-    <div className="print-book" aria-hidden="true">
+    <div className={`print-book ${fontClass}`} aria-hidden="true">
       <section className="print-page print-cover">
         <Art scene={cover} image={coverImage} />
         <p className="cover-title">{title}</p>

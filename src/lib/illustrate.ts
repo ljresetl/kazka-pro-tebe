@@ -1,6 +1,7 @@
 "use client";
 
-import { saveImage } from "./image-store";
+import { deletePhoto, loadPhoto, saveImage } from "./image-store";
+import { findTopic } from "./catalog";
 import type { Story } from "./types";
 
 type Img = { data: string; mimeType: string };
@@ -11,7 +12,17 @@ function seedFrom(text: string) {
   return (h >>> 0) % 1_000_000;
 }
 
-type Part = { kind: "cover" | "page"; pageText: string; illustration?: string };
+type Part = { kind: "cover" | "page"; pageText: string; illustration?: string; photo?: boolean };
+
+const KIND_EN = { person: "person", pet: "animal", object: "toy or object" } as const;
+
+/** Інші герої для художника: «Bublyk (песик, animal)». */
+function companions(story: Story) {
+  const list = (story.options?.characters ?? [])
+    .filter((c) => c.name.trim())
+    .map((c) => `${c.name} (${[c.relation, KIND_EN[c.type], c.age ? `${c.age} years old` : null].filter(Boolean).join(", ")})`);
+  return list.length ? list : undefined;
+}
 
 async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
   const res = await fetch("/api/illustrate", {
@@ -24,7 +35,13 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       theme: story.theme,
       title: story.title,
       friend: story.friend,
-      ...part,
+      style: story.options?.style,
+      topic: story.options?.topic && findTopic(story.options.topic) ? story.options.topic : undefined,
+      companions: companions(story),
+      hasPhoto: part.kind === "cover" && Boolean(reference) && part.photo,
+      kind: part.kind,
+      pageText: part.pageText,
+      illustration: part.illustration,
       reference,
     }),
   });
@@ -41,7 +58,15 @@ export async function illustrateStory(story: Story, onProgress: (done: number, t
   const total = story.pages.length + 1;
   onProgress(0, total);
   const first = story.pages[0];
-  const cover = await draw(story, { kind: "cover", pageText: first.text, illustration: first.illustration });
+  // Фото дитини (якщо батьки його дали) потрібне лише для обкладинки.
+  const photo = await loadPhoto(story.id);
+  const cover = await draw(
+    story,
+    { kind: "cover", pageText: first.text, illustration: first.illustration, photo: Boolean(photo) },
+    photo ?? undefined,
+  );
+  // Обіцяли батькам: фото не зберігаємо довше, ніж потрібно.
+  if (photo) await deletePhoto(story.id);
   await saveImage(story.id, -1, cover.data, cover.mimeType);
   onProgress(1, total);
 

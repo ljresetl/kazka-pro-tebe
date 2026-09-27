@@ -1,0 +1,51 @@
+import type { Metadata } from "next";
+import CopyButton from "@/components/CopyButton";
+import SlotImage from "@/components/SlotImage";
+import { ALL_IMAGES, IMAGE_GROUPS, isReady } from "@/lib/images";
+import { pageMeta } from "@/lib/seo";
+
+export const metadata: Metadata = pageMeta({
+  title: "Картинки для генерації",
+  description: "Службова сторінка: список картинок сайту з описами для генерації.",
+  path: "/zaglushky",
+  noindex: true,
+});
+
+export default function PlaceholdersPage() {
+  const ready = ALL_IMAGES.filter(isReady).length;
+  return (
+    <div className="wrap page-pad">
+      <div className="page-top">
+        <h1>Картинки для генерації</h1>
+        <p>
+          Готово {ready} з {ALL_IMAGES.length}. Скопіюйте опис, вставте в Gemini чи інший генератор, збережіть
+          результат як WebP під указаним ім&apos;ям у папку <code>public</code> — і картинка замінить заглушку на
+          сайті.
+        </p>
+      </div>
+      {IMAGE_GROUPS.map((g) => {
+        const items = ALL_IMAGES.filter((s) => s.group === g.id);
+        return (
+          <section key={g.id} className="ph-group">
+            <h2>{g.label}</h2>
+            <ul className="ph-list">
+              {items.map((s) => (
+                <li key={s.id} className={isReady(s) ? "is-ready" : ""}>
+                  <SlotImage id={s.id} alt={s.title} detail="none" className="ph-thumb" />
+                  <div>
+                    <strong>{s.title}</strong>
+                    <p className="ph-meta">
+                      {isReady(s) ? "✓ готово" : "потрібна"} · <code>public{s.file}</code> · {s.width}×{s.height}
+                    </p>
+                    <p className="ph-prompt">{s.prompt}</p>
+                    <CopyButton text={s.prompt} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}

@@ -10,7 +10,7 @@ export const maxDuration = 120;
 // збирається на сервері (buildPrompt), тож ключ не використати для сторонніх картинок.
 const Schema = z.object({
   gender: z.enum(["boy", "girl"]),
-  age: z.number().int().min(1).max(12),
+  age: z.number().int().min(0).max(16),
   heroSeed: z.number().int().min(0).max(1_000_000),
   theme: z.enum(["space", "forest", "sea", "dino", "castle", "meadow"]),
   title: z.string().trim().min(1).max(120),
@@ -18,6 +18,10 @@ const Schema = z.object({
   pageText: z.string().trim().min(1).max(1500),
   illustration: z.string().trim().max(600).optional(),
   friend: z.string().trim().max(40).optional(),
+  style: z.string().max(40).optional(),
+  topic: z.string().max(40).optional(),
+  companions: z.array(z.string().trim().max(120)).max(4).optional(),
+  hasPhoto: z.boolean().optional(),
   reference: z
     .object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(4_000_000) })
     .optional(),

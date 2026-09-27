@@ -8,12 +8,38 @@ export const maxDuration = 120;
 const RequestSchema = z.object({
   childName: z.string().trim().min(1).max(40),
   gender: z.enum(["boy", "girl"]),
-  age: z.number().int().min(1).max(12),
+  age: z.number().int().min(0).max(16),
   theme: z.enum(["space", "forest", "sea", "dino", "castle", "meadow"]),
   trait: z.string().trim().min(1).max(40),
   friend: z.string().trim().max(40).optional(),
   message: z.string().trim().max(200).optional(),
   wish: z.string().trim().max(400).optional(),
+  ageGroup: z.string().max(10).optional(),
+  category: z.string().max(40).optional(),
+  topic: z.string().max(40).optional(),
+  moral: z.string().max(40).optional(),
+  style: z.string().max(40).optional(),
+  font: z.string().max(40).optional(),
+  hobbies: z.string().trim().max(120).optional(),
+  food: z.string().trim().max(80).optional(),
+  characters: z
+    .array(
+      z.object({
+        type: z.enum(["person", "pet", "object"]),
+        name: z.string().trim().max(40),
+        relation: z.string().trim().max(40).optional(),
+        gender: z.enum(["girl", "boy", "neutral"]).optional(),
+        age: z.number().int().min(0).max(120).optional(),
+        hobbies: z.string().trim().max(120).optional(),
+        food: z.string().trim().max(80).optional(),
+      }),
+    )
+    .max(4)
+    .optional(),
+  dedicationFrom: z.string().trim().max(60).optional(),
+  dedicationRelation: z.string().trim().max(40).optional(),
+  occasion: z.string().trim().max(80).optional(),
+  teach: z.string().trim().max(200).optional(),
 });
 
 // Простий захист від зловживань: не більше 8 казок на годину з однієї адреси.
