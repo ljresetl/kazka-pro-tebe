@@ -101,6 +101,15 @@ h3,
   letter-spacing: -0.01em;
   margin: 0;
   text-wrap: balance;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+p,
+li,
+td,
+th {
+  overflow-wrap: break-word;
 }
 
 p {
@@ -1304,6 +1313,27 @@ textarea.field-input {
 .reader {
   display: grid;
   gap: 12px;
+  min-width: 0;
+}
+.reader > * {
+  min-width: 0;
+}
+.reader-book > * {
+  min-width: 0;
+}
+@media (max-width: 379px) {
+  .reader-nav .nav-word {
+    display: none;
+  }
+  .reader-nav .btn-small {
+    padding: 8px 12px;
+  }
+  .reader-text {
+    padding: 20px 16px 40px;
+  }
+  .story-text {
+    font-size: 18px;
+  }
 }
 .reader-book {
   display: grid;

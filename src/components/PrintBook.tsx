@@ -25,7 +25,7 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
     <div className="print-book" aria-hidden="true">
       <section className="print-page print-cover">
         <Art scene={cover} image={coverImage} />
-        <h1 className="cover-title">{title}</h1>
+        <p className="cover-title">{title}</p>
         <p className="cover-dedication">{dedication}</p>
         {watermark && <span className="watermark">{watermark}</span>}
       </section>
