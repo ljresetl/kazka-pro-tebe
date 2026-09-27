@@ -6,6 +6,7 @@ import { useState } from "react";
 import BackLink from "@/components/BackLink";
 import { OrnamentRule } from "@/components/Ornament";
 import Scene from "@/components/Scene";
+import { AI_ENABLED, STATIC_SITE } from "@/lib/features";
 import { makeTemplateStory } from "@/lib/make-story";
 import { saveStory } from "@/lib/storage";
 import { getTheme, THEMES, TRAITS } from "@/lib/themes";
@@ -22,6 +23,7 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
   const [trait, setTrait] = useState(TRAITS[0]);
   const [friend, setFriend] = useState("");
   const [message, setMessage] = useState("");
+  const [wish, setWish] = useState("");
   const [status, setStatus] = useState<"idle" | "writing" | "error">("idle");
   const [error, setError] = useState("");
   const [nameError, setNameError] = useState(false);
@@ -48,9 +50,10 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
         trait,
         friend: friend.trim() || undefined,
         message: message.trim() || undefined,
+        wish: AI_ENABLED ? wish.trim() || undefined : undefined,
       };
       let story: Story;
-      if (process.env.NEXT_PUBLIC_STATIC_SITE === "1") {
+      if (STATIC_SITE) {
         // Статична версія сайту (GitHub Pages) не має сервера — казка складається в браузері.
         await new Promise((r) => setTimeout(r, 1100));
         story = makeTemplateStory(req);
@@ -196,6 +199,24 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
               ))}
             </div>
           </fieldset>
+
+          {AI_ENABLED && (
+            <div className="field">
+              <label htmlFor="wish">Про що має бути казка (необов&apos;язково)</label>
+              <textarea
+                id="wish"
+                className="field-input"
+                value={wish}
+                onChange={(e) => setWish(e.target.value)}
+                maxLength={400}
+                rows={4}
+                placeholder="Наприклад: завтра перший день у садочку, трохи боїться. Або: обожнює пожежні машини й кота Мурчика."
+              />
+              <p className="field-help">
+                Опишіть подію, страх чи захоплення дитини — казка буде саме про це. До 400 символів.
+              </p>
+            </div>
+          )}
 
           <div className="field">
             <label htmlFor="friend">Друг або улюбленець (необов&apos;язково)</label>

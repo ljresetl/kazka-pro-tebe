@@ -3,19 +3,13 @@
 import { saveOrder, saveStory } from "./storage";
 import type { Order, Story } from "./types";
 
-// ЄДИНЕ місце, яке треба змінити, щоб підключити справжню оплату.
+// Оплата замовлень.
 //
-// Зараз працює тестовий режим: замовлення одразу вважається оплаченим.
-// Для LiqPay / WayForPay / monobank потрібен сервер, який підписує платіж
-// секретним ключем (у браузері ключ зберігати не можна). План:
-//   1. Перенести сайт на хостинг із сервером (напр. Vercel) — код уже вміє
-//      працювати з сервером, див. src/app/api.
-//   2. Додати маршрут src/app/api/payment/route.ts: він приймає замовлення,
-//      підписує платіж і повертає посилання на сторінку оплати.
-//   3. У startPayment нижче замість тестової гілки викликати цей маршрут
-//      і повернути { status: "redirect", url }.
-//   4. Додати маршрут для зворотного виклику платіжної системи, який
-//      позначає замовлення оплаченим і надсилає PDF на пошту.
+// NEXT_PUBLIC_PAYMENT_MODE=test (за замовчуванням) — тестовий режим:
+//   замовлення одразу вважається оплаченим, гроші не списуються.
+// NEXT_PUBLIC_PAYMENT_MODE=live — справжня оплата через LiqPay:
+//   потрібні сервер (Vercel) і ключі LIQPAY_PUBLIC_KEY / LIQPAY_PRIVATE_KEY.
+//   Серверна частина — src/lib/liqpay.ts і src/app/api/payment/*.
 
 export const PAYMENT_MODE: "test" | "live" = process.env.NEXT_PUBLIC_PAYMENT_MODE === "live" ? "live" : "test";
 
@@ -44,11 +38,37 @@ export async function startPayment(order: Order, story: Story): Promise<PaymentR
     return { status: "paid" };
   }
 
-  // TODO(оплата): запит до власного сервера, який створює платіж.
-  return {
-    status: "error",
-    message: "Оплата тимчасово недоступна. Спробуйте пізніше або напишіть нам.",
-  };
+  // Бойовий режим: сервер підписує платіж LiqPay і повертає посилання на оплату.
+  // Після оплати LiqPay поверне покупця на /kazka/oplata/rezultat?order=…
+  try {
+    const res = await fetch("/api/payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    });
+    const data = (await res.json()) as { url?: string; error?: string };
+    if (!res.ok || !data.url) throw new Error(data.error);
+    return { status: "redirect", url: data.url };
+  } catch (err) {
+    return {
+      status: "error",
+      message:
+        err instanceof Error && err.message
+          ? err.message
+          : "Не вдалося перейти до оплати. Спробуйте ще раз або напишіть нам.",
+    };
+  }
+}
+
+/** Питає сервер, чи оплачено замовлення (після повернення з LiqPay). */
+export async function checkPayment(orderId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/payment/status?order=${encodeURIComponent(orderId)}`, { cache: "no-store" });
+    const data = (await res.json()) as { paid?: boolean };
+    return Boolean(data.paid);
+  } catch {
+    return false;
+  }
 }
 
 /** Викликається після успішної оплати. */

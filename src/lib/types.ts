@@ -55,6 +55,7 @@ export type Story = {
   trait?: string;
   friend?: string;
   message?: string;
+  wish?: string;
   /** Який шаблонний сюжет використано (для «Інший сюжет»). */
   plotId?: string;
   paid?: boolean;
@@ -85,4 +86,6 @@ export type StoryRequest = {
   friend?: string;
   /** Звернення від батьків на першій сторінці. */
   message?: string;
+  /** Побажання батьків до сюжету (працює лише з ШІ). */
+  wish?: string;
 };

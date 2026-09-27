@@ -12,7 +12,8 @@ export function makeTemplateStory(req: StoryRequest, avoidPlotId?: string): Stor
     const current = PLOTS[req.theme].findIndex((p) => p.id === avoidPlotId);
     if (current >= 0) variant = (current + 1) % count;
   }
-  const content = templateStory(req, variant);
+  // Випадковий seed — щоразу інші формулювання, імена помічників і деталі.
+  const content = templateStory(req, variant, Math.floor(Math.random() * 2 ** 31));
   return {
     id: crypto.randomUUID().slice(0, 8),
     childName: req.childName,
@@ -22,6 +23,7 @@ export function makeTemplateStory(req: StoryRequest, avoidPlotId?: string): Stor
     trait: req.trait,
     friend: req.friend,
     message: req.message,
+    wish: req.wish,
     createdAt: Date.now(),
     source: "template",
     ...content,
@@ -38,5 +40,6 @@ export function requestFromStory(story: Story): StoryRequest {
     trait: story.trait ?? "сміливість",
     friend: story.friend,
     message: story.message,
+    wish: story.wish,
   };
 }
