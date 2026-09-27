@@ -33,4 +33,13 @@ describe("запит до художника-ШІ", () => {
     expect(withIll).toContain("the child sings on the beach");
     expect(withIll).not.toContain(req.pageText);
   });
+
+  it("бере стиль і тему з конструктора, інших героїв і фото лише за прапорцем", () => {
+    const p = buildPrompt({ ...req, style: "plastylin", topic: "pozhezhnyky", companions: ["Bublyk (песик, animal)"] });
+    expect(p).toContain("claymation");
+    expect(p).toContain("firefighters");
+    expect(p).toContain("Bublyk");
+    expect(p).not.toMatch(/photo/i);
+    expect(buildPrompt({ ...req, kind: "cover", hasPhoto: true })).toContain("attached photo");
+  });
 });

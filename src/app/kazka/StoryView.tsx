@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackLink from "@/components/BackLink";
 import BookReader from "@/components/BookReader";
+import { bookFontClass } from "@/lib/book-fonts";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
 import IllustrationsPanel from "@/components/IllustrationsPanel";
 import { AI_ENABLED, AI_IMAGES, STATIC_SITE } from "@/lib/features";
@@ -123,6 +124,7 @@ export default function StoryView({ id }: { id: string }) {
           cover={theme.scene}
           coverImage={images.cover}
           pages={pages}
+          fontClass={bookFontClass(story.options?.font)}
           lockedFrom={paid ? undefined : FREE_PAGES}
           lockedMessage={
             <div>
@@ -192,6 +194,7 @@ export default function StoryView({ id }: { id: string }) {
         cover={theme.scene}
         coverImage={images.cover}
         pages={printPages}
+        fontClass={bookFontClass(story.options?.font)}
         watermark={paid ? undefined : "Перегляд · Казкарня"}
       />
     </div>

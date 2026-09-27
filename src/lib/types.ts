@@ -61,6 +61,7 @@ export type Story = {
   /** Який шаблонний сюжет використано (для «Інший сюжет»). */
   plotId?: string;
   paid?: boolean;
+  options?: BookOptions;
 };
 
 export type ProductId = "pdf" | "pdf-coloring" | "print";
@@ -79,7 +80,36 @@ export type Order = {
   createdAt: number;
 };
 
-export type StoryRequest = {
+/** Додатковий герой казки (друг, братик, улюбленець, іграшка). */
+export type Character = {
+  type: "person" | "pet" | "object";
+  name: string;
+  /** Хто це головному героєві: братик, песик, бабуся… */
+  relation?: string;
+  gender?: "girl" | "boy" | "neutral";
+  age?: number;
+  hobbies?: string;
+  food?: string;
+};
+
+/** Вибір у конструкторі: розділ, тема, мораль, стиль, шрифт, передмова. */
+export type BookOptions = {
+  ageGroup?: string;
+  category?: string;
+  topic?: string;
+  moral?: string;
+  style?: string;
+  font?: string;
+  hobbies?: string;
+  food?: string;
+  characters?: Character[];
+  dedicationFrom?: string;
+  dedicationRelation?: string;
+  occasion?: string;
+  teach?: string;
+};
+
+export type StoryRequest = BookOptions & {
   childName: string;
   gender: Gender;
   age: number;

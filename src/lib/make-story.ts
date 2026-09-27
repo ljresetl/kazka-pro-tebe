@@ -1,5 +1,28 @@
 import { PLOTS, plotCount, templateStory } from "./template-story";
-import type { Story, StoryRequest } from "./types";
+import type { BookOptions, Story, StoryRequest } from "./types";
+
+const OPTION_KEYS = [
+  "ageGroup",
+  "category",
+  "topic",
+  "moral",
+  "style",
+  "font",
+  "hobbies",
+  "food",
+  "characters",
+  "dedicationFrom",
+  "dedicationRelation",
+  "occasion",
+  "teach",
+] as const satisfies readonly (keyof BookOptions)[];
+
+/** Вибір із конструктора (усе, крім базових полів). */
+export function optionsOf(req: StoryRequest): BookOptions | undefined {
+  const out: Record<string, unknown> = {};
+  for (const key of OPTION_KEYS) if (req[key] !== undefined) out[key] = req[key];
+  return Object.keys(out).length ? (out as BookOptions) : undefined;
+}
 
 /**
  * Шаблонна казка — працює і на сервері, і прямо в браузері.
@@ -24,6 +47,7 @@ export function makeTemplateStory(req: StoryRequest, avoidPlotId?: string): Stor
     friend: req.friend,
     message: req.message,
     wish: req.wish,
+    options: optionsOf(req),
     createdAt: Date.now(),
     source: "template",
     ...content,
@@ -33,6 +57,7 @@ export function makeTemplateStory(req: StoryRequest, avoidPlotId?: string): Stor
 /** Відновлює параметри запиту з уже створеної казки. */
 export function requestFromStory(story: Story): StoryRequest {
   return {
+    ...story.options,
     childName: story.childName,
     gender: story.gender,
     age: story.age,

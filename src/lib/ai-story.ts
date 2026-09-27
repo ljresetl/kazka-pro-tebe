@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
+import { describeOptions } from "./story-options";
 import { getTheme } from "./themes";
 import { SCENES, type StoryPage, type StoryRequest } from "./types";
 
@@ -29,9 +30,9 @@ const SYSTEM = `Ти — українська дитяча письменниц�
 
 Правила:
 - Лише українська мова, жива й проста, без русизмів і канцеляриту. Слова, зрозумілі дитині вказаного віку.
-- Рівно 7 сторінок. Для 2–3 років — 2–3 короткі речення на сторінці; для 4–8 років — 5–7 речень з деталями, діалогами й звуками.
+- Рівно 7 сторінок. Для 0–3 років — 2–3 короткі речення на сторінці з повторами; для 4–8 років — 5–7 речень з деталями, діалогами й звуками; для 9 років і старших — 7–10 речень, живі діалоги, гумор і справжня інтрига.
 - Правильний рід дієслів і займенників відповідно до статі дитини. Ім'я — у називному відмінку, у звертаннях — у кличному.
-- Сюжет: дитина вирушає в пригоду, зустрічає помічника, розв'язує проблему завдяки вказаній рисі характеру, повертається додому. Без насильства, страшних сцен і моралізаторства в лоб; остання сторінка закінчується теплою думкою про цю рису.
+- Сюжет: дитина вирушає в пригоду, зустрічає помічника, розв'язує проблему завдяки вказаній рисі характеру (або цінності, якої батьки хочуть навчити), повертається додому. Без насильства, страшних сцен і моралізаторства в лоб; остання сторінка закінчується теплою думкою про цю рису.
 - Для кожної сторінки:
   • "scene" — сцена з дозволеного списку, що найкраще пасує до тексту;
   • "illustration" — опис ілюстрації АНГЛІЙСЬКОЮ (1–2 речення): хто й що робить, де, яка пора доби. Героя називай "the child", без імені, без опису зовнішності.
@@ -39,13 +40,29 @@ const SYSTEM = `Ти — українська дитяча письменниц�
 
 function brief(req: StoryRequest) {
   const theme = getTheme(req.theme);
+  const o = describeOptions(req);
+  const others = (req.characters ?? [])
+    .filter((c) => c.name.trim())
+    .map((c) => {
+      const kind = c.type === "pet" ? "тварина" : c.type === "object" ? "іграшка чи предмет" : "людина";
+      const extra = [c.age ? `${c.age} р.` : null, c.hobbies ? `захоплення: ${c.hobbies}` : null, c.food ? `улюблена їжа: ${c.food}` : null]
+        .filter(Boolean)
+        .join(", ");
+      return `  • ${c.name} (${[c.relation, kind].filter(Boolean).join(", ")}${extra ? "; " + extra : ""})`;
+    });
   return [
     `Ім'я дитини: ${req.childName}`,
     `Стать: ${req.gender === "boy" ? "хлопчик" : "дівчинка"}`,
     `Вік: ${req.age}`,
-    `Тема: ${theme.label} — ${theme.blurb}`,
-    `Риса характеру, яка допомагає в пригоді: ${req.trait}`,
-    req.friend ? `Найкращий друг або улюбленець, який може з'явитися в казці: ${req.friend}` : null,
+    o.topic ? `Тема казки: ${o.category} — ${o.topic}` : `Тема: ${theme.label} — ${theme.blurb}`,
+    o.moral ? `Мораль, цінність казки: ${o.moral}` : `Риса характеру, яка допомагає в пригоді: ${req.trait}`,
+    req.hobbies ? `Захоплення дитини (вплети в сюжет): ${req.hobbies}` : null,
+    req.food ? `Улюблена їжа дитини (можна згадати): ${req.food}` : null,
+    others.length ? `Інші герої казки (усі мають з'явитися й діяти):\n${others.join("\n")}` : null,
+    !others.length && req.friend ? `Найкращий друг або улюбленець, який може з'явитися в казці: ${req.friend}` : null,
+    req.dedicationFrom ? `Казку дарує: ${req.dedicationFrom}${req.dedicationRelation ? ` (${req.dedicationRelation})` : ""}` : null,
+    req.occasion ? `Привід: ${req.occasion}` : null,
+    req.teach ? `Чого батьки хочуть навчити дитину цією казкою: ${req.teach}` : null,
     req.message ? `Звернення батьків для присвяти: ${req.message}` : null,
     req.wish
       ? `Побажання батьків до сюжету (побудуй казку навколо цього, якщо це безпечно й доречно для дитини; інакше м'яко обійди): ${req.wish}`

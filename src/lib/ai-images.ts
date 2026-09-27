@@ -1,8 +1,10 @@
 import "server-only";
 import { GoogleGenAI, Modality } from "@google/genai";
+import { findTopic, ILLUSTRATION_STYLES } from "./catalog";
 
 // Ілюстрації до казки від Gemini (моделі «Nano Banana»).
-// Фото дитини НЕ використовуються: героя модель вигадує за статтю й віком.
+// Якщо батьки дали згоду й завантажили фото, воно передається лише для обкладинки,
+// щоб герой був схожий на дитину; інакше героя модель вигадує за статтю й віком.
 // Щоб герой був однаковим на всіх сторінках, спершу малюється обкладинка,
 // а далі вона передається як зразок для кожної сторінки.
 //
@@ -63,12 +65,25 @@ export type IllustrationRequest = {
   illustration?: string;
   /** Друг або улюбленець дитини, як його назвали батьки. */
   friend?: string;
+  /** Стиль ілюстрацій з каталогу (id). */
+  style?: string;
+  /** Тема з каталогу (id) — визначає світ історії. */
+  topic?: string;
+  /** Інші герої: «песик Бублик», «братик Остап (3 роки)». */
+  companions?: string[];
+  /** Батьки завантажили фото дитини (передається разом із запитом). */
+  hasPhoto?: boolean;
 };
 
 /** Точний запит до художника-ШІ, зібраний із налаштувань казки. */
 export function buildPrompt(r: IllustrationRequest) {
   const hero = heroDescription(r.gender, r.age, r.heroSeed);
-  const setting = THEME_SETTING[r.theme] ?? THEME_SETTING.meadow;
+  const topic = r.topic ? findTopic(r.topic) : null;
+  const setting = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
+  const style = ILLUSTRATION_STYLES.find((s) => s.id === r.style);
+  const look = style
+    ? `Children's picture book illustration. Art style: ${style.prompt}. Friendly, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.`
+    : STYLE;
   const what =
     r.kind === "cover"
       ? `Book cover illustration for the children's fairy tale "${r.title}". Show the main character happily in the world of the story.`
@@ -76,12 +91,15 @@ export function buildPrompt(r: IllustrationRequest) {
         ? `Illustrate this moment of the story: ${r.illustration}`
         : `Illustrate this page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
   return [
-    STYLE,
-    `Main character: ${hero}. The same character appears on every page of the book.`,
-    r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
+    look,
+    r.hasPhoto
+      ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair and skin tone), drawn in the art style above. The same character appears on every page of the book.`
+      : `Main character: ${hero}. The same character appears on every page of the book.`,
+    r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
+    !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
     what,
-    "Landscape 4:3 composition, the main character clearly visible, gentle and safe for children aged 2–8.",
+    "Landscape 4:3 composition, the main character clearly visible, gentle and safe for children.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -95,7 +113,9 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt =
     buildPrompt(r) +
-    (reference ? "\nUse the attached cover as the reference: keep the main character's face, hair and clothes and the art style exactly the same." : "");
+    (reference && !r.hasPhoto
+      ? "\nUse the attached cover as the reference: keep the main character's face, hair and clothes and the art style exactly the same."
+      : "");
 
   const response = await ai.models.generateContent({
     model: process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image",

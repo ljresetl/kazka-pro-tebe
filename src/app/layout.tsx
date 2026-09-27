@@ -1,24 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Onest, Unbounded } from "next/font/google";
+import { Nunito } from "next/font/google";
 import ConsentBanner from "@/components/ConsentBanner";
 import SiteFooter from "@/components/SiteFooter";
+import PromoBar from "@/components/PromoBar";
 import SiteHeader from "@/components/SiteHeader";
 import { jsonLd, OG_IMAGE } from "@/lib/seo";
 import { abs, SITE } from "@/lib/site";
 import "./globals.css";
+import "./design.css";
 
-// Обидва шрифти створені українськими дизайнерами й мають повну кирилицю.
-const unbounded = Unbounded({
-  variable: "--font-display",
-  subsets: ["latin", "cyrillic"],
-  weight: ["600", "700"],
-  display: "swap",
-});
-
-const onest = Onest({
+// Nunito — округлий шрифт з повною кирилицею: і для заголовків, і для тексту.
+const nunito = Nunito({
   variable: "--font-body",
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -55,7 +50,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f6f8fe",
+  themeColor: "#fff8ee",
 };
 
 const orgLd = {
@@ -71,9 +66,10 @@ const orgLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="uk" data-scroll-behavior="smooth" className={`${unbounded.variable} ${onest.variable}`}>
+    <html lang="uk" data-scroll-behavior="smooth" className={nunito.variable}>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(orgLd)} />
+        <PromoBar />
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />

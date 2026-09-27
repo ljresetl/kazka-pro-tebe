@@ -6,6 +6,7 @@ import BackLink from "@/components/BackLink";
 import { OrnamentRule } from "@/components/Ornament";
 import Scene from "@/components/Scene";
 import { formatUah, getPrice } from "@/lib/prices";
+import { deleteImages } from "@/lib/image-store";
 import { deleteStory, useOrders, useStories } from "@/lib/storage";
 import { getTheme } from "@/lib/themes";
 
@@ -54,7 +55,10 @@ export default function MyStoriesPage() {
                   className="icon-btn"
                   aria-label={`Видалити казку «${s.title}»`}
                   onClick={() => {
-                    if (window.confirm(`Видалити казку «${s.title}»?`)) deleteStory(s.id);
+                    if (window.confirm(`Видалити казку «${s.title}»?`)) {
+                      deleteStory(s.id);
+                      deleteImages(s.id).catch(() => {});
+                    }
                   }}
                 >
                   <Trash2 size={18} aria-hidden="true" />
