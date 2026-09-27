@@ -1,12 +1,17 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BackLink from "@/components/BackLink";
+import { OrnamentRule } from "@/components/Ornament";
 import Scene from "@/components/Scene";
+import { makeTemplateStory } from "@/lib/make-story";
 import { saveStory } from "@/lib/storage";
 import { getTheme, THEMES, TRAITS } from "@/lib/themes";
-import { makeTemplateStory } from "@/lib/make-story";
 import type { Gender, Story, StoryRequest, ThemeId } from "@/lib/types";
+
+const AGES = [2, 3, 4, 5, 6, 7, 8];
 
 export default function CreateForm({ initialName, initialTheme }: { initialName: string; initialTheme: string }) {
   const router = useRouter();
@@ -16,8 +21,10 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
   const [theme, setTheme] = useState<ThemeId>(getTheme(initialTheme).id);
   const [trait, setTrait] = useState(TRAITS[0]);
   const [friend, setFriend] = useState("");
+  const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "writing" | "error">("idle");
   const [error, setError] = useState("");
+  const [nameError, setNameError] = useState(false);
 
   const current = getTheme(theme);
   const shownName = name.trim() || "Ваша дитина";
@@ -25,12 +32,13 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setError("Напишіть ім'я дитини — без нього казка не вийде.");
-      setStatus("error");
+      setNameError(true);
+      document.getElementById("name")?.focus();
       return;
     }
     setStatus("writing");
     setError("");
+    window.scrollTo({ top: 0 });
     try {
       const req: StoryRequest = {
         childName: name.trim(),
@@ -39,11 +47,12 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
         theme,
         trait,
         friend: friend.trim() || undefined,
+        message: message.trim() || undefined,
       };
       let story: Story;
       if (process.env.NEXT_PUBLIC_STATIC_SITE === "1") {
         // Статична версія сайту (GitHub Pages) не має сервера — казка складається в браузері.
-        await new Promise((r) => setTimeout(r, 900));
+        await new Promise((r) => setTimeout(r, 1100));
         story = makeTemplateStory(req);
       } else {
         const res = await fetch("/api/story", {
@@ -71,67 +80,90 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
           <span />
           <span />
         </div>
-        <h1 className="display" style={{ fontSize: 28 }}>
-          Пишемо казку…
-        </h1>
+        <h1>Пишемо казку…</h1>
         <p>Головний герой — {name.trim()}.</p>
-        <p className="muted">Зазвичай це займає до двох хвилин. Не закривайте сторінку.</p>
+        <p className="muted">Зазвичай це займає до хвилини. Не закривайте сторінку.</p>
       </div>
     );
   }
 
   return (
-    <div className="create">
-      <div>
-        <h1 className="riso-type">Розкажіть про головного героя</h1>
-        <form className="create-form" onSubmit={submit} noValidate>
+    <div className="wrap">
+      <div className="back-row">
+        <BackLink fallback="/" />
+      </div>
+      <div className="page-top">
+        <OrnamentRule className="ornament-rule" />
+        <h1>Створімо казку</h1>
+        <p>Заповніть кілька полів — і за хвилину прочитаєте казку. Перегляд безкоштовний.</p>
+      </div>
+
+      <div className="create">
+        <form className="form-card" onSubmit={submit} noValidate>
           <div className="field">
             <label htmlFor="name">Ім&apos;я дитини</label>
             <input
               id="name"
               className="field-input"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.trim()) setNameError(false);
+              }}
               maxLength={40}
               placeholder="Наприклад, Марійка"
               autoComplete="off"
+              autoCapitalize="words"
+              aria-invalid={nameError}
+              aria-describedby={nameError ? "name-error" : "name-help"}
               required
             />
-            <p className="field-help">Так, як ви звертаєтеся вдома: Марійка, Тимко, Соня.</p>
+            {nameError ? (
+              <p className="field-error" id="name-error">
+                Напишіть ім&apos;я дитини — без нього казка не вийде.
+              </p>
+            ) : (
+              <p className="field-help" id="name-help">
+                Так, як ви звертаєтеся вдома: Марійка, Тимко, Соня.
+              </p>
+            )}
           </div>
 
-          <fieldset className="field">
-            <legend>Хто головний герой</legend>
-            <div className="choices">
-              {(
-                [
-                  ["girl", "Дівчинка"],
-                  ["boy", "Хлопчик"],
-                ] as const
-              ).map(([value, label]) => (
-                <label key={value} className="choice">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value={value}
-                    checked={gender === value}
-                    onChange={() => setGender(value)}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <div className="form-row is-2">
+            <fieldset className="field">
+              <legend>Хто головний герой</legend>
+              <div className="choices">
+                {(
+                  [
+                    ["girl", "Дівчинка"],
+                    ["boy", "Хлопчик"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <label key={value} className="choice">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value={value}
+                      checked={gender === value}
+                      onChange={() => setGender(value)}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
-          <div className="field">
-            <label htmlFor="age">Вік</label>
-            <select id="age" className="field-input" value={age} onChange={(e) => setAge(Number(e.target.value))}>
-              {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
+            <fieldset className="field">
+              <legend>Вік</legend>
+              <div className="choices">
+                {AGES.map((a) => (
+                  <label key={a} className="choice">
+                    <input type="radio" name="age" value={a} checked={age === a} onChange={() => setAge(a)} />
+                    <span>{a}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
 
           <fieldset className="field">
@@ -178,29 +210,44 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
             />
           </div>
 
+          <div className="field">
+            <label htmlFor="message">Звернення до дитини (необов&apos;язково)</label>
+            <textarea
+              id="message"
+              className="field-input"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              maxLength={200}
+              placeholder="Марійко, з днем народження! Любимо тебе, мама й тато."
+              rows={3}
+            />
+            <p className="field-help">Буде на першій сторінці книжки. До 200 символів.</p>
+          </div>
+
           {status === "error" && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
 
-          <div>
-            <button type="submit" className="btn btn-primary">
-              Створити безкоштовний перегляд
+          <div className="submit-bar">
+            <button type="submit" className="btn btn-primary btn-block">
+              <Sparkles size={18} aria-hidden="true" />
+              Створити казку безкоштовно
             </button>
           </div>
         </form>
-      </div>
 
-      <aside className="create-aside" aria-label="Попередній вигляд обкладинки">
-        <div className="live-cover">
-          <Scene id={current.scene} />
-          <div className="live-cover-title">
-            <h2>{current.titleFor(shownName)}</h2>
-            <p>{current.blurb}</p>
+        <aside className="create-aside" aria-label="Попередній вигляд обкладинки">
+          <div className="preview-card">
+            <Scene id={current.scene} />
+            <div className="preview-card-body">
+              <h2>{current.titleFor(shownName)}</h2>
+              <p>{current.blurb}</p>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
+      </div>
     </div>
   );
 }

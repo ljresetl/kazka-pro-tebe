@@ -12,6 +12,7 @@ const RequestSchema = z.object({
   theme: z.enum(["space", "forest", "sea", "dino", "castle", "meadow"]),
   trait: z.string().trim().min(1).max(40),
   friend: z.string().trim().max(40).optional(),
+  message: z.string().trim().max(200).optional(),
 });
 
 export async function POST(request: Request) {

@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import type { Story } from "./types";
+import type { Order, Story } from "./types";
 
-// Поки немає бекенду й акаунтів, казки зберігаються в браузері покупця.
+// Поки немає бекенду й акаунтів, казки й замовлення зберігаються в браузері покупця.
 
-const KEY = (id: string) => `kazka:story:${id}`;
+const STORY_KEY = (id: string) => `kazka:story:${id}`;
+const STORY_IDS = "kazka:ids";
+const ORDERS = "kazka:orders";
 const EVENT = "kazka:storage";
 
 function read(key: string): string | null {
@@ -16,23 +18,25 @@ function read(key: string): string | null {
   }
 }
 
-export function saveStory(story: Story) {
+function write(key: string, value: string) {
   try {
-    window.localStorage.setItem(KEY(story.id), JSON.stringify(story));
-    const ids = listIds().filter((i) => i !== story.id);
-    window.localStorage.setItem("kazka:ids", JSON.stringify([story.id, ...ids].slice(0, 50)));
+    window.localStorage.setItem(key, value);
   } catch {
-    // Приватний режим або переповнене сховище — казка просто не збережеться.
+    // Приватний режим або переповнене сховище — дані просто не збережуться.
   }
-  window.dispatchEvent(new Event(EVENT));
 }
 
-function listIds(): string[] {
+function parse<T>(raw: string | null | undefined, fallback: T): T {
+  if (!raw) return fallback;
   try {
-    return JSON.parse(read("kazka:ids") ?? "[]");
+    return JSON.parse(raw) as T;
   } catch {
-    return [];
+    return fallback;
   }
+}
+
+function notify() {
+  window.dispatchEvent(new Event(EVENT));
 }
 
 function subscribe(cb: () => void) {
@@ -44,24 +48,62 @@ function subscribe(cb: () => void) {
   };
 }
 
-/** undefined — ще не прочитали (сервер), null — казки немає. */
-export function useStory(id: string): Story | null | undefined {
-  const raw = useSyncExternalStore(
+/** Сире значення з localStorage: undefined на сервері, "" якщо порожньо. */
+function useRaw(key: string): string | undefined {
+  return useSyncExternalStore(
     subscribe,
-    () => read(KEY(id)) ?? "",
+    () => read(key) ?? "",
     () => undefined,
   );
-  return useMemo(() => {
-    if (raw === undefined) return undefined;
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as Story;
-    } catch {
-      return null;
-    }
-  }, [raw]);
 }
 
-export function markPaid(story: Story) {
-  saveStory({ ...story, paid: true });
+/* ---------- Казки ---------- */
+
+export function saveStory(story: Story) {
+  write(STORY_KEY(story.id), JSON.stringify(story));
+  const ids = parse<string[]>(read(STORY_IDS), []).filter((i) => i !== story.id);
+  write(STORY_IDS, JSON.stringify([story.id, ...ids].slice(0, 50)));
+  notify();
+}
+
+export function deleteStory(id: string) {
+  try {
+    window.localStorage.removeItem(STORY_KEY(id));
+  } catch {}
+  write(STORY_IDS, JSON.stringify(parse<string[]>(read(STORY_IDS), []).filter((i) => i !== id)));
+  notify();
+}
+
+/** undefined — ще не прочитали (сервер), null — казки немає. */
+export function useStory(id: string): Story | null | undefined {
+  const raw = useRaw(STORY_KEY(id));
+  return useMemo(() => (raw === undefined ? undefined : parse<Story | null>(raw, null)), [raw]);
+}
+
+function readAllStories(): string {
+  const ids = parse<string[]>(read(STORY_IDS), []);
+  return "[" + ids.map((id) => read(STORY_KEY(id)) ?? "null").join(",") + "]";
+}
+
+/** Усі казки, створені в цьому браузері, від нових до старих. */
+export function useStories(): Story[] | undefined {
+  // Рядок-знімок усіх казок: змінюється, коли змінюється будь-яка казка.
+  const raw = useSyncExternalStore(subscribe, readAllStories, () => undefined);
+  return useMemo(
+    () => (raw === undefined ? undefined : parse<(Story | null)[]>(raw, []).filter((s): s is Story => s !== null)),
+    [raw],
+  );
+}
+
+/* ---------- Замовлення ---------- */
+
+export function saveOrder(order: Order) {
+  const orders = parse<Order[]>(read(ORDERS), []).filter((o) => o.id !== order.id);
+  write(ORDERS, JSON.stringify([order, ...orders].slice(0, 50)));
+  notify();
+}
+
+export function useOrders(): Order[] | undefined {
+  const raw = useRaw(ORDERS);
+  return useMemo(() => (raw === undefined ? undefined : parse<Order[]>(raw, [])), [raw]);
 }

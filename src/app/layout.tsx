@@ -1,57 +1,81 @@
-import type { Metadata } from "next";
-import { Literata, Unbounded } from "next/font/google";
-import Link from "next/link";
+import type { Metadata, Viewport } from "next";
+import { Onest, Unbounded } from "next/font/google";
+import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
+import { jsonLd, OG_IMAGE } from "@/lib/seo";
+import { abs, SITE } from "@/lib/site";
 import "./globals.css";
 
+// Обидва шрифти створені українськими дизайнерами й мають повну кирилицю.
 const unbounded = Unbounded({
   variable: "--font-display",
   subsets: ["latin", "cyrillic"],
-  weight: ["500", "700", "900"],
+  weight: ["600", "700"],
+  display: "swap",
 });
 
-const literata = Literata({
+const onest = Onest({
   variable: "--font-body",
   subsets: ["latin", "cyrillic"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Казка про тебе — іменні казки для дітей",
-    template: "%s · Казка про тебе",
+    default: `Іменна казка для дитини українською — ${SITE.name}`,
+    template: `%s — ${SITE.name}`,
   },
-  description:
-    "Персональна казка українською, де головний герой — ваша дитина. Безкоштовний перегляд за 2 хвилини, PDF для друку вдома або друкована книжка.",
+  description: SITE.description,
+  applicationName: SITE.name,
+  keywords: [
+    "іменна казка",
+    "персоналізована книга для дитини",
+    "казка з ім'ям дитини",
+    "іменна книга",
+    "подарунок дитині",
+    "казки українською",
+    "казка для друку pdf",
+  ],
+  alternates: { canonical: abs("/") },
+  openGraph: {
+    type: "website",
+    url: abs("/"),
+    siteName: SITE.name,
+    locale: "uk_UA",
+    title: "Іменна казка для дитини українською",
+    description: SITE.description,
+    images: [OG_IMAGE],
+  },
+  twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f6f8fe",
+};
+
+const orgLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE.name,
+  url: abs("/"),
+  logo: `${SITE.url}/icon.svg`,
+  ...(SITE.email ? { email: SITE.email } : {}),
+  ...(SITE.phone ? { telephone: SITE.phone } : {}),
+  sameAs: [SITE.instagram, SITE.telegram].filter(Boolean),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="uk" data-scroll-behavior="smooth" className={`${unbounded.variable} ${literata.variable}`}>
+    <html lang="uk" data-scroll-behavior="smooth" className={`${unbounded.variable} ${onest.variable}`}>
       <body>
-        <header className="site-header">
-          <Link href="/" className="logo" aria-label="Казка про тебе — на головну">
-            <span className="logo-mark" aria-hidden="true">К</span>
-            Казка про тебе
-          </Link>
-          <nav className="site-nav" aria-label="Головне меню">
-            <Link href="/pryklady">Приклади</Link>
-            <Link href="/biblioteka">Бібліотека</Link>
-            <Link href="/#yak-tse-pratsyuye">Як це працює</Link>
-            <Link href="/#tsiny">Ціни</Link>
-            <Link href="/stvoryty" className="btn btn-primary btn-small">
-              Створити<span className="hide-sm"> казку</span>
-            </Link>
-          </nav>
-        </header>
-        <main>{children}</main>
-        <footer className="site-footer">
-          <p>
-            <strong>Казка про тебе</strong> — іменні казки українською для дітей 2–8 років.
-          </p>
-          <p className="muted">
-            Народні казки в бібліотеці — наш власний переказ. © {new Date().getFullYear()}
-          </p>
-        </footer>
+        <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(orgLd)} />
+        <SiteHeader />
+        <main id="main">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
