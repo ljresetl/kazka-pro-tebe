@@ -2083,6 +2083,53 @@ textarea.field-input {
   font-weight: 600;
 }
 
+/* ---------- Згода на обробку даних ---------- */
+.consent {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 12px;
+  align-items: start;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line);
+  font-size: 15px;
+}
+.consent-icon {
+  color: var(--mint);
+  margin-top: 2px;
+}
+.consent-text p {
+  margin: 0;
+}
+.consent .btn {
+  grid-column: 1 / -1;
+}
+@media (min-width: 760px) {
+  .consent {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    max-width: 560px;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+  }
+  .consent .btn {
+    grid-column: auto;
+  }
+}
+@media print {
+  .consent {
+    display: none !important;
+  }
+}
+
 /* ---------- Друк ---------- */
 .print-book {
   display: none;

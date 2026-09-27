@@ -1,9 +1,14 @@
+import longTexts from "./examples-texts.json";
 import { PLOTS, templateStory, yearsWord } from "./template-story";
 import { getTheme } from "./themes";
 import type { Gender, Illustration, SceneId, StoryPage, ThemeId } from "./types";
 
-// Приклади — це ті самі шаблонні сюжети, які отримує покупець,
-// лише з ім'ям конкретної дитини. Тож приклад чесно показує результат.
+// Приклади побудовані на тих самих сюжетах, що й казки покупців.
+// Довші, «авторські» версії текстів лежать в examples-texts.json
+// (написані локальною моделлю Лапа й вичитані вручну). Якщо для прикладу
+// там немає тексту, береться шаблонна версія.
+
+const LONG_TEXTS = longTexts as Record<string, string[]>;
 
 type ExampleSeed = {
   slug: string;
@@ -176,7 +181,13 @@ function build(seed: ExampleSeed): ExampleStory {
     },
     Math.max(variant, 0),
   );
-  const pages = story.pages.map((p, i) => ({ ...p, image: seed.images?.pages[i] }));
+  const long = LONG_TEXTS[seed.slug];
+  const useLong = Array.isArray(long) && long.length === story.pages.length;
+  const pages = story.pages.map((p, i) => ({
+    ...p,
+    text: useLong ? long[i] : p.text,
+    image: seed.images?.pages[i],
+  }));
   return {
     ...seed,
     title: story.title,
