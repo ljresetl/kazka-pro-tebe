@@ -51,7 +51,29 @@ export type Story = {
   pages: StoryPage[];
   source: "ai" | "template" | "library";
   createdAt: number;
+  /** Параметри, з якими створено казку, — для кнопки «Інший сюжет». */
+  trait?: string;
+  friend?: string;
+  message?: string;
+  /** Який шаблонний сюжет використано (для «Інший сюжет»). */
+  plotId?: string;
   paid?: boolean;
+};
+
+export type ProductId = "pdf" | "pdf-coloring" | "print";
+
+export type Order = {
+  id: string;
+  storyId: string;
+  storyTitle: string;
+  product: ProductId;
+  amount: number;
+  contact: { name: string; email: string; phone: string };
+  /** Лише для друкованої книжки. */
+  delivery?: { city: string; branch: string };
+  comment?: string;
+  status: "pending" | "paid";
+  createdAt: number;
 };
 
 export type StoryRequest = {
@@ -61,4 +83,6 @@ export type StoryRequest = {
   theme: ThemeId;
   trait: string;
   friend?: string;
+  /** Звернення від батьків на першій сторінці. */
+  message?: string;
 };

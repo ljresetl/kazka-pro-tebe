@@ -1,17 +1,42 @@
-import { plotCount, templateStory } from "./template-story";
+import { PLOTS, plotCount, templateStory } from "./template-story";
 import type { Story, StoryRequest } from "./types";
 
-/** Шаблонна казка з випадковим сюжетом — працює і на сервері, і прямо в браузері. */
-export function makeTemplateStory(req: StoryRequest): Story {
-  const content = templateStory(req, Math.floor(Math.random() * plotCount(req.theme)));
+/**
+ * Шаблонна казка — працює і на сервері, і прямо в браузері.
+ * `avoidPlotId` — сюжет, який не треба повторювати (кнопка «Інший сюжет»).
+ */
+export function makeTemplateStory(req: StoryRequest, avoidPlotId?: string): Story {
+  const count = plotCount(req.theme);
+  let variant = Math.floor(Math.random() * count);
+  if (avoidPlotId && count > 1) {
+    const current = PLOTS[req.theme].findIndex((p) => p.id === avoidPlotId);
+    if (current >= 0) variant = (current + 1) % count;
+  }
+  const content = templateStory(req, variant);
   return {
     id: crypto.randomUUID().slice(0, 8),
     childName: req.childName,
     gender: req.gender,
     age: req.age,
     theme: req.theme,
+    trait: req.trait,
+    friend: req.friend,
+    message: req.message,
     createdAt: Date.now(),
     source: "template",
     ...content,
+  };
+}
+
+/** Відновлює параметри запиту з уже створеної казки. */
+export function requestFromStory(story: Story): StoryRequest {
+  return {
+    childName: story.childName,
+    gender: story.gender,
+    age: story.age,
+    theme: story.theme,
+    trait: story.trait ?? "сміливість",
+    friend: story.friend,
+    message: story.message,
   };
 }
