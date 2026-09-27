@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BackLink from "@/components/BackLink";
@@ -256,6 +257,10 @@ export default function CreateForm({ initialName, initialTheme }: { initialName:
               <Sparkles size={18} aria-hidden="true" />
               Створити казку безкоштовно
             </button>
+            <p className="legal-note" style={{ textAlign: "center" }}>
+              Натискаючи кнопку, ви погоджуєтеся на обробку введених даних згідно з{" "}
+              <Link href="/konfidentsiinist">політикою конфіденційності</Link>.
+            </p>
           </div>
         </form>
 

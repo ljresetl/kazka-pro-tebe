@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Onest, Unbounded } from "next/font/google";
+import ConsentBanner from "@/components/ConsentBanner";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { jsonLd, OG_IMAGE } from "@/lib/seo";
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
+        <ConsentBanner />
       </body>
     </html>
   );
