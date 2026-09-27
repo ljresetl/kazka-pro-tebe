@@ -4,12 +4,20 @@ import type { NextConfig } from "next";
 const isPages = process.env.GITHUB_PAGES === "1";
 const basePath = isPages ? (process.env.PAGES_BASE_PATH ?? "") : "";
 
+// Головна адреса сайту (для canonical, Open Graph, sitemap).
+// На Vercel береться його продакшн-домен; можна перевизначити NEXT_PUBLIC_SITE_URL.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+  "https://kazka-pro-tebe.vercel.app";
+
 const nextConfig: NextConfig = {
   ...(isPages ? { output: "export", trailingSlash: true } : {}),
   basePath,
   images: { unoptimized: isPages },
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_SITE_URL: siteUrl,
     NEXT_PUBLIC_STATIC_SITE: isPages ? "1" : "",
   },
 };
