@@ -125,19 +125,49 @@ async function claudeStory(req: StoryRequest): Promise<AiStory> {
 
 async function geminiStory(req: StoryRequest): Promise<AiStory> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const response = await ai.models.generateContent({
-    model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
-    contents: brief(req),
-    config: {
-      systemInstruction: SYSTEM,
-      responseMimeType: "application/json",
-      responseJsonSchema: z.toJSONSchema(StorySchema),
-      temperature: 0.9,
-    },
-  });
-  const raw = response.text;
-  if (!raw) throw new Error("Gemini повернув порожню відповідь");
-  const parsed = StorySchema.safeParse(JSON.parse(raw));
-  if (!parsed.success) throw new Error("Gemini повернув казку в неправильному форматі");
-  return validate(parsed.data);
+  // Безкоштовні моделі Gemini часто перевантажені (503) або впираються в ліміт (429).
+  // Тоді пробуємо ще раз, а потім переходимо на запасну, легшу модель.
+  const models = geminiTextModels();
+  let lastError: unknown;
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: brief(req),
+          config: {
+            systemInstruction: SYSTEM,
+            responseMimeType: "application/json",
+            responseJsonSchema: z.toJSONSchema(StorySchema),
+            temperature: 0.9,
+          },
+        });
+        const raw = response.text;
+        if (!raw) throw new Error("Gemini повернув порожню відповідь");
+        const parsed = StorySchema.safeParse(JSON.parse(raw));
+        if (!parsed.success) throw new Error("Gemini повернув казку в неправильному форматі");
+        return validate(parsed.data);
+      } catch (err) {
+        lastError = err;
+        console.error(`Gemini ${model}, спроба ${attempt + 1}:`, String(err).slice(0, 300));
+        if (!isBusy(err)) break;
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/** Основна модель (GEMINI_TEXT_MODEL) і запасні, через кому в GEMINI_FALLBACK_MODELS. */
+export function geminiTextModels() {
+  const main = process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest";
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS || "gemini-flash-lite-latest")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+  return [...new Set([main, ...fallbacks])];
+}
+
+function isBusy(err: unknown) {
+  return /\b(503|429|500)\b|UNAVAILABLE|RESOURCE_EXHAUSTED|overloaded|high demand/i.test(String(err));
 }
