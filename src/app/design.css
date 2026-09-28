@@ -207,14 +207,14 @@
 .wz-chips svg {
   color: var(--coral);
 }
-.wz-step h1 {
+.wz-step .wz-step-title {
   font-size: clamp(26px, 7vw, 40px);
 }
 .wz-lead {
   margin: 8px 0 20px;
   color: var(--muted);
 }
-.wz-step h1 + .wz-tiles {
+.wz-step .wz-step-title + .wz-tiles {
   margin-top: 20px;
 }
 .wz-tiles {

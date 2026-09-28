@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Lock } from "lucide-react";
 import { SITE } from "@/lib/site";
 import Logo from "./Logo";
 
@@ -125,6 +126,16 @@ export default function SiteFooter() {
             )}
           </ul>
         </div>
+      </div>
+      <div className="wrap footer-pay" aria-label="Способи оплати">
+        <span className="footer-pay-title">
+          <Lock size={14} aria-hidden="true" /> Безпечна оплата
+        </span>
+        {["Visa", "Mastercard", "Apple Pay", "Google Pay", "LiqPay"].map((m) => (
+          <span key={m} className="pay-badge">
+            {m}
+          </span>
+        ))}
       </div>
       <div className="wrap footer-bottom">
         <span>

@@ -13,7 +13,8 @@ const EVENT = "kazka:consent";
 
 function read() {
   try {
-    return window.localStorage.getItem(KEY) === CONSENT_VERSION;
+    const v = window.localStorage.getItem(KEY);
+    return v === CONSENT_VERSION || v === `declined:${CONSENT_VERSION}`;
   } catch {
     return false;
   }
@@ -33,9 +34,9 @@ export default function ConsentBanner() {
   const accepted = useSyncExternalStore(subscribe, read, () => true);
   if (accepted) return null;
 
-  function accept() {
+  function choose(value: string) {
     try {
-      window.localStorage.setItem(KEY, CONSENT_VERSION);
+      window.localStorage.setItem(KEY, value);
     } catch {
       // Приватний режим — банер з'явиться знову при наступному заході.
     }
@@ -47,14 +48,20 @@ export default function ConsentBanner() {
       <ShieldCheck size={24} aria-hidden="true" className="consent-icon" />
       <div className="consent-text">
         <p id="consent-title">
-          <strong>Ваші дані в безпеці.</strong> Ми використовуємо ім&apos;я та інші дані, які ви вводите, лише щоб
-          створити казку й виконати замовлення. Казки зберігаються у вашому браузері. Детальніше — у{" "}
+          <strong>Ваші дані в безпеці.</strong> Казкарня не використовує рекламних і аналітичних кукі. Ім&apos;я та
+          інші дані, які ви вводите, потрібні лише, щоб створити книжку й виконати замовлення, а книжки зберігаються у
+          вашому браузері. Детальніше — у{" "}
           <Link href="/konfidentsiinist">політиці конфіденційності</Link>.
         </p>
       </div>
-      <button type="button" className="btn btn-primary btn-small" onClick={accept}>
-        Погоджуюсь
-      </button>
+      <div className="consent-actions">
+        <button type="button" className="btn btn-ghost btn-small" onClick={() => choose(`declined:${CONSENT_VERSION}`)}>
+          Відхилити
+        </button>
+        <button type="button" className="btn btn-primary btn-small" onClick={() => choose(CONSENT_VERSION)}>
+          Прийняти
+        </button>
+      </div>
     </div>
   );
 }

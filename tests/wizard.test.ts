@@ -10,7 +10,7 @@ describe("каталог", () => {
   it("id тем унікальні", () => {
     const ids = ALL_TOPICS.map((t) => t.topic.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(CATEGORIES).toHaveLength(8);
+    expect(CATEGORIES).toHaveLength(9);
     expect(ILLUSTRATION_STYLES).toHaveLength(10);
   });
 

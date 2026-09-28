@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Crumbs, Faq, LinkCards, Reviews, Section, SectionHead } from "@/components/seo/Blocks";
+import { Crumbs, Faq, LinkCards, PopularNames, Reviews, Section, SectionHead } from "@/components/seo/Blocks";
 import BlogTeasers from "@/components/seo/BlogTeasers";
 import ThemeTabs from "@/components/seo/ThemeTabs";
 import SlotImage from "@/components/SlotImage";
@@ -103,7 +103,8 @@ export default async function GiftPage(props: PageProps<"/podarunky/[slug]">) {
         </p>
       </Section>
 
-      <BlogTeasers />
+      <PopularNames seed={slug} limit={25} title="Улюблені імена" />
+      <BlogTeasers tint />
     </>
   );
 }

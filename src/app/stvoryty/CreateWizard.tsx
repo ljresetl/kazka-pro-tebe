@@ -229,7 +229,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
           <span />
           <span />
         </div>
-        <h1>Пишемо казку…</h1>
+        <h2 className="wz-step-title">Пишемо казку…</h2>
         <p>Головний герой — {name.trim()}.</p>
         <p className="muted">Зазвичай це займає до хвилини. Не закривайте сторінку.</p>
       </div>
@@ -241,6 +241,14 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
   return (
     <div className="wrap wz">
+      <header className="wz-page-head">
+        <h1>Створіть персональну дитячу книжку</h1>
+        <p>
+          Оберіть тему історії, додайте ім&apos;я та особисті деталі — і отримаєте неповторну е-книгу. Потім історію
+          можна замовити у твердій обкладинці як пам&apos;ять на роки.
+        </p>
+      </header>
+      <p className="wz-panel-title">Складіть свою неповторну дитячу книжку</p>
       <div className="wz-top">
         <p className="wz-count">
           Крок {step + 1} з {STEPS.length} · {STEPS[step]}
@@ -248,6 +256,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
         <div className="wz-progress" aria-hidden="true">
           <span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
         </div>
+        {chips.some(Boolean) && <p className="wz-chips-title">Ваш вибір</p>}
         {chips.some(Boolean) && (
           <ul className="wz-chips" aria-label="Ваш вибір">
             {chips.map((label, i) =>
@@ -266,14 +275,14 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 0 && (
         <section className="wz-step">
-          <h1>Для якого віку книжка?</h1>
+          <h2 className="wz-step-title">Для якого віку книжка?</h2>
           <p className="wz-lead">Від віку залежить довжина речень і складність сюжету.</p>
           <div className="wz-tiles is-big">
-            {AGE_GROUPS.map((a) => (
+            {AGE_GROUPS.map((a, i) => (
               <button
                 key={a.id}
                 type="button"
-                className="wz-tile"
+                className={`wz-tile is-tone-${i}`}
                 aria-pressed={ageGroup === a.id}
                 onClick={() => {
                   setAgeGroup(a.id);
@@ -292,7 +301,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 1 && (
         <section className="wz-step">
-          <h1>Оберіть розділ</h1>
+          <h2 className="wz-step-title">Оберіть розділ</h2>
           <p className="wz-lead">Далі покажемо теми з цього розділу.</p>
           <div className="wz-tiles">
             {CATEGORIES.map((c) => (
@@ -317,7 +326,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 2 && (
         <section className="wz-step">
-          <h1>{cat ? `${cat.label}: оберіть тему` : "Оберіть тему"}</h1>
+          <h2 className="wz-step-title">{cat ? `${cat.label}: оберіть тему` : "Оберіть тему"}</h2>
           {!cat ? (
             <button type="button" className="btn btn-ghost" onClick={() => go(1)}>
               Спершу оберіть розділ
@@ -343,7 +352,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 3 && (
         <section className="wz-step">
-          <h1>Чого навчить казка?</h1>
+          <h2 className="wz-step-title">Чого навчить казка?</h2>
           <p className="wz-lead">Герой розв&apos;яже пригоду саме завдяки цій цінності.</p>
           <div className="wz-tiles is-small">
             {MORALS.map((m) => (
@@ -364,7 +373,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 4 && (
         <section className="wz-step">
-          <h1>Стиль ілюстрацій</h1>
+          <h2 className="wz-step-title">Стиль ілюстрацій</h2>
           <p className="wz-lead">Однакова сцена в кожному стилі — оберіть, як виглядатиме ваша книжка.</p>
           <div className="wz-tiles is-wide">
             {ILLUSTRATION_STYLES.map((s) => (
@@ -385,7 +394,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 5 && (
         <section className="wz-step">
-          <h1>Шрифт книжки</h1>
+          <h2 className="wz-step-title">Шрифт книжки</h2>
           <p className="wz-lead">Так буде набрано текст казки.</p>
           <div className="wz-tiles is-fonts">
             {BOOK_FONTS.map((f) => (
@@ -406,7 +415,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 6 && (
         <section className="wz-step">
-          <h1>Герої казки</h1>
+          <h2 className="wz-step-title">Герої казки</h2>
           <p className="wz-lead">Головний герой — ваша дитина. Можна додати ще до {MAX_EXTRA} героїв: братика, бабусю, песика чи улюблену іграшку.</p>
 
           <div className="form-card wz-hero">
@@ -646,7 +655,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
 
       {step === 7 && (
         <section className="wz-step">
-          <h1>Передмова</h1>
+          <h2 className="wz-step-title">Передмова</h2>
           <p className="wz-lead">
             Кілька теплих слів стануть першою сторінкою книжки. Усі поля необов&apos;язкові.
           </p>

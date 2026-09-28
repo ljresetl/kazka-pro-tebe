@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookQuality, Crumbs, FinalCta, HowItWorks, Section, SectionHead, ThemeGrid } from "@/components/seo/Blocks";
+import { AgeChips, BookQuality, Crumbs, Faq, HowItWorks, Perks, Reviews, Section, SectionHead, ThemeGrid } from "@/components/seo/Blocks";
+import { GENERAL_FAQ } from "@/lib/general-faq";
 import { LetterNav } from "@/components/seo/NamesList";
 import StartBox from "@/components/seo/StartBox";
 import SlotImage from "@/components/SlotImage";
@@ -84,7 +85,10 @@ export default async function NamePage(props: PageProps<"/imena/[slug]">) {
         <LetterNav active={n.letter} />
       </Section>
 
-      <FinalCta href={href} />
+      <Reviews tint />
+      <AgeChips />
+      <Faq items={GENERAL_FAQ} tint />
+      <Perks title="Створіть неповторну книжку саме для своєї дитини" />
     </>
   );
 }

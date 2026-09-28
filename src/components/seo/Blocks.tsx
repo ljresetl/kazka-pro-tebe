@@ -7,6 +7,8 @@ import { OrnamentRule } from "@/components/Ornament";
 import SlotImage from "@/components/SlotImage";
 import { BOOK_FACTS, BOOK_QUALITY, PERKS } from "@/lib/book-facts";
 import { AGE_GROUPS, CATEGORIES } from "@/lib/catalog";
+import { AGES } from "@/lib/pages/age-list";
+import { popularNames } from "@/lib/pages/names";
 import { REVIEWS } from "@/lib/reviews";
 import { jsonLd } from "@/lib/seo";
 import { abs } from "@/lib/site";
@@ -171,7 +173,7 @@ export function BookQuality() {
 export function ThemeGrid({ title = "Книжки на будь-яку тему й нагоду", exclude }: { title?: string; exclude?: string }) {
   return (
     <Section tint id="usi-temy">
-      <SectionHead title={title} lead="Понад сотня тем у восьми розділах — від динозаврів до першого дзвоника." />
+      <SectionHead title={title} lead="Понад сотня тем у дев'яти розділах — від динозаврів до першого дзвоника." />
       <div className="theme-groups">
         {CATEGORIES.map((c) => (
           <div key={c.id} className="theme-group">
@@ -361,5 +363,62 @@ export function AgePicker({ topic, title = "Оберіть вік дитини" 
         </div>
       </div>
     </section>
+  );
+}
+
+/** Улюблені імена — чипи з посиланнями. */
+export function PopularNames({ seed, limit = 14, title = "Улюблені імена для дитячих книжок", tint }: { seed: string; limit?: number; title?: string; tint?: boolean }) {
+  return (
+    <Section tint={tint}>
+      <SectionHead title={title} />
+      <div className="topic-chips">
+        {popularNames(seed, limit).map((n) => (
+          <Link key={n.slug} href={`/imena/${n.slug}`} className="topic-chip is-plain">
+            {n.name} <span aria-hidden="true">{n.emoji}</span>
+          </Link>
+        ))}
+        <Link href="/imena" className="topic-chip is-accent">
+          Усі імена
+        </Link>
+      </div>
+    </Section>
+  );
+}
+
+/** Вікові сторінки — чипи «Для кожного віку — своя історія». */
+export function AgeChips({ tint }: { tint?: boolean }) {
+  return (
+    <Section tint={tint}>
+      <SectionHead title="Для кожного віку — своя історія" />
+      <div className="topic-chips">
+        {AGES.map((a) => (
+          <Link key={a.slug} href={`/vik/${a.slug}`} className="topic-chip is-plain">
+            {a.label}
+          </Link>
+        ))}
+        <Link href="/vik" className="topic-chip is-accent">
+          Усі вікові групи
+        </Link>
+      </div>
+    </Section>
+  );
+}
+
+/** SEO-текст унизу загальних сторінок: заголовок і два підрозділи. */
+export function SeoOutro({ title, parts }: { title: string; parts: { h: string; p: string[] }[] }) {
+  return (
+    <Section>
+      <div className="prose-block">
+        <h2>{title}</h2>
+        {parts.map((part) => (
+          <div key={part.h}>
+            <h3>{part.h}</h3>
+            {part.p.map((t) => (
+              <p key={t}>{t}</p>
+            ))}
+          </div>
+        ))}
+      </div>
+    </Section>
   );
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getSlot, isReady } from "@/lib/images";
+import { getSlot, isReady, type ImageSlot } from "@/lib/images";
 import { asset } from "@/lib/site";
 import CopyButton from "./CopyButton";
 
@@ -10,6 +10,7 @@ import CopyButton from "./CopyButton";
  */
 export default function SlotImage({
   id,
+  slot: given,
   alt,
   className = "",
   detail = "label",
@@ -17,13 +18,15 @@ export default function SlotImage({
   priority,
 }: {
   id: string;
+  /** Готовий опис картинки, якої немає в загальному реєстрі (напр., обкладинки статей блогу). */
+  slot?: ImageSlot;
   alt: string;
   className?: string;
   detail?: "full" | "label" | "none";
   sizes?: string;
   priority?: boolean;
 }) {
-  const slot = getSlot(id);
+  const slot = given ?? getSlot(id);
   if (isReady(slot)) {
     return (
       <Image

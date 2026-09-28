@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import CopyButton from "@/components/CopyButton";
 import SlotImage from "@/components/SlotImage";
-import { ALL_IMAGES, IMAGE_GROUPS, isReady } from "@/lib/images";
+import { blogImage, POSTS } from "@/lib/blog";
+import { ALL_IMAGES as BASE_IMAGES, IMAGE_GROUPS as BASE_GROUPS, isReady } from "@/lib/images";
+
+const ALL_IMAGES = [...BASE_IMAGES, ...POSTS.map(blogImage)];
+const IMAGE_GROUPS = [...BASE_GROUPS, { id: "blog", label: `Статті блогу (${POSTS.length})` }];
 import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
@@ -31,7 +35,7 @@ export default function PlaceholdersPage() {
             <ul className="ph-list">
               {items.map((s) => (
                 <li key={s.id} className={isReady(s) ? "is-ready" : ""}>
-                  <SlotImage id={s.id} alt={s.title} detail="none" className="ph-thumb" />
+                  <SlotImage id={s.id} slot={s} alt={s.title} detail="none" className="ph-thumb" />
                   <div>
                     <strong>{s.title}</strong>
                     <p className="ph-meta">
