@@ -92,6 +92,9 @@ export default function SiteFooter() {
             <li>
               <Link href="/konfidentsiinist">Конфіденційність</Link>
             </li>
+            <li>
+              <Link href="/litsenzii">Авторські права й ліцензії</Link>
+            </li>
           </ul>
         </div>
         <div>
