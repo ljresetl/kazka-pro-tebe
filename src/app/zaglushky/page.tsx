@@ -18,7 +18,7 @@ export default function PlaceholdersPage() {
       <div className="page-top">
         <h1>Картинки для генерації</h1>
         <p>
-          Готово {ready} з {ALL_IMAGES.length}. Скопіюйте опис, вставте в Gemini чи інший генератор, збережіть
+          Готово {ready} з {ALL_IMAGES.length}. Скопіюйте опис, вставте в ChatGPT (як на сайті-зразку, для іконок — з прозорим фоном), Gemini чи інший генератор, збережіть
           результат як WebP під указаним ім&apos;ям у папку <code>public</code> — і картинка замінить заглушку на
           сайті.
         </p>

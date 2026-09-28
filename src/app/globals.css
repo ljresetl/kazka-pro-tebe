@@ -2196,6 +2196,26 @@ textarea.field-input {
   .print-cover .cover-title {
     font-size: 30pt;
   }
+  .print-title-page,
+  .print-text-page {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 18mm;
+  }
+  .print-title-page .cover-dedication {
+    font-size: 16pt;
+    font-style: italic;
+  }
+  .print-art-page .scene,
+  .print-art-page img {
+    height: 250mm;
+    object-fit: cover;
+  }
+  .print-text-page .story-text {
+    font-size: 19pt;
+    line-height: 1.7;
+  }
   .print-page .page-no {
     bottom: 0;
     right: 0;

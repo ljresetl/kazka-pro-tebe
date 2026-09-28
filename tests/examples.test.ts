@@ -8,7 +8,8 @@ describe("приклади казок", () => {
     const texts = longTexts as Record<string, string[]>;
     for (const e of EXAMPLES) {
       expect(texts[e.slug], e.slug).toBeDefined();
-      expect(e.pages.map((p) => p.text)).toEqual(texts[e.slug]);
+      expect(e.pages).toHaveLength(12);
+      for (const t of texts[e.slug]) expect(e.pages.map((p) => p.text)).toContain(t);
     }
   });
 
@@ -21,9 +22,9 @@ describe("приклади казок", () => {
     }
   });
 
-  it("у казки про Соломію є картинка на кожній сторінці", () => {
+  it("у казки про Соломію є готові картинки на основних сторінках", () => {
     const s = EXAMPLES.find((e) => e.slug === "solomiia-i-mushlia")!;
     expect(s.coverImage).toBeDefined();
-    expect(s.pages.every((p) => p.image)).toBe(true);
+    expect(s.pages.filter((p) => p.image)).toHaveLength(6);
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { deletePhoto, loadPhoto, saveImage } from "./image-store";
+import { deletePhoto, loadImage, loadPhoto, saveImage } from "./image-store";
 import { findTopic } from "./catalog";
 import type { Story } from "./types";
 
@@ -76,4 +76,13 @@ export async function illustrateStory(story: Story, onProgress: (done: number, t
     await saveImage(story.id, i, img.data, img.mimeType);
     onProgress(i + 2, total);
   }
+}
+
+/** Перемальовує одну сторінку (обкладинка — зразок героя, щоб він лишався схожим). */
+export async function redrawPage(story: Story, index: number) {
+  const page = story.pages[index];
+  if (!page) return;
+  const cover = await loadImage(story.id, -1);
+  const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover ?? undefined);
+  await saveImage(story.id, index, img.data, img.mimeType);
 }

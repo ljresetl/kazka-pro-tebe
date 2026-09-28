@@ -69,7 +69,7 @@ describe("шаблонні казки", () => {
   it("друг з’являється на початку, посередині й у фіналі", () => {
     const s = templateStory({ ...base, friend: "кішка Мурка" }, 0, 3);
     expect(s.pages[0].text).toContain("кішка Мурка");
-    expect(s.pages[2].text.toLowerCase()).toContain("кішка мурка");
+    expect(s.pages[5].text.toLowerCase()).toContain("кішка мурка");
     expect(s.pages.at(-1)!.text.toLowerCase()).toContain("кішка мурка");
   });
 
@@ -88,5 +88,22 @@ describe("шаблонні казки", () => {
 
   it("звернення батьків стає присвятою", () => {
     expect(templateStory({ ...base, message: "З днем народження!" }).dedication).toBe("З днем народження!");
+  });
+});
+
+describe("26 сторінок книжки", () => {
+  it("кожен шаблонний сюжет має рівно 12 сторінок історії", async () => {
+    const { PLOTS, templateStory } = await import("@/lib/template-story");
+    for (const [theme, plots] of Object.entries(PLOTS)) {
+      plots.forEach((_, variant) => {
+        for (const gender of ["boy", "girl"] as const) {
+          for (const age of [3, 7]) {
+            const s = templateStory({ childName: "Марко", gender, age, theme: theme as never, trait: "сміливість", friend: "песик Бублик" }, variant);
+            expect(s.pages, `${theme} #${variant}`).toHaveLength(12);
+            for (const p of s.pages) expect(p.text).not.toMatch(/\{\{|\[\[|undefined/);
+          }
+        }
+      });
+    }
   });
 });

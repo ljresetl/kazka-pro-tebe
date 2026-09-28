@@ -1,18 +1,36 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import Checkout from "./Checkout";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { addToCart, readStory } from "@/lib/storage";
 
-function CheckoutById() {
+// Старі посилання «Оплатити казку»: кладемо книжку в кошик і відкриваємо кошик.
+function ToCart() {
   const sp = useSearchParams();
-  return <Checkout id={sp.get("id") ?? ""} initialProduct={sp.get("product") ?? undefined} />;
+  const router = useRouter();
+  useEffect(() => {
+    const id = sp.get("id") ?? "";
+    const story = readStory(id);
+    if (story) {
+      const hardcover = sp.get("product") === "print";
+      addToCart({
+        storyId: story.id,
+        storyTitle: story.title,
+        kind: hardcover ? "hardcover" : "ebook",
+        cover: hardcover ? "matova" : undefined,
+        ebookPaid: Boolean(story.paid),
+        paidOrder: story.paidOrder,
+      });
+    }
+    router.replace("/koshyk");
+  }, [sp, router]);
+  return <div className="writing" />;
 }
 
 export default function CheckoutPage() {
   return (
     <Suspense fallback={<div className="writing" />}>
-      <CheckoutById />
+      <ToCart />
     </Suspense>
   );
 }

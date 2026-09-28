@@ -84,6 +84,10 @@ export const CATEGORIES: Category[] = [
       t("hry-nadvori", "Ігри надворі", "playing outside", "a kite and a skipping rope"),
       t("potiah", "Потяг", "a train journey", "a small steam train"),
       t("perevdiahannia", "Перевдягання", "dress-up play", "a costume trunk with hats"),
+      t("pliazh", "На пляжі", "a day at the beach", "a sand castle with a bucket and a starfish"),
+      t("ferma", "На фермі", "a day on a farm", "a red barn with a little cow and chicks"),
+      t("turbota-tvaryny", "Турбота про тварин", "caring for animals", "a child's hands holding a bowl for a kitten and a puppy"),
+      t("tvorchist", "Творчість і рукоділля", "arts and crafts", "scissors, coloured paper and a glue stick making a paper crown"),
     ],
   },
   {
@@ -133,6 +137,9 @@ export const CATEGORIES: Category[] = [
       t("kupala", "Івана Купала", "the Ukrainian midsummer festival Ivana Kupala", "a floral wreath floating on water with a candle"),
       t("valentyn", "День святого Валентина", "Valentine's Day", "a heart-shaped balloon"),
       t("helovin", "Гелловін", "Halloween", "a smiling pumpkin lantern"),
+      t("karnaval", "Карнавал", "a costume carnival", "a colourful carnival mask with confetti"),
+      t("den-nezalezhnosti", "День Незалежності", "Ukrainian Independence Day", "a blue and yellow Ukrainian flag with a sunflower"),
+      t("den-vyshyvanky", "День вишиванки", "Ukrainian Vyshyvanka Day (embroidered shirt day)", "a small white embroidered Ukrainian shirt with red and black patterns"),
     ],
   },
   {
@@ -179,6 +186,7 @@ export const CATEGORIES: Category[] = [
       t("kyshenkovi", "Кишенькові гроші", "pocket money and saving", "a piggy bank with coins"),
       t("kharchuvannia", "Корисна їжа", "healthy eating", "a plate with vegetables smiling"),
       t("pershi-kroky", "Перші кроки", "first steps", "baby shoes"),
+      t("palchyk", "Прощання зі смоктанням пальчика", "stopping thumb sucking", "a small hand giving a thumbs-up with a star"),
     ],
   },
   {

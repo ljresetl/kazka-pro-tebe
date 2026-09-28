@@ -5,18 +5,17 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { checkPayment, markOrderPaid } from "@/lib/payment";
-import { useOrders, useStories } from "@/lib/storage";
+import { clearCart, useOrders } from "@/lib/storage";
 
 // Сюди LiqPay повертає покупця після оплати. Перевіряємо статус на сервері
 // кілька разів (банк іноді підтверджує платіж із затримкою).
 function Result() {
   const orderId = useSearchParams().get("order") ?? "";
   const orders = useOrders();
-  const stories = useStories();
   const [state, setState] = useState<"checking" | "paid" | "pending">("checking");
 
   const order = orders?.find((o) => o.id === orderId);
-  const story = stories?.find((s) => s.id === order?.storyId);
+  const storyId = order?.items?.[0]?.storyId ?? order?.storyId;
 
   useEffect(() => {
     if (!orderId || orders === undefined) return;
@@ -24,7 +23,10 @@ function Result() {
     (async () => {
       for (let attempt = 0; attempt < 6 && !cancelled; attempt++) {
         if (await checkPayment(orderId)) {
-          if (order && story) markOrderPaid(order, story);
+          if (order) {
+            markOrderPaid(order);
+            if (order.items) clearCart();
+          }
           if (!cancelled) setState("paid");
           return;
         }
@@ -48,11 +50,11 @@ function Result() {
               <Check size={36} strokeWidth={3} />
             </div>
             <h1>Оплату отримано. Дякуємо!</h1>
-            <p>Замовлення {orderId}. Уся казка вже відкрита — друкуйте або зберігайте як PDF.</p>
+            <p>Замовлення {orderId}. Книжка вже відкрита повністю. Друковані книжки надішлемо Новою Поштою після друку (3–5 робочих днів).</p>
             <div className="button-row" style={{ justifyContent: "center" }}>
-              {story && (
-                <Link href={`/kazka?id=${story.id}`} className="btn btn-primary">
-                  Відкрити казку
+              {storyId && (
+                <Link href={`/kazka?id=${storyId}`} className="btn btn-primary">
+                  Відкрити книжку
                 </Link>
               )}
               <Link href="/moi-kazky" className="btn btn-ghost">

@@ -23,7 +23,7 @@ export async function generateMetadata(props: PageProps<"/pryklady/[slug]">): Pr
     : OG_IMAGE;
   return pageMeta({
     title: `${ex.title} — приклад іменної казки`,
-    description: `${ex.summary} Читайте повністю онлайн: ${ex.pages.length} сторінок, для дітей ${ex.ageLabel}. Створіть таку саму казку для своєї дитини.`,
+    description: `${ex.summary} Читайте повністю онлайн: книжка на 26 сторінок, для дітей ${ex.ageLabel}. Створіть таку саму казку для своєї дитини.`,
     path: `/pryklady/${ex.slug}`,
     image,
     type: "book",
@@ -46,7 +46,7 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
     name: ex.title,
     inLanguage: "uk",
     bookFormat: "https://schema.org/EBook",
-    numberOfPages: ex.pages.length,
+    numberOfPages: 26,
     genre: "Дитяча казка",
     audience: { "@type": "PeopleAudience", suggestedMinAge: Math.max(2, ex.age - 1), suggestedMaxAge: ex.age + 2 },
     abstract: ex.summary,
@@ -144,8 +144,8 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
             того, хлопчик це чи дівчинка. Звернення на першій сторінці ви напишете самі.
           </p>
           <p>
-            Казку з {ex.pages.length} сторінок можна читати з екрана, роздрукувати як PDF на папері A4 або замовити
-            книжкою в м&apos;якій палітурці.
+            Книжку на 26 сторінок можна читати з екрана, роздрукувати як PDF на папері A4 або замовити
+            книжкою у твердій обкладинці.
           </p>
         </div>
       </SeoText>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { Palette, Printer } from "lucide-react";
 import type { Illustration, SceneId } from "@/lib/types";
 import Scene from "./Scene";
@@ -20,26 +21,45 @@ function Art({ scene, image }: { scene: SceneId; image?: Illustration }) {
   return image ? <img src={image.src} alt="" /> : <Scene id={scene} />;
 }
 
-// Версія книжки лише для друку: одна сторінка казки на аркуш A4.
+// Версія книжки лише для друку, як справжня книжка A4:
+// обкладинка, титул із передмовою, далі кожна сторінка історії — розворот
+// «ілюстрація + текст». Для 12 сторінок історії виходить 26 сторінок.
 export default function PrintBook({ title, dedication, cover, coverImage, pages, watermark, fontClass = "" }: Props) {
+  const mark = watermark ? <span className="watermark">{watermark}</span> : null;
   return (
     <div className={`print-book ${fontClass}`} aria-hidden="true">
       <section className="print-page print-cover">
         <Art scene={cover} image={coverImage} />
         <p className="cover-title">{title}</p>
+        {mark}
+      </section>
+      <section className="print-page print-title-page">
+        <p className="cover-title">{title}</p>
         <p className="cover-dedication">{dedication}</p>
-        {watermark && <span className="watermark">{watermark}</span>}
+        <span className="page-no">2</span>
+        {mark}
       </section>
       {pages.map((p, i) => (
-        <section className="print-page" key={i}>
-          <Art scene={p.scene} image={p.image} />
-          <p className="story-text">{p.text}</p>
-          <span className="page-no">{i + 1}</span>
-          {watermark && <span className="watermark">{watermark}</span>}
-        </section>
+        <Fragment key={i}>
+          <section className="print-page print-art-page">
+            <Art scene={p.scene} image={p.image} />
+            <span className="page-no">{3 + i * 2}</span>
+            {mark}
+          </section>
+          <section className="print-page print-text-page">
+            <p className="story-text">{p.text}</p>
+            <span className="page-no">{4 + i * 2}</span>
+            {mark}
+          </section>
+        </Fragment>
       ))}
     </div>
   );
+}
+
+/** Скільки сторінок у друкованій книжці: обкладинка, титул і по дві на кожну сторінку історії. */
+export function printPageCount(storyPages: number) {
+  return 2 + storyPages * 2;
 }
 
 export function PrintButtons({ note, coloring = true }: { note?: string; coloring?: boolean }) {
@@ -67,7 +87,7 @@ export function PrintButtons({ note, coloring = true }: { note?: string; colorin
         </button>
       )}
       <p className="hint">
-        {note ?? "У вікні друку оберіть «Зберегти як PDF», щоб отримати файл. Формат A4, одна сторінка казки на аркуш."}
+        {note ?? "У вікні друку оберіть «Зберегти як PDF», щоб отримати файл. Формат A4: обкладинка, титул і розвороти «ілюстрація + текст»."}
       </p>
     </div>
   );

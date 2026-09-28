@@ -58,7 +58,21 @@ function TileImage({ id, wide = false }: { id: string; wide?: boolean }) {
   );
 }
 
-export type WizardInit = { name: string; ageGroup: string; category: string; topic: string };
+export type WizardInit = {
+  name: string;
+  ageGroup: string;
+  category: string;
+  topic: string;
+  /** Для продовження: ті самі герої, стиль, шрифт і вік. */
+  gender?: Gender;
+  age?: number;
+  style?: string;
+  font?: string;
+  hobbies?: string;
+  food?: string;
+  characters?: Character[];
+  wish?: string;
+};
 
 export default function CreateWizard({ init }: { init: WizardInit }) {
   const router = useRouter();
@@ -71,27 +85,28 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
   );
   const [topic, setTopic] = useState(initTopic?.topic.id ?? "");
   const [moral, setMoral] = useState("");
-  const [style, setStyle] = useState("");
-  const [font, setFont] = useState("");
+  const [style, setStyle] = useState(init.style ?? "");
+  const [font, setFont] = useState(init.font ?? "");
 
   const [name, setName] = useState(init.name);
-  const [gender, setGender] = useState<Gender>("girl");
+  const [gender, setGender] = useState<Gender>(init.gender ?? "girl");
   const [age, setAge] = useState<number | "">(() => {
+    if (init.age) return init.age;
     const g = AGE_GROUPS.find((a) => a.id === init.ageGroup);
     return g ? Math.max(g.minAge, 2) : "";
   });
-  const [hobbies, setHobbies] = useState("");
-  const [food, setFood] = useState("");
+  const [hobbies, setHobbies] = useState(init.hobbies ?? "");
+  const [food, setFood] = useState(init.food ?? "");
   const [photo, setPhoto] = useState<{ data: string; mimeType: string; preview: string } | null>(null);
   const [photoConsent, setPhotoConsent] = useState(false);
-  const [extras, setExtras] = useState<Character[]>([]);
+  const [extras, setExtras] = useState<Character[]>(init.characters ?? []);
 
   const [from, setFrom] = useState("");
   const [relation, setRelation] = useState("");
   const [occasion, setOccasion] = useState("");
   const [teach, setTeach] = useState("");
   const [message, setMessage] = useState("");
-  const [wish, setWish] = useState("");
+  const [wish, setWish] = useState(init.wish ?? "");
 
   const done = [ageGroup, category, topic, moral, style, font];
   const firstOpen = done.findIndex((v) => !v);
