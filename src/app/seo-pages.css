@@ -1342,3 +1342,20 @@ body:has(.wz-mini-footer) .site-footer {
   max-width: 100%;
   font-size: 14px;
 }
+
+/* Читалка: смужка прогресу замість крапок (не переноситься на телефоні) */
+.reader-progress {
+  height: 6px;
+  margin: 8px auto 0;
+  max-width: 220px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.reader-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--coral);
+  transition: width 0.2s ease;
+}

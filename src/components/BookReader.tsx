@@ -25,6 +25,9 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
   // 0 — обкладинка, далі сторінки казки
   const [[spread, dir], setSpread] = useState<[number, number]>([0, 0]);
   const total = pages.length + 1;
+  // Нумерація як у друкованій книжці: обкладинка й титул — 1–2,
+  // далі кожен розворот — ілюстрація (ліва) і текст (права). 12 розворотів → 26 сторінок.
+  const printTotal = 2 + pages.length * 2;
   const reduce = useReducedMotion();
 
   const go = useCallback(
@@ -95,7 +98,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
             {page ? (
               <>
                 <p className="story-text">{page.text}</p>
-                <span className="page-no">{spread}</span>
+                <span className="page-no">{spread * 2 + 2}</span>
                 {locked && <div className="lock-overlay">{lockedMessage}</div>}
               </>
             ) : (
@@ -122,12 +125,10 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
         </button>
         <div>
           <div className="reader-count">
-            {spread === 0 ? "Обкладинка" : `Сторінка ${spread} з ${pages.length}`}
+            {spread === 0 ? `Обкладинка й титул · 1–2 з ${printTotal}` : `Сторінки ${spread * 2 + 1}–${spread * 2 + 2} з ${printTotal}`}
           </div>
-          <div className="reader-dots" aria-hidden="true">
-            {Array.from({ length: total }, (_, i) => (
-              <span key={i} className={i === spread ? "is-on" : ""} />
-            ))}
+          <div className="reader-progress" aria-hidden="true">
+            <span style={{ width: `${((spread + 1) / total) * 100}%` }} />
           </div>
         </div>
         <button
