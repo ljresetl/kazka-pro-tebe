@@ -1,5 +1,6 @@
 import longTexts from "./examples-texts.json";
 import { PLOTS, templateStory, yearsWord } from "./template-story";
+import { AGE_GROUPS as AGE_GROUPS_CATALOG, BOOK_FONTS, findTopic, ILLUSTRATION_STYLES } from "./catalog";
 import { getTheme } from "./themes";
 import type { Gender, Illustration, SceneId, StoryPage, ThemeId } from "./types";
 
@@ -21,6 +22,9 @@ type ExampleSeed = {
   friend?: string;
   message: string;
   summary: string;
+  /** Стиль ілюстрацій і шрифт (id з каталогу) — для блоку «Параметри історії». */
+  style?: string;
+  font?: string;
   /** Готові ілюстрації: обкладинка + по одній на сторінку. */
   images?: { cover: Illustration; pages: Illustration[] };
 };
@@ -181,13 +185,16 @@ function build(seed: ExampleSeed): ExampleStory {
     },
     Math.max(variant, 0),
   );
+  // Вичитані тексти й готові ілюстрації стоять на основних сторінках сюжету,
+  // між ними — додаткові сторінки (разом 12, як у книжках покупців).
   const long = LONG_TEXTS[seed.slug];
-  const useLong = Array.isArray(long) && long.length === story.pages.length;
-  const pages = story.pages.map((p, i) => ({
-    ...p,
-    text: useLong ? long[i] : p.text,
-    image: seed.images?.pages[i],
-  }));
+  const useLong = Array.isArray(long) && long.length === story.baseIndexes.length;
+  const pages: StoryPage[] = story.pages.map((p) => ({ ...p }));
+  story.baseIndexes.forEach((at, i) => {
+    if (useLong) pages[at].text = long[i];
+    const image = seed.images?.pages[i];
+    if (image) pages[at].image = image;
+  });
   return {
     ...seed,
     title: story.title,
@@ -200,6 +207,35 @@ function build(seed: ExampleSeed): ExampleStory {
 }
 
 export const EXAMPLES: ExampleStory[] = SEEDS.map(build);
+
+const THEME_TOPIC: Record<ThemeId, string> = {
+  space: "kosmos",
+  forest: "charivnyi-lis",
+  sea: "pidvodnyi-svit",
+  dino: "dynozavry",
+  castle: "lytsari",
+  meadow: "sadivnytstvo",
+};
+const STYLES = ["3d", "akvarel", "huash", "plastylin", "anime", "kolazh", "komiks", "naklieiky", "heometriia", "kubyky"];
+const FONTS = ["kazkova", "pisok", "zavytky", "pryhodnytskyi", "shkilnyi", "bulbashky", "tsukerka", "neon"];
+
+/** Параметри, з якими створено приклад (як «Параметри історії» на зразку). */
+export function exampleParams(e: ExampleStory) {
+  const i = EXAMPLES.indexOf(e);
+  const found = findTopic(THEME_TOPIC[e.theme]);
+  const style = ILLUSTRATION_STYLES.find((s) => s.id === (e.style ?? STYLES[i % STYLES.length]));
+  const font = BOOK_FONTS.find((f) => f.id === (e.font ?? FONTS[i % FONTS.length]));
+  const age = AGE_GROUPS_CATALOG.find((a) => e.age >= a.minAge && e.age <= a.maxAge);
+  return [
+    ["Назва", e.title],
+    ["Вік", age?.label ?? e.ageLabel],
+    ["Розділ", found?.category.label ?? ""],
+    ["Тема", found?.topic.label ?? ""],
+    ["Стиль", style?.label ?? ""],
+    ["Шрифт", font?.label ?? ""],
+    ["Кількість героїв", String(e.friend ? 2 : 1)],
+  ] as const;
+}
 
 export function getExample(slug: string) {
   return EXAMPLES.find((e) => e.slug === slug);

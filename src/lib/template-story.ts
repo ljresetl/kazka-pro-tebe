@@ -1,3 +1,4 @@
+import { EXTRA_PAGES } from "./template-extra";
 import type { StoryPage, StoryRequest, ThemeId } from "./types";
 
 // Шаблонні казки — працюють без ключа ШІ, прямо в браузері.
@@ -534,7 +535,14 @@ export function templateStory(
   req: StoryRequest,
   variant = 0,
   seed?: number,
-): { title: string; dedication: string; pages: StoryPage[]; plotId: string } {
+): {
+  title: string;
+  dedication: string;
+  pages: StoryPage[];
+  plotId: string;
+  /** Де в книжці стоять основні сторінки сюжету (решта — додаткові). */
+  baseIndexes: number[];
+} {
   const g = (m: string, f: string) => (req.gender === "boy" ? m : f);
   const trait = TRAIT_WORDS[req.trait] ?? TRAIT_WORDS["сміливість"];
   const friend = req.friend?.trim();
@@ -561,12 +569,30 @@ export function templateStory(
     v,
   };
 
-  const pages = plot.pages(ctx).map((p) => ({ ...p, text: renderText(p.text, rand, toddler) }));
+  // Основні сторінки сюжету + додаткові (разом рівно 12).
+  const extras = EXTRA_PAGES[plot.id]?.({ n: ctx.n, g, adj: ctx.adj, Adj: ctx.Adj, v }) ?? [];
+  // Якщо після фінальної сторінки сюжету є епілог — мораль переноситься в самий кінець книжки.
+  const baseCount = plot.pages(ctx).length;
+  const tail = extras.some((e) => e.after === baseCount - 1);
+  const base = plot.pages(tail ? { ...ctx, ending: "" } : ctx);
+  const merged: StoryPage[] = [];
+  const baseIndexes: number[] = [];
+  base.forEach((p, i) => {
+    baseIndexes.push(merged.length);
+    merged.push(p);
+    for (const e of extras) if (e.after === i) merged.push({ scene: e.scene, text: e.text });
+  });
+  if (tail) {
+    const last = merged.length - 1;
+    merged[last] = { ...merged[last], text: `${merged[last].text} ${ctx.ending}` };
+  }
+  const pages = merged.map((p) => ({ ...p, text: renderText(p.text, rand, toddler) }));
 
-  // Друг з'являється й посеред пригоди — на третій сторінці.
-  if (friend && pages[2]) {
+  // Друг з'являється й посеред пригоди.
+  const midIndex = Math.floor(pages.length / 2) - 1;
+  if (friend && pages[midIndex]) {
     const mid = pick(FRIEND_MID).replace("{F}", friend);
-    pages[2] = { ...pages[2], text: `${pages[2].text} ${mid.replace(/^./, (c) => c.toUpperCase())}` };
+    pages[midIndex] = { ...pages[midIndex], text: `${pages[midIndex].text} ${mid.replace(/^./, (c) => c.toUpperCase())}` };
   }
 
   const message = req.message?.trim();
@@ -576,5 +602,6 @@ export function templateStory(
       message || `Цю казку створено для тебе, ${req.childName}. Нехай у твоєму житті буде багато добрих пригод.`,
     pages,
     plotId: plot.id,
+    baseIndexes,
   };
 }

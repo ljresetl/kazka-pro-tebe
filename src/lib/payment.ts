@@ -1,7 +1,7 @@
 "use client";
 
-import { saveOrder, saveStory } from "./storage";
-import type { Order, Story } from "./types";
+import { readStory, saveOrder, saveStory } from "./storage";
+import type { Order } from "./types";
 
 // Оплата замовлень.
 //
@@ -29,16 +29,16 @@ export type PaymentResult =
   | { status: "redirect"; url: string }
   | { status: "error"; message: string };
 
-export async function startPayment(order: Order, story: Story): Promise<PaymentResult> {
+export async function startPayment(order: Order): Promise<PaymentResult> {
   saveOrder(order);
 
   if (PAYMENT_MODE === "test") {
     await new Promise((r) => setTimeout(r, 1200));
-    markOrderPaid(order, story);
+    markOrderPaid(order);
     return { status: "paid" };
   }
 
-  // Бойовий режим: сервер підписує платіж LiqPay і повертає посилання на оплату.
+  // Бойовий режим: сервер перераховує суму, підписує платіж LiqPay і повертає посилання.
   // Після оплати LiqPay поверне покупця на /kazka/oplata/rezultat?order=…
   try {
     const res = await fetch("/api/payment", {
@@ -71,8 +71,12 @@ export async function checkPayment(orderId: string): Promise<boolean> {
   }
 }
 
-/** Викликається після успішної оплати. */
-export function markOrderPaid(order: Order, story: Story) {
+/** Викликається після успішної оплати: відкриває всі книжки із замовлення. */
+export function markOrderPaid(order: Order) {
   saveOrder({ ...order, status: "paid" });
-  saveStory({ ...story, paid: true });
+  const ids = new Set<string>([...(order.items ?? []).map((i) => i.storyId), ...(order.storyId ? [order.storyId] : [])]);
+  for (const id of ids) {
+    const story = readStory(id);
+    if (story && !story.paid) saveStory({ ...story, paid: true, paidOrder: order.id });
+  }
 }

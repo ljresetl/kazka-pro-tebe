@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import InfoPage from "@/components/InfoPage";
+import { FREE_SHIPPING_FROM, SHIPPING, THIRD_BOOK_DISCOUNT } from "@/lib/offer";
 import { formatUah, PRICES } from "@/lib/prices";
 import { pageMeta } from "@/lib/seo";
 
@@ -29,9 +30,9 @@ export default function DeliveryPage() {
           </tr>
         </thead>
         <tbody>
-          {PRICES.map((p) => (
+          {PRICES.filter((p) => p.id !== "pdf-coloring").map((p) => (
             <tr key={p.id}>
-              <td>{p.name}</td>
+              <td>{p.id === "print" ? `${p.name} (оплачена е-книга зараховується)` : p.name}</td>
               <td>{formatUah(p.amount)}</td>
               <td>{p.shipping ? "Друк 3–5 робочих днів + доставка 1–2 дні" : "Одразу після оплати"}</td>
             </tr>
@@ -57,7 +58,8 @@ export default function DeliveryPage() {
       <ul>
         <li>Доставляємо Новою Поштою по всій Україні — у відділення або поштомат.</li>
         <li>Друк займає 3–5 робочих днів, доставка — зазвичай 1–2 дні.</li>
-        <li>Доставку ви оплачуєте при отриманні за тарифами Нової Пошти.</li>
+        <li>Доставка однієї книжки — {formatUah(SHIPPING)}, від {FREE_SHIPPING_FROM} книжок — безкоштовно.</li>
+        <li>Кожна 3-тя книжка у твердій обкладинці — зі знижкою {THIRD_BOOK_DISCOUNT}%.</li>
         <li>Після відправлення надсилаємо номер накладної.</li>
       </ul>
 

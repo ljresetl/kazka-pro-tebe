@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { formatUah, PRICES } from "@/lib/prices";
+import { Sparkles, Truck } from "lucide-react";
+import { FREE_SHIPPING_FROM, THIRD_BOOK_DISCOUNT } from "@/lib/offer";
 
-/** Вузька помаранчева смуга над шапкою з головними умовами. */
+/** Вузька помаранчева смуга над шапкою з акціями (як на зразку). */
 export default function PromoBar() {
   return (
     <div className="promo-bar">
-      <div className="wrap promo-row">
-        <span>Перегляд казки — безкоштовно</span>
+      <Link href="/tsiny" className="wrap promo-row">
+        <span>
+          <Truck size={16} aria-hidden="true" /> Безкоштовна доставка від {FREE_SHIPPING_FROM} книжок!
+        </span>
         <span className="promo-dot promo-mid" aria-hidden="true" />
-        <span className="promo-mid">PDF одразу після оплати, від {formatUah(PRICES[0].amount)}</span>
-        <span className="promo-dot promo-wide" aria-hidden="true" />
-        <Link href="/dostavka-i-oplata" className="promo-wide">
-          Книжка в палітурці з доставкою Новою Поштою
-        </Link>
-      </div>
+        <span className="promo-mid">
+          <Sparkles size={16} aria-hidden="true" /> −{THIRD_BOOK_DISCOUNT}% на 3-тю книжку у твердій обкладинці
+        </span>
+      </Link>
     </div>
   );
 }

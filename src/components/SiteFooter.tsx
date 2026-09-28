@@ -11,19 +11,22 @@ export default function SiteFooter() {
           <p>Іменні казки українською для дітей від малюків до 10+ років. Перегляд безкоштовний, платите лише за ту казку, яку хочете зберегти.</p>
         </div>
         <div>
-          <h2>Казки</h2>
+          <h2>Відкрийте</h2>
           <ul>
             <li>
-              <Link href="/stvoryty">Створити казку</Link>
+              <Link href="/stvoryty">Створити книжку</Link>
             </li>
             <li>
               <Link href="/pryklady">Приклади</Link>
             </li>
             <li>
-              <Link href="/biblioteka">Безкоштовні казки</Link>
+              <Link href="/vidhuky">Відгуки</Link>
             </li>
             <li>
-              <Link href="/blog">Блог про казки</Link>
+              <Link href="/tsiny">Ціни</Link>
+            </li>
+            <li>
+              <Link href="/mozhlyvosti">Можливості</Link>
             </li>
             <li>
               <Link href="/moi-kazky">Мої казки</Link>
@@ -31,10 +34,53 @@ export default function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h2>Покупцям</h2>
+          <h2>Привід</h2>
           <ul>
             <li>
-              <Link href="/#tsiny">Ціни</Link>
+              <Link href="/podarunky/den-narodzhennia">День народження</Link>
+            </li>
+            <li>
+              <Link href="/podarunky/narodzhennia-dytyny">Народження малюка</Link>
+            </li>
+            <li>
+              <Link href="/podarunky/rizdvo">Різдво</Link>
+            </li>
+            <li>
+              <Link href="/podarunky/mykolai">Святий Миколай</Link>
+            </li>
+            <li>
+              <Link href="/podarunky">Усі приводи</Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2>Натхнення</h2>
+          <ul>
+            <li>
+              <Link href="/idei">Ідеї для книжок</Link>
+            </li>
+            <li>
+              <Link href="/temy">Теми</Link>
+            </li>
+            <li>
+              <Link href="/imena">Популярні імена</Link>
+            </li>
+            <li>
+              <Link href="/vik">За віком</Link>
+            </li>
+            <li>
+              <Link href="/biblioteka">Безкоштовні казки</Link>
+            </li>
+            <li>
+              <Link href="/blog">Блог</Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2>Підтримка</h2>
+          <ul>
+            <li>
+              <Link href="/dopomoha">Центр допомоги</Link>
             </li>
             <li>
               <Link href="/dostavka-i-oplata">Доставка й оплата</Link>

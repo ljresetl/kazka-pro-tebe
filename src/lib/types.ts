@@ -61,6 +61,8 @@ export type Story = {
   /** Який шаблонний сюжет використано (для «Інший сюжет»). */
   plotId?: string;
   paid?: boolean;
+  /** Номер замовлення, яким оплачено е-книгу (для знижки на друк). */
+  paidOrder?: string;
   options?: BookOptions;
 };
 
@@ -68,9 +70,14 @@ export type ProductId = "pdf" | "pdf-coloring" | "print";
 
 export type Order = {
   id: string;
-  storyId: string;
-  storyTitle: string;
-  product: ProductId;
+  /** Старі замовлення — одна казка й один товар. */
+  storyId?: string;
+  storyTitle?: string;
+  product?: ProductId;
+  /** Нові замовлення — позиції кошика. */
+  items?: import("./cart").CartLine[];
+  /** Код друга, якщо застосовано. */
+  referral?: string;
   amount: number;
   contact: { name: string; email: string; phone: string };
   /** Лише для друкованої книжки. */

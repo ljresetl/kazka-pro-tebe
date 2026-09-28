@@ -50,6 +50,16 @@ async function loadImages(storyId: string): Promise<Stored[]> {
   });
 }
 
+/** Одна збережена картинка як base64 (напр., обкладинка — зразок героя для перемальовування). */
+export async function loadImage(storyId: string, index: number): Promise<{ data: string; mimeType: string } | null> {
+  const item = (await loadImages(storyId).catch(() => [])).find((i) => i.index === index);
+  if (!item) return null;
+  const buf = new Uint8Array(await item.blob.arrayBuffer());
+  let bin = "";
+  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  return { data: btoa(bin), mimeType: item.blob.type || "image/png" };
+}
+
 export async function deleteImages(storyId: string) {
   const items = await loadImages(storyId).catch(() => []);
   if (!items.length) return;

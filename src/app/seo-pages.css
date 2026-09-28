@@ -1,0 +1,1143 @@
+/* Сторінки тем, імен, ідей, віку й подарунків. Мобільний спершу. */
+
+.seo-crumbs ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 14px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.seo-crumbs li:not(:last-child)::after {
+  content: "›";
+  margin-left: 8px;
+  color: var(--line);
+}
+.seo-crumbs a {
+  color: var(--muted);
+}
+
+.seo-hero {
+  padding: 20px 0 36px;
+}
+.seo-hero h1 {
+  font-size: clamp(28px, 7.4vw, 50px);
+  font-weight: 900;
+  line-height: 1.1;
+}
+.seo-hero-lead {
+  margin: 14px 0 20px;
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 44rem;
+}
+.seo-hero-grid {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+.seo-hero-art .slot-ph,
+.seo-hero-art .slot-img {
+  border-radius: var(--radius-xl);
+  width: 100%;
+  height: auto;
+}
+
+.quick-facts {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.quick-facts li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quick-facts svg {
+  flex: none;
+  color: var(--coral);
+}
+
+/* Вибір віку */
+.age-pick {
+  padding-top: 0;
+}
+.age-pick-box {
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  background: var(--paper-deep);
+}
+.age-pick-title {
+  margin-bottom: 14px;
+  font-size: 22px;
+}
+
+/* Текст теми */
+.theme-text {
+  max-width: 820px;
+}
+.theme-text h2 {
+  font-size: clamp(24px, 5.6vw, 34px);
+  color: var(--coral-strong);
+  margin-bottom: 12px;
+}
+.theme-text h3,
+.prose-block h3 {
+  margin: 20px 0 6px;
+  font-size: 18px;
+}
+.theme-text p,
+.prose-block p,
+.prose-block li {
+  color: var(--ink);
+  line-height: 1.65;
+}
+.prose-block {
+  max-width: 820px;
+}
+.prose-block h2 {
+  margin: 28px 0 10px;
+  font-size: clamp(22px, 5vw, 30px);
+}
+.prose-block h2:first-child {
+  margin-top: 0;
+}
+.prose-block ul {
+  padding-left: 20px;
+}
+
+.story-preview {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--coral-soft);
+  border-left: 4px solid var(--coral);
+}
+.story-preview h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+.story-preview-text p {
+  font-style: italic;
+  margin: 0 0 10px;
+}
+.story-preview:not(.is-open) .story-preview-text {
+  max-height: 7.5em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 60%, transparent);
+  mask-image: linear-gradient(#000 60%, transparent);
+}
+.link-btn {
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--coral-strong);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Якість книжки */
+.quality {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+.quality .slot-ph,
+.quality .slot-img {
+  border-radius: var(--radius-xl);
+  width: 100%;
+  height: auto;
+}
+.quality-sub {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.quality-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.quality-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.quality-list svg {
+  flex: none;
+  margin-top: 4px;
+  color: var(--mint);
+}
+
+/* Теми за розділами */
+.theme-groups {
+  display: grid;
+  gap: 18px;
+}
+.theme-group h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  color: var(--coral-strong);
+}
+.theme-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.theme-group a {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.topic-chip.is-plain {
+  padding: 6px 16px;
+}
+.topic-chip.is-accent {
+  padding: 6px 16px;
+  background: var(--coral);
+  color: #fff;
+  box-shadow: none;
+}
+.topic-chip.is-active {
+  background: var(--coral-soft);
+  box-shadow: 0 0 0 1.5px var(--coral);
+}
+
+/* Картки-посилання */
+.link-cards {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.link-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.15s ease;
+}
+.link-card:hover {
+  transform: translateY(-2px);
+}
+.link-card-img.slot-ph,
+.link-card-img.slot-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0;
+}
+.link-card-body {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px 14px;
+}
+.link-card-body strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+.link-card-body small {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.link-cards.is-small .link-card-img.slot-ph,
+.link-cards.is-small .link-card-img.slot-img {
+  aspect-ratio: 1;
+}
+
+.section-more {
+  margin-top: 20px;
+}
+
+/* Відгуки */
+.reviews {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.review {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.review-stars {
+  color: var(--sun);
+  letter-spacing: 2px;
+}
+.review p {
+  margin: 8px 0;
+  font-style: italic;
+}
+.reviews-empty {
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1.5px dashed var(--line);
+  color: var(--muted);
+}
+.reviews-empty p {
+  margin: 0;
+}
+
+/* Сторінки ідей та імен */
+.idea-grid {
+  display: grid;
+  gap: 28px;
+  align-items: start;
+}
+.idea-text h2 {
+  margin: 22px 0 8px;
+  font-size: clamp(20px, 4.6vw, 26px);
+}
+.idea-text h3 {
+  margin: 18px 0 6px;
+  font-size: 18px;
+}
+.idea-text p {
+  line-height: 1.65;
+}
+.idea-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.idea-tags a {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--coral-soft);
+  color: var(--coral-strong);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.idea-sample {
+  margin: 0;
+  padding: 14px 18px;
+  border-left: 4px solid var(--coral);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--coral-soft);
+  font-style: italic;
+  line-height: 1.6;
+}
+.idea-titles {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+}
+
+.start-box {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.start-box .slot-ph,
+.start-box .slot-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+}
+.start-box h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.start-box-body {
+  display: grid;
+  gap: 12px;
+}
+.start-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+}
+.start-price strong {
+  color: var(--coral-strong);
+  font-size: 20px;
+}
+.name-side {
+  display: grid;
+  gap: 16px;
+}
+.photo-example {
+  margin: 0;
+}
+.photo-example .slot-ph,
+.photo-example .slot-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+}
+.photo-example figcaption {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.letter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 0;
+}
+.letter-nav a {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--line);
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--ink);
+}
+.letter-nav a[aria-current="page"],
+.letter-nav a:hover {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: none;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 24px;
+}
+.pager a {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--line);
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pager a[aria-current="page"] {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: none;
+}
+
+.more-tags {
+  margin-top: 24px;
+}
+.more-tags summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--coral-strong);
+  margin-bottom: 12px;
+}
+.idea-filter {
+  margin-top: 4px;
+}
+
+.notfound-name {
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+.perk-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.perk-checks li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-weight: 700;
+}
+.perk-checks svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--mint);
+}
+
+/* Вкладки тем */
+.theme-tabs-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  scrollbar-width: thin;
+}
+.theme-tabs-list button {
+  flex: none;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--line);
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+.theme-tabs-list button.is-active {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: none;
+}
+
+.blog-teasers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.blog-teasers a {
+  display: grid;
+  gap: 8px;
+  height: 100%;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: var(--ink);
+}
+.blog-teasers span {
+  color: var(--coral-strong);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  .quick-facts {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .link-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .link-cards.is-small {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .reviews,
+  .blog-teasers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .theme-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .perk-checks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 24px;
+  }
+}
+@media (min-width: 900px) {
+  .seo-hero {
+    padding: 32px 0 56px;
+  }
+  .seo-hero-grid {
+    grid-template-columns: 1.15fr 1fr;
+    gap: 48px;
+  }
+  .quality {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 48px;
+  }
+  .idea-grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+    gap: 48px;
+  }
+  .start-box,
+  .name-side {
+    position: sticky;
+    top: 90px;
+  }
+  .name-side .start-box {
+    position: static;
+  }
+  .link-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .link-cards.is-small {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .theme-groups {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .reviews,
+  .blog-teasers {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .age-pick-box {
+    padding: 28px 32px;
+  }
+}
+
+/* Ціни */
+.price-flow {
+  display: grid;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+.price-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 22px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.price-card.is-main {
+  box-shadow: 0 0 0 2px var(--coral), var(--shadow);
+}
+.price-card h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.price-card p {
+  margin: 0;
+  color: var(--muted);
+}
+.price-card .price-card-amount {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.price-card .price-card-note {
+  font-size: 14px;
+  color: var(--coral-strong);
+  font-weight: 700;
+}
+.price-card ul {
+  list-style: none;
+  margin: 6px 0 10px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.price-card li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.price-card li svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--mint);
+}
+.price-arrow {
+  display: grid;
+  place-items: center;
+  color: var(--coral);
+}
+.price-arrow .only-wide {
+  display: none;
+}
+.extras {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.extra {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.extra .slot-ph,
+.extra .slot-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+.extra h3 {
+  margin: 4px 0 0;
+  font-size: 16px;
+}
+.extra p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.extra .extra-price {
+  font-size: 15px;
+  color: var(--ink);
+}
+.extra-price s {
+  color: var(--muted);
+}
+.extra-price strong {
+  color: var(--coral-strong);
+  font-size: 18px;
+}
+@media (min-width: 900px) {
+  .price-flow {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+  }
+  .price-arrow .only-wide {
+    display: block;
+  }
+  .price-arrow .only-narrow {
+    display: none;
+  }
+  .extras {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Можливості */
+.feature-rows {
+  display: grid;
+  gap: 32px;
+}
+.feature-row {
+  display: grid;
+  gap: 16px;
+  align-items: center;
+}
+.feature-row .slot-ph,
+.feature-row .slot-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+}
+.feature-row h2 {
+  font-size: clamp(22px, 5vw, 30px);
+  margin: 0 0 8px;
+}
+.feature-row p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.feature-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  color: var(--coral-strong);
+}
+.badge-new {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+@media (min-width: 900px) {
+  .feature-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .feature-row.is-flip > :first-child {
+    order: 2;
+  }
+}
+
+/* Допомога */
+.help-wrap {
+  max-width: 880px;
+}
+.help-search {
+  margin: 20px 0 32px;
+  padding: 20px;
+  border-radius: var(--radius-xl);
+  background: var(--paper-deep);
+}
+.help-search h2,
+.help-cats-title {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+.help-search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  min-height: 52px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--line);
+}
+.help-search-box:focus-within {
+  box-shadow: 0 0 0 2px var(--coral);
+}
+.help-search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+}
+.help-results {
+  margin-top: 16px;
+}
+.help-cats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 36px;
+}
+.help-cats a {
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--ink);
+}
+.help-section {
+  margin-bottom: 36px;
+  scroll-margin-top: 90px;
+}
+.help-section > h2 {
+  font-size: clamp(22px, 5vw, 28px);
+  margin-bottom: 12px;
+}
+.help-section summary h3 {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+}
+.help-back {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+@media (min-width: 640px) {
+  .help-cats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.review-summary {
+  font-weight: 800;
+  font-size: 18px;
+}
+.review-photo {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+.review-name {
+  font-size: 16px;
+  margin: 0;
+}
+.reviews-page {
+  margin-top: 20px;
+}
+
+/* Шапка: іконка «Мої казки» і довша кнопка */
+.header-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--ink);
+}
+.header-icon:hover {
+  background: var(--coral-soft);
+}
+@media (max-width: 639px) {
+  .header-cta {
+    display: none !important;
+  }
+}
+@media (min-width: 900px) and (max-width: 1099px) {
+  .header-cta {
+    display: none !important;
+  }
+}
+
+/* Підвал на 6 колонок, як на зразку */
+@media (min-width: 900px) {
+  .footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .footer-grid {
+    grid-template-columns: 1.4fr repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* Приклади на головній */
+.ex-shows {
+  display: grid;
+  gap: 16px;
+}
+.ex-show {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.ex-show .card {
+  box-shadow: none;
+}
+.ex-show-h {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.ex-show-photo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.ex-show-photo .slot-ph,
+.ex-show-photo .slot-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+.ex-param-row {
+  display: contents;
+}
+.ex-show-links {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+@media (min-width: 900px) {
+  .ex-shows {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.promo-row {
+  text-decoration: none;
+  color: inherit;
+}
+.promo-row > span:not(.promo-dot) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 559px) {
+  .promo-row > .promo-mid {
+    display: none;
+  }
+}
+
+/* Кошик */
+.cart-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.cart-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "info info del" "qty sum sum";
+  gap: 8px 12px;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.cart-line > div:first-child {
+  grid-area: info;
+  display: grid;
+  gap: 2px;
+}
+.cart-qty {
+  grid-area: qty;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cart-qty button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--paper-deep);
+  cursor: pointer;
+}
+.cart-sum {
+  grid-area: sum;
+  justify-self: end;
+}
+.cart-del {
+  grid-area: del;
+  position: static !important;
+}
+.cart-cover select {
+  font: inherit;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.extras-cart {
+  margin-bottom: 16px;
+}
+.extras-cart .extra .btn {
+  justify-self: start;
+}
+.header-cart {
+  position: relative;
+}
+.header-cart-count {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+@media (min-width: 640px) {
+  .cart-line {
+    grid-template-columns: minmax(0, 1fr) auto 100px auto;
+    grid-template-areas: "info qty sum del";
+  }
+}
+
+/* Мої казки */
+.my-card {
+  display: grid;
+  gap: 8px;
+}
+.my-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.my-actions .my-del {
+  position: static;
+  margin-left: auto;
+}
+.invite h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.invite-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.invite-row .field-input {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+/* Читалка: 13 розворотів — крапки переносяться, кнопки не вилазять за екран */
+.reader-nav {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.reader-dots {
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 4px;
+}
+
+/* Редактор книжки */
+.story-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.story-editor-head h2 {
+  margin: 0;
+}
+.story-editor .field {
+  margin-bottom: 14px;
+}
+.editor-pages {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.editor-pages li {
+  display: grid;
+  gap: 8px;
+}
+.editor-pages label {
+  font-weight: 800;
+}
+.editor-pages .btn {
+  justify-self: start;
+}
+.story-editor-save {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}

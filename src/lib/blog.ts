@@ -1,6 +1,11 @@
 // Статті блогу. Щоб додати нову — допишіть об'єкт у масив POSTS
 // (нові зверху). Сторінка, sitemap і розмітка для Google оновляться самі.
 
+import { POSTS_1 } from "./blog-posts/posts-1";
+import { POSTS_2 } from "./blog-posts/posts-2";
+import { POSTS_3 } from "./blog-posts/posts-3";
+import { POSTS_4 } from "./blog-posts/posts-4";
+
 export type BlogSection = { heading: string; paragraphs: string[] };
 
 export type BlogPost = {
@@ -158,6 +163,9 @@ export const POSTS: BlogPost[] = [
     ],
   },
 ];
+
+// Інші статті — у src/lib/blog-posts (від нових до старих).
+POSTS.push(...POSTS_1, ...POSTS_2, ...POSTS_3, ...POSTS_4);
 
 export function getPost(slug: string) {
   return POSTS.find((p) => p.slug === slug);

@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { BookHeart, ShoppingBag } from "lucide-react";
+import { priceCart, REFERRAL_RE } from "@/lib/cart";
+import { saveReferral, useCart } from "@/lib/storage";
 import Logo from "./Logo";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/pryklady", label: "Приклади" },
-  { href: "/biblioteka", label: "Безкоштовні казки" },
-  { href: "/blog", label: "Блог" },
-  { href: "/#tsiny", label: "Ціни" },
-  { href: "/moi-kazky", label: "Мої казки" },
+  { href: "/vidhuky", label: "Відгуки" },
+  { href: "/podarunky", label: "Привід" },
+  { href: "/mozhlyvosti", label: "Можливості" },
+  { href: "/tsiny", label: "Ціни" },
 ];
 
 export default function SiteHeader() {
@@ -27,6 +30,15 @@ export default function SiteHeader() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  const cart = useCart();
+  const count = cart ? priceCart(cart).lines.reduce((n, l) => n + l.qty, 0) : 0;
+
+  // Посилання друга ?kod=XXXXXX — запам'ятовуємо код для знижки в кошику.
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("kod")?.toUpperCase();
+    if (code && REFERRAL_RE.test(code)) saveReferral(code);
+  }, []);
 
   const isActive = (href: string) => !href.includes("#") && pathname.startsWith(href);
 
@@ -47,8 +59,15 @@ export default function SiteHeader() {
         </nav>
 
         <div className="header-actions">
+          <Link href="/moi-kazky" className="header-icon" aria-label="Мої казки" title="Мої казки">
+            <BookHeart size={22} aria-hidden="true" />
+          </Link>
+          <Link href="/koshyk" className="header-icon header-cart" aria-label={`Кошик${count ? `: ${count}` : ""}`} title="Кошик">
+            <ShoppingBag size={22} aria-hidden="true" />
+            {count > 0 && <span className="header-cart-count">{count}</span>}
+          </Link>
           <Link href="/stvoryty" className="btn btn-primary btn-small header-cta">
-            Створити казку
+            Створити дитячу книжку
           </Link>
           <button
             type="button"
@@ -80,10 +99,16 @@ export default function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Link href="/dostavka-i-oplata">Доставка й оплата</Link>
-          <Link href="/kontakty">Контакти</Link>
+          <Link href="/idei">Ідеї для книжок</Link>
+          <Link href="/temy">Теми</Link>
+          <Link href="/imena">Імена</Link>
+          <Link href="/vik">За віком</Link>
+          <Link href="/biblioteka">Безкоштовні казки</Link>
+          <Link href="/blog">Блог</Link>
+          <Link href="/moi-kazky">Мої казки</Link>
+          <Link href="/dopomoha">Допомога</Link>
           <Link href="/stvoryty" className="btn btn-primary btn-block">
-            Створити казку
+            Створити дитячу книжку
           </Link>
         </nav>
       )}

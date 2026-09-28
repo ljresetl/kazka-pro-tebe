@@ -8,6 +8,7 @@ import { jsonLd, OG_IMAGE } from "@/lib/seo";
 import { abs, SITE } from "@/lib/site";
 import "./globals.css";
 import "./design.css";
+import "./seo-pages.css";
 
 // Nunito — округлий шрифт з повною кирилицею: і для заголовків, і для тексту.
 const nunito = Nunito({
@@ -19,7 +20,7 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   title: {
-    default: `Іменна казка для дитини українською — ${SITE.name}`,
+    default: `Персональна дитяча книжка з ім'ям дитини — ${SITE.name}`,
     template: `%s — ${SITE.name}`,
   },
   description: SITE.description,
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     url: abs("/"),
     siteName: SITE.name,
     locale: "uk_UA",
-    title: "Іменна казка для дитини українською",
+    title: "Персональна дитяча книжка з ім'ям дитини",
     description: SITE.description,
     images: [OG_IMAGE],
   },

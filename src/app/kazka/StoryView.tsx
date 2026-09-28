@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Shuffle } from "lucide-react";
+import { BookOpen, Library, Pencil, Shuffle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,8 +12,10 @@ import IllustrationsPanel from "@/components/IllustrationsPanel";
 import { AI_ENABLED, AI_IMAGES, STATIC_SITE } from "@/lib/features";
 import { useStoryImages } from "@/lib/image-store";
 import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
-import { formatUah, PRICES } from "@/lib/prices";
-import { saveStory, useStory } from "@/lib/storage";
+import StoryEditor from "@/components/StoryEditor";
+import { EBOOK, HARDCOVER } from "@/lib/offer";
+import { formatUah } from "@/lib/prices";
+import { addToCart, saveStory, useStory } from "@/lib/storage";
 import { plotCount, yearsWord } from "@/lib/template-story";
 import { getTheme } from "@/lib/themes";
 import type { Story } from "@/lib/types";
@@ -24,6 +26,7 @@ export default function StoryView({ id }: { id: string }) {
   const story = useStory(id);
   const router = useRouter();
   const [regenerating, setRegenerating] = useState(false);
+  const [editing, setEditing] = useState(false);
   const images = useStoryImages(id);
 
   if (story === undefined) return <div className="writing" />;
@@ -60,6 +63,19 @@ export default function StoryView({ id }: { id: string }) {
   const canIllustrate = AI_IMAGES && !STATIC_SITE && paid;
   const aiMode = AI_ENABLED && !STATIC_SITE;
   const canRegenerate = !paid && (aiMode || plotCount(story.theme) > 1);
+
+  function buy(kind: "ebook" | "hardcover") {
+    if (!story) return;
+    addToCart({
+      storyId: story.id,
+      storyTitle: story.title,
+      kind,
+      cover: kind === "hardcover" ? "matova" : undefined,
+      ebookPaid: Boolean(story.paid),
+      paidOrder: story.paidOrder,
+    });
+    router.push("/koshyk");
+  }
 
   async function anotherPlot() {
     if (!story) return;
@@ -112,11 +128,22 @@ export default function StoryView({ id }: { id: string }) {
                 {regenerating ? "Пишемо…" : "Інший сюжет"}
               </button>
             )}
-            <Link href="/stvoryty" className="btn btn-ghost btn-small">
-              Нова казка
+            <button type="button" className="btn btn-soft btn-small" onClick={() => setEditing((e) => !e)} aria-expanded={editing}>
+              <Pencil size={16} aria-hidden="true" />
+              Редагувати
+            </button>
+            <Link href={`/stvoryty?prodovzhennia=${story.id}`} className="btn btn-ghost btn-small">
+              <Library size={16} aria-hidden="true" />
+              Продовження
             </Link>
           </div>
         </div>
+
+        {editing && (
+          <div style={{ marginBottom: 24 }}>
+            <StoryEditor story={story} canRedraw={canIllustrate && hasAiImages} onClose={() => setEditing(false)} />
+          </div>
+        )}
 
         <BookReader
           title={story.title}
@@ -129,9 +156,9 @@ export default function StoryView({ id }: { id: string }) {
           lockedMessage={
             <div>
               <p>Далі казка відкривається після оплати</p>
-              <Link href={`/kazka/oplata?id=${story.id}`} className="btn btn-primary">
-                Відкрити всю казку — {formatUah(PRICES[0].amount)}
-              </Link>
+              <button type="button" className="btn btn-primary" onClick={() => buy("ebook")}>
+                Відкрити всю книжку — {formatUah(EBOOK)}
+              </button>
             </div>
           }
         />
@@ -144,39 +171,53 @@ export default function StoryView({ id }: { id: string }) {
 
         <div className="book-actions">
           {paid ? (
-            <div className="panel">
-              <h2>Казка готова до друку</h2>
+            <div className="panel" id="rozmalovka">
+              <h2>Е-книга готова</h2>
               <p>
-                Роздрукуйте книжку або збережіть її як PDF, щоб надіслати бабусі чи в друкарню. «Розмальовка» зробить
-                ілюстрації контурами — дитина розфарбує їх сама.
+                Роздрукуйте книжку або збережіть її як PDF, щоб надіслати бабусі. «Розмальовка» зробить ілюстрації
+                контурами — дитина розфарбує їх сама.
               </p>
               <PrintButtons />
             </div>
           ) : (
             <div className="panel">
-              <h2>Сподобалась казка?</h2>
+              <h2>Сподобалась книжка?</h2>
               <ul className="offer-list">
-                {PRICES.map((p) => (
-                  <li key={p.id}>
-                    <span>{p.name}</span>
-                    <strong>{formatUah(p.amount)}</strong>
-                  </li>
-                ))}
+                <li>
+                  <span>Е-книга, 26 сторінок</span>
+                  <strong>{formatUah(EBOOK)}</strong>
+                </li>
+                <li>
+                  <span>Книжка у твердій обкладинці (е-книга входить)</span>
+                  <strong>{formatUah(HARDCOVER)}</strong>
+                </li>
               </ul>
-              <Link href={`/kazka/oplata?id=${story.id}`} className="btn btn-primary btn-block">
-                Обрати й оплатити
-              </Link>
+              <div className="button-row">
+                <button type="button" className="btn btn-primary" onClick={() => buy("ebook")}>
+                  Купити е-книгу
+                </button>
+                <button type="button" className="btn btn-ghost" onClick={() => buy("hardcover")}>
+                  <BookOpen size={18} aria-hidden="true" />
+                  Тверда обкладинка
+                </button>
+              </div>
             </div>
           )}
 
           {paid ? (
             <div className="panel">
-              <h2>Замовити книжку в палітурці</h2>
-              <p>Кольоровий друк, м&apos;яка обкладинка, доставка Новою Поштою за 1–2 дні після друку.</p>
-              <Link href={`/kazka/oplata?id=${story.id}&product=print`} className="btn btn-ghost">
+              <h2>Замовити книжку у твердій обкладинці</h2>
+              <p>
+                Формат A4, щільний крейдований папір, матова або глянцева обкладинка. Оплачена е-книга вже врахована:
+                доплата — {formatUah(HARDCOVER - EBOOK)}. Доставка Новою Поштою.
+              </p>
+              <button type="button" className="btn btn-primary" onClick={() => buy("hardcover")}>
                 <BookOpen size={18} aria-hidden="true" />
-                Замовити за {formatUah(PRICES[2].amount)}
-              </Link>
+                Замовити за {formatUah(HARDCOVER - EBOOK)}
+              </button>
+              <p className="hint" style={{ marginTop: 12 }}>
+                До книжки можна додати листівку, розмальовку, картину на полотні чи календар — зі знижкою 20%.
+              </p>
             </div>
           ) : (
             <div className="panel">
