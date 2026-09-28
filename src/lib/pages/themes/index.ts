@@ -22,12 +22,9 @@ export function getThemeText(id: string) {
   return BY_ID.get(id);
 }
 
-/** Стабільний вибір варіанта для теми (той самий при кожній збірці). */
-export function pick<T>(key: string, list: T[]): T {
-  let h = 0;
-  for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return list[h % list.length];
-}
+import { pick } from "../pick";
+
+export { pick };
 
 // Спільні продовження абзаців. {T} — назва теми в нижньому регістрі.
 const WHY_TAIL = [

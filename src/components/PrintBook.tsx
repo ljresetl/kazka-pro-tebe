@@ -62,7 +62,7 @@ export function printPageCount(storyPages: number) {
   return 2 + storyPages * 2;
 }
 
-export function PrintButtons({ note, coloring = true }: { note?: string; coloring?: boolean }) {
+export function PrintButtons({ note, coloring = true, label = "Роздрукувати або зберегти PDF" }: { note?: string; coloring?: boolean; label?: string }) {
   const print = (asColoring: boolean) => {
     const root = document.documentElement;
     root.classList.toggle("print-coloring", asColoring);
@@ -78,7 +78,7 @@ export function PrintButtons({ note, coloring = true }: { note?: string; colorin
     <div className="print-buttons">
       <button type="button" className="btn btn-primary" onClick={() => print(false)}>
         <Printer size={18} aria-hidden="true" />
-        Роздрукувати або зберегти PDF
+        {label}
       </button>
       {coloring && (
         <button type="button" className="btn btn-ghost" onClick={() => print(true)}>

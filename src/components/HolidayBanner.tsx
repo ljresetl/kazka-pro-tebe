@@ -22,7 +22,7 @@ export default function HolidayBanner() {
               Ще {next.days} {daysWord(next.days)}
             </span>
             <h2>{next.holiday.label} вже скоро</h2>
-            <p>Подаруйте {next.holiday.gift}, де головний герой — ваша дитина. PDF буде готовий одразу.</p>
+            <p>Подаруйте {next.holiday.gift}, де головний герой — ваша дитина. Е-книга буде готова одразу.</p>
             <Link href={`/stvoryty?tema=${next.holiday.topic}`} className="btn btn-primary">
               Створити святкову казку
             </Link>

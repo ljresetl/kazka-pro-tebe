@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useStory } from "@/lib/storage";
@@ -60,8 +61,16 @@ function CreateFromQuery() {
 
 export default function CreatePage() {
   return (
-    <Suspense fallback={<div className="writing" />}>
-      <CreateFromQuery />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="writing" />}>
+        <CreateFromQuery />
+      </Suspense>
+      {/* У конструкторі, як на зразку, замість повного підвалу — три посилання. */}
+      <nav className="wz-mini-footer" aria-label="Корисне">
+        <Link href="/dopomoha">Центр допомоги</Link>
+        <Link href="/umovy">Публічна оферта</Link>
+        <Link href="/konfidentsiinist">Конфіденційність</Link>
+      </nav>
+    </>
   );
 }

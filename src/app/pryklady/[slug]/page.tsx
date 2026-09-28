@@ -3,12 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BackLink from "@/components/BackLink";
 import BookReader from "@/components/BookReader";
-import SeoText from "@/components/SeoText";
-import ShareButtons from "@/components/ShareButtons";
-import { EXAMPLES, getExample } from "@/lib/examples";
+import PrintBook, { PrintButtons } from "@/components/PrintBook";
+import { BookQuality, Faq, Perks } from "@/components/seo/Blocks";
+import SlotImage from "@/components/SlotImage";
+import { EXAMPLES, exampleParams, getExample } from "@/lib/examples";
+import { GENERAL_FAQ } from "@/lib/general-faq";
 import { jsonLd, OG_IMAGE, pageMeta } from "@/lib/seo";
 import { abs, SITE } from "@/lib/site";
-import { getTheme } from "@/lib/themes";
 
 export function generateStaticParams() {
   return EXAMPLES.map((e) => ({ slug: e.slug }));
@@ -35,7 +36,6 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
   const ex = getExample(slug);
   if (!ex) notFound();
 
-  const theme = getTheme(ex.theme);
   const index = EXAMPLES.findIndex((e) => e.slug === ex.slug);
   const next = EXAMPLES.at((index + 1) % EXAMPLES.length)!;
   const url = abs(`/pryklady/${ex.slug}`);
@@ -64,32 +64,46 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
   };
 
   return (
-    <>
+    <div className="print-root">
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(bookLd)} />
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(crumbsLd)} />
       <div className="wrap book-page">
         <div className="back-row" style={{ paddingTop: 0, marginBottom: 12 }}>
           <BackLink fallback="/pryklady" label="Усі приклади" />
         </div>
-        <nav aria-label="Хлібні крихти">
-          <ol className="crumbs">
-            <li>
-              <Link href="/">Головна</Link>
-            </li>
-            <li>
-              <Link href="/pryklady">Приклади</Link>
-            </li>
-            <li aria-current="page">{ex.title}</li>
-          </ol>
-        </nav>
-        <div className="book-head">
-          <div>
-            <h1>{ex.title}</h1>
-            <p className="book-meta">
-              <span className="tag">{ex.ageLabel}</span>
-              <span className="tag is-mint">{theme.label}</span>
-              <span className="tag is-sun">{ex.trait}</span>
-            </p>
+        <p className="ex-kicker">Приклад персональної дитячої книжки:</p>
+        <h1 className="ex-title">{ex.title}</h1>
+
+        <div className="ex-panel">
+          <div className="ex-show-photos">
+            <h2 className="ex-show-h">Використані фото</h2>
+            <SlotImage id={`pryklad-foto/${ex.slug}`} alt={`Фото, з якого намальовано героя: ${ex.childName}`} detail="none" sizes="200px" />
+            <span className="ex-show-arrow" aria-hidden="true">
+              ↘
+            </span>
+          </div>
+          <div className="ex-show-params">
+            <h2 className="ex-show-h">Параметри історії</h2>
+            <dl className="ex-param-table">
+              {exampleParams(ex)
+                .filter(([k]) => k !== "Назва")
+                .map(([k, v]) => (
+                  <div key={k}>
+                    <dt>{k}:</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              <div>
+                <dt>Історія:</dt>
+                <dd>{ex.summary}</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="ex-panel-actions">
+            <PrintButtons coloring={false} note="Приклад можна зберегти як PDF: у вікні друку оберіть «Зберегти як PDF»." label="Завантажити приклад" />
+            <Link href={`/stvoryty?theme=${ex.theme}`} className="btn btn-primary">
+              Створити власну дитячу книжку
+            </Link>
           </div>
         </div>
 
@@ -100,55 +114,17 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
           coverImage={ex.coverImage}
           pages={ex.pages}
         />
-
-        <div className="book-actions">
-          <div className="panel">
-            <h2>Таку саму казку — для вашої дитини</h2>
-            <p>
-              Вкажіть ім&apos;я — і за хвилину отримаєте власну казку в пригоді «{theme.label}». Перегляд
-              безкоштовний.
-            </p>
-            <Link href={`/stvoryty?theme=${ex.theme}`} className="btn btn-primary">
-              Створити свою казку
-            </Link>
-          </div>
-          <div className="panel">
-            <ShareButtons
-              url={url}
-              title={ex.title}
-              text={`Казка «${ex.title}» — подивіться, які іменні казки бувають:`}
-              label="Поділитися прикладом"
-            />
-            <p style={{ margin: "20px 0 8px" }}>
-              Далі: «{next.title}» — {next.childName}, {next.ageLabel}.
-            </p>
-            <Link href={`/pryklady/${next.slug}`} className="btn btn-ghost btn-small">
-              Читати наступний приклад
-            </Link>
-          </div>
-        </div>
+        <p style={{ marginTop: 16 }}>
+          Далі: «{next.title}» — {next.childName}, {next.ageLabel}.{" "}
+          <Link href={`/pryklady/${next.slug}`}>Читати наступний приклад</Link>
+        </p>
       </div>
 
-      <SeoText title={`Про казку «${ex.title}»`}>
-        <div>
-          <p>{ex.summary}</p>
-          <p>
-            Це приклад із нашого каталогу: так виглядає казка в пригоді «{theme.label.toLowerCase()}» для дитини{" "}
-            {ex.ageLabel}. Головна думка — {ex.trait}: саме ця риса допомагає героєві впоратися з випробуванням у
-            кульмінації історії.
-          </p>
-        </div>
-        <div>
-          <p>
-            У вашій версії замість імені «{ex.childName}» буде ім&apos;я вашої дитини, а слова зміняться відповідно до
-            того, хлопчик це чи дівчинка. Звернення на першій сторінці ви напишете самі.
-          </p>
-          <p>
-            Книжку на 26 сторінок можна читати з екрана, роздрукувати як PDF на папері A4 або замовити
-            книжкою у твердій обкладинці.
-          </p>
-        </div>
-      </SeoText>
-    </>
+      <BookQuality />
+      <Perks title="Створіть неповторну книжку саме для своєї дитини" />
+      <Faq items={GENERAL_FAQ} tint />
+
+      <PrintBook title={ex.title} dedication={ex.dedication} cover={ex.cover} coverImage={ex.coverImage} pages={ex.pages} />
+    </div>
   );
 }

@@ -4,7 +4,7 @@
 // і вона з'явиться на сайті після наступної збірки.
 import { AGE_GROUPS, CATEGORIES, ILLUSTRATION_STYLES, MORALS } from "./catalog";
 import manifest from "./image-manifest.json";
-import { NAMES } from "./pages/names";
+import { NAMES } from "./pages/names-data";
 import { AGES } from "./pages/age-list";
 import { GIFTS } from "./pages/gifts";
 import { EXTRAS } from "./offer";

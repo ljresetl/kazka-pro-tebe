@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import InfoPage from "@/components/InfoPage";
 import SellerDetails from "@/components/SellerDetails";
+import ContactForm from "./ContactForm";
 import { pageMeta } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
@@ -21,20 +22,20 @@ export default function ContactsPage() {
 
   return (
     <InfoPage title="Контакти">
-      <p>
-        Маєте питання про казку, замовлення чи доставку? Напишіть нам — відповідаємо в робочі дні протягом доби.
-      </p>
+      <p>Маєте питання, зауваження чи ідеї? Пишіть нам — ми завжди на зв&apos;язку й відповідаємо в робочі дні.</p>
+      <ContactForm />
 
-      {channels.length > 0 ? (
-        <ul>
-          {channels.map((c) => (
-            <li key={c.label}>
-              <strong>{c.label}:</strong> <a href={c.href}>{c.text}</a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="notice is-info">Контакти для зв&apos;язку з&apos;являться тут найближчим часом.</p>
+      {channels.length > 0 && (
+        <>
+          <h2>Інші способи зв&apos;язку</h2>
+          <ul>
+            {channels.map((c) => (
+              <li key={c.label}>
+                <strong>{c.label}:</strong> <a href={c.href}>{c.text}</a>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
       <h2>Реквізити</h2>

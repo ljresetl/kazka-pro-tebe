@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import BackLink from "@/components/BackLink";
 import { Kvitka, OrnamentRule } from "@/components/Ornament";
 import ShareButtons from "@/components/ShareButtons";
-import { formatDate, getPost, POSTS } from "@/lib/blog";
+import { blogImage, formatDate, getPost, POSTS } from "@/lib/blog";
+import SlotImage from "@/components/SlotImage";
 import { getBook } from "@/lib/library";
 import { jsonLd, OG_IMAGE, pageMeta } from "@/lib/seo";
 import { abs, SITE } from "@/lib/site";
@@ -79,6 +80,7 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
         <p className="post-meta">
           <time dateTime={post.date}>{formatDate(post.date)}</time> · {post.readMinutes} хв читання
         </p>
+        <SlotImage id={`blog/${post.slug}`} slot={blogImage(post)} alt="" detail="label" className="article-img" priority sizes="(min-width: 900px) 760px, 92vw" />
         <p className="article-lead">{post.lead}</p>
       </header>
 

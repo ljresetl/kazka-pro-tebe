@@ -6,6 +6,8 @@ import { POSTS_2 } from "./blog-posts/posts-2";
 import { POSTS_3 } from "./blog-posts/posts-3";
 import { POSTS_4 } from "./blog-posts/posts-4";
 
+import type { ImageSlot } from "./images";
+
 export type BlogSection = { heading: string; paragraphs: string[] };
 
 export type BlogPost = {
@@ -173,4 +175,17 @@ export function getPost(slug: string) {
 
 export function formatDate(date: string) {
   return new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
+}
+
+/** Картинка до статті (як на зразку: ілюстрація в стилі 3D-мультфільму). */
+export function blogImage(p: BlogPost): ImageSlot {
+  return {
+    id: `blog/${p.slug}`,
+    group: "blog",
+    title: `Стаття «${p.title}»`,
+    prompt: `Warm children's book illustration for a parenting blog article titled "${p.title}" (${p.description}). Cosy family scene with a child and a picture book, soft 3D animated film style, warm pastel palette with orange accents, 3:2 landscape, no text, no letters.`,
+    width: 1200,
+    height: 800,
+    file: `/img/blog/${p.slug}.webp`,
+  };
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Crumbs, FinalCta, ThemeGrid } from "@/components/seo/Blocks";
+import { AgeChips, Crumbs, Perks, ThemeGrid } from "@/components/seo/Blocks";
 import SlotImage from "@/components/SlotImage";
 import { FEATURES } from "@/lib/features-list";
 import { pageMeta } from "@/lib/seo";
@@ -45,7 +45,8 @@ export default function FeaturesPage() {
         </div>
       </section>
       <ThemeGrid />
-      <FinalCta />
+      <AgeChips />
+      <Perks title="Створіть неповторну книжку саме для своєї дитини" />
     </>
   );
 }

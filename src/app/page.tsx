@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import HolidayBanner from "@/components/HolidayBanner";
 import { OrnamentRule } from "@/components/Ornament";
-import { AgePicker, Faq, Reviews, Section, SectionHead } from "@/components/seo/Blocks";
+import { AgePicker, Faq, Perks, Reviews, Section, SectionHead, ThemeGrid } from "@/components/seo/Blocks";
 import ExampleShowcase from "@/components/seo/ExampleShowcase";
-import ThemeTabs from "@/components/seo/ThemeTabs";
 import SlotImage from "@/components/SlotImage";
 import { EXAMPLES } from "@/lib/examples";
 import { EBOOK, HARDCOVER } from "@/lib/offer";
@@ -154,17 +153,10 @@ export default function Home() {
         </p>
       </Section>
 
-      <Section tint id="temy-rozdily">
-        <SectionHead title="Книжки на будь-яку тему й нагоду" />
-        <ThemeTabs />
-        <p className="section-more">
-          <Link href="/temy" className="btn btn-ghost">
-            Усі теми
-          </Link>
-        </p>
-      </Section>
+      <ThemeGrid />
 
       <Reviews />
+      <Perks title="Створіть неповторну книжку саме для своєї дитини" />
 
       <Faq items={FAQ} tint />
       <section className="section section-tint" style={{ paddingTop: 0 }}>

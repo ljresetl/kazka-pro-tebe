@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import ExampleCard from "@/components/ExampleCard";
+import type { ReactNode } from "react";
 import { AGE_GROUPS, EXAMPLES } from "@/lib/examples";
 import { THEMES, TRAITS } from "@/lib/themes";
 
 // Фільтри читають адресу (?vik=…&tema=…&rysa=…) у браузері,
 // тож каталог працює і на статичному хостингу.
-export default function ExamplesList() {
+export default function ExamplesList({ cards }: { cards: Record<string, ReactNode> }) {
   const sp = useSearchParams();
   const vik = sp.get("vik") ?? "";
   const tema = sp.get("tema") ?? "";
@@ -104,9 +104,9 @@ export default function ExamplesList() {
           </div>
         </div>
       ) : (
-        <div className="card-grid">
+        <div className="ex-shows">
           {list.map((e) => (
-            <ExampleCard key={e.slug} e={e} />
+            <div key={e.slug}>{cards[e.slug]}</div>
           ))}
         </div>
       )}

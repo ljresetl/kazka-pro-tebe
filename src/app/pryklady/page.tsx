@@ -1,26 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
-import BackLink from "@/components/BackLink";
-import ExampleCard from "@/components/ExampleCard";
-import { OrnamentRule } from "@/components/Ornament";
-import SeoText from "@/components/SeoText";
+import { Crumbs, Perks, Reviews } from "@/components/seo/Blocks";
+import ExampleShowcase from "@/components/seo/ExampleShowcase";
 import { EXAMPLES } from "@/lib/examples";
 import { jsonLd, pageMeta } from "@/lib/seo";
 import { abs } from "@/lib/site";
 import ExamplesList from "./ExamplesList";
 
 export const metadata: Metadata = pageMeta({
-  title: "Приклади іменних казок для дітей 3–7 років",
+  title: "Приклади персональних дитячих книжок",
   description:
-    "Десять прикладів персональних казок українською: космос, ліс, море, динозаври, замок і лука. Читайте онлайн і подивіться, якою буде казка про вашу дитину.",
+    "Приклади персональних дитячих книжок українською: фото, з яких намальовано героїв, параметри історії й повний текст. Подивіться, якою буде книжка про вашу дитину.",
   path: "/pryklady",
 });
 
 const listLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Приклади іменних казок",
+  name: "Приклади персональних дитячих книжок",
   itemListElement: EXAMPLES.map((e, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -30,68 +27,25 @@ const listLd = {
 };
 
 export default function ExamplesPage() {
+  const cards = Object.fromEntries(EXAMPLES.map((e) => [e.slug, <ExampleShowcase key={e.slug} e={e} />]));
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(listLd)} />
-      <div className="wrap" style={{ paddingBottom: 32 }}>
-        <div className="back-row">
-          <BackLink fallback="/" />
-        </div>
-        <div className="page-top">
-          <OrnamentRule className="ornament-rule" />
-          <h1>Приклади казок</h1>
-          <p>
-            Так виглядають казки, які ми створюємо: той самий сюжет отримаєте й ви, лише з іменем вашої дитини.
-            Читайте прямо тут.
+      <Crumbs items={[{ name: "Приклади", path: "/pryklady" }]} />
+      <section className="seo-hero">
+        <div className="wrap">
+          <h1 style={{ textAlign: "center" }}>Приклади персональних дитячих книжок</h1>
+          <p className="seo-hero-lead" style={{ textAlign: "center", marginInline: "auto" }}>
+            Цікаво, яким може бути персональна дитяча книжка? Перегляньте наші приклади й подивіться, як кожна дитина
+            може стати зіркою неповторної чарівної пригоди.
           </p>
+          <Suspense fallback={<div className="ex-shows">{EXAMPLES.map((e) => cards[e.slug])}</div>}>
+            <ExamplesList cards={cards} />
+          </Suspense>
         </div>
-
-        <Suspense
-          fallback={
-            <div className="card-grid">
-              {EXAMPLES.map((e) => (
-                <ExampleCard key={e.slug} e={e} />
-              ))}
-            </div>
-          }
-        >
-          <ExamplesList />
-        </Suspense>
-
-        <div className="cta-band" style={{ marginTop: 40 }}>
-          <div>
-            <h2>Сподобався приклад?</h2>
-            <p>Створіть таку саму казку зі своїм героєм — перегляд безкоштовний.</p>
-          </div>
-          <Link href="/stvoryty" className="btn btn-primary">
-            Створити казку
-          </Link>
-        </div>
-      </div>
-
-      <SeoText title="Як обрати казку для дитини">
-        <div>
-          <p>
-            Для малюків 2–3 років найкраще працюють спокійні сюжети з повторами: сумний Місяць, мушля, що співає, або
-            зірочка, яку треба повернути на небо. Короткі речення й знайомі образи — дім, вікно, ліжечко — допомагають
-            заснути без сліз.
-          </p>
-          <p>
-            Дітям 4–5 років подобаються пригоди з маленьким випробуванням: знайти маму диплодока, розгадати знаки на
-            пеньку чи помиритися з хмаркою. Тут з&apos;являються нові слова й трохи довший текст на сторінці.
-          </p>
-        </div>
-        <div>
-          <p>
-            Для 6–8 років обирайте сюжети, де герой діє сам і довше: піднятися на маяк під час шторму чи допомогти
-            дракону, який боїться темряви. Такі казки діти часто вже читають самостійно.
-          </p>
-          <p>
-            Звертайте увагу й на рису характеру. Якщо дитина соромиться — оберіть казку про сміливість. Якщо
-            поспішає — про терплячість. Казка не повчає напряму, але показує, як саме ця якість рятує ситуацію.
-          </p>
-        </div>
-      </SeoText>
+      </section>
+      <Reviews tint />
+      <Perks title="Створіть неповторну книжку саме для своєї дитини" />
     </>
   );
 }

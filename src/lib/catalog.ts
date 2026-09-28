@@ -207,8 +207,17 @@ export const CATEGORIES: Category[] = [
       t("nevpevnenist", "Невпевненість", "insecurity", "a small bird learning to fly"),
       t("emotsii", "Керування емоціями", "managing emotions", "a rainbow of emotion faces"),
       t("hordist", "Гордість за себе", "being proud of yourself", "a golden medal with a smile"),
-      t("smishni", "Смішні історії", "funny stories", "a laughing face with confetti"),
+    ],
+  },
+  {
+    id: "istorii",
+    label: "Історії",
+    en: "stories",
+    icon: "a stack of storybooks with a crescent moon and a smiling star",
+    about: "Мрійливі історії на ніч і смішні пригоди",
+    topics: [
       t("mriia", "Мрії на ніч", "dreamy bedtime stories", "a cloud bed with stars"),
+      t("smishni", "Смішні історії", "funny stories", "a laughing face with confetti"),
     ],
   },
 ];
