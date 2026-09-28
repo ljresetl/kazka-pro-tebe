@@ -52,5 +52,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/kontakty", 0.4, "yearly"),
     page("/umovy", 0.2, "yearly"),
     page("/konfidentsiinist", 0.2, "yearly"),
+    page("/litsenzii", 0.1, "yearly"),
   ];
 }
