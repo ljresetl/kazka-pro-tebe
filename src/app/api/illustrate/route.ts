@@ -54,6 +54,12 @@ export async function POST(request: Request) {
     return Response.json(image);
   } catch (err) {
     console.error("Illustration failed:", err);
+    if (/RESOURCE_EXHAUSTED|\b429\b|quota/i.test(String(err))) {
+      return Response.json(
+        { error: "Ліміт генератора ілюстрацій вичерпано. Спробуйте пізніше — або власнику сайту треба увімкнути оплату в Google AI Studio." },
+        { status: 429 },
+      );
+    }
     return Response.json({ error: "Не вдалося намалювати ілюстрацію. Спробуйте ще раз." }, { status: 502 });
   }
 }
