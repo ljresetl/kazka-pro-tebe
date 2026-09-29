@@ -107,6 +107,11 @@ export function buildPrompt(r: IllustrationRequest) {
     .join("\n");
 }
 
+/** Токени кожного запиту — у журнал Vercel, щоб рахувати собівартість казки (рядки «[usage]»). */
+export function logUsage(what: string, model: string | undefined, usage: unknown) {
+  console.log(`[usage] ${JSON.stringify({ what, model, usage })}`);
+}
+
 export function imagesConfigured() {
   return Boolean(process.env.GEMINI_API_KEY);
 }
@@ -121,6 +126,7 @@ async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string 
       model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
       contents: `One English sentence (max 35 words) describing the illustration for this page of a Ukrainian children's book: who does what, where, time of day, mood. Call the main hero "the child", never use names, never mention writing, signs, letters or words. Page: «${pageText}»`,
     });
+    logUsage("scene", res.modelVersion, res.usageMetadata);
     return res.text?.trim().slice(0, 600) || undefined;
   } catch {
     return undefined;
@@ -150,6 +156,7 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
     },
   });
 
+  logUsage(r.kind, response.modelVersion, response.usageMetadata);
   const parts = response.candidates?.[0]?.content?.parts ?? [];
   const image = parts.find((p) => p.inlineData?.data)?.inlineData;
   if (!image?.data) throw new Error("Gemini не повернув зображення");

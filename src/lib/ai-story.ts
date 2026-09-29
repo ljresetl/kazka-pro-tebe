@@ -123,6 +123,7 @@ async function claudeStory(req: StoryRequest): Promise<AiStory> {
     system: SYSTEM,
     messages: [{ role: "user", content: brief(req) }],
   });
+  console.log(`[usage] ${JSON.stringify({ what: "story", model: response.model, usage: response.usage })}`);
   if (response.stop_reason === "refusal") {
     throw new Error("Модель відмовилася писати цю казку");
   }
@@ -148,6 +149,7 @@ async function geminiStory(req: StoryRequest): Promise<AiStory> {
             temperature: 0.9,
           },
         });
+        console.log(`[usage] ${JSON.stringify({ what: "story", model: response.modelVersion ?? model, usage: response.usageMetadata })}`);
         const raw = response.text;
         if (!raw) throw new Error("Gemini повернув порожню відповідь");
         const parsed = StorySchema.safeParse(JSON.parse(raw));
