@@ -1,3 +1,4 @@
+import { CREATION_PAUSED, CREATION_PAUSED_MESSAGE } from "@/lib/features";
 import { z } from "zod";
 import { aiStory, hasAiCredentials } from "@/lib/ai-story";
 import { makeTemplateStory } from "@/lib/make-story";
@@ -57,6 +58,7 @@ function tooMany(ip: string) {
 }
 
 export async function POST(request: Request) {
+  if (CREATION_PAUSED) return Response.json({ error: CREATION_PAUSED_MESSAGE }, { status: 503 });
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
   if (tooMany(ip)) {
     return Response.json(

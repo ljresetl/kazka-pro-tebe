@@ -1,3 +1,4 @@
+import { CREATION_PAUSED, CREATION_PAUSED_MESSAGE } from "@/lib/features";
 import { z } from "zod";
 import { drawIllustration, imagesConfigured } from "@/lib/ai-images";
 
@@ -34,6 +35,7 @@ const LIMIT = 40;
 const hits = new Map<string, number[]>();
 
 export async function POST(request: Request) {
+  if (CREATION_PAUSED) return Response.json({ error: CREATION_PAUSED_MESSAGE }, { status: 503 });
   if (!imagesConfigured()) return Response.json({ error: "Ілюстрації ще не налаштовані." }, { status: 503 });
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
