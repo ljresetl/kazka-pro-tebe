@@ -1,7 +1,8 @@
 // Хто може читати сайт автоматично. Пускаємо пошуковики (Google, Bing, DuckDuckGo, Apple, Yandex…),
 // прев'ю посилань у месенджерах і офіційних ШІ-ботів великих компаній (OpenAI, Anthropic, Google,
 // Apple, Microsoft, Perplexity, Meta, Amazon) — щоб сайт з'являвся у відповідях ChatGPT, Claude,
-// Gemini, Perplexity. Анонімні збирачі даних, SEO-скрапери й програми для скачування — ні.
+// Gemini, Perplexity, а також SEO-сервіси Ahrefs і Semrush. Анонімні збирачі даних,
+// дрібні SEO-скрапери й програми для скачування — ні.
 
 /** Збирачі даних без користі для сайту (для robots.txt і блокування на сервері). */
 export const BAD_BOTS = [
@@ -17,8 +18,6 @@ export const BAD_BOTS = [
   "cohere-training-data-crawler",
   "Scrapy",
   "img2dataset",
-  "AhrefsBot",
-  "SemrushBot",
   "MJ12bot",
   "DotBot",
   "DataForSeoBot",

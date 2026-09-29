@@ -16,6 +16,8 @@ describe("хто може читати сайт", () => {
       "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot",
       "Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)",
       "Mozilla/5.0 (compatible; PerplexityBot/1.0; +https://perplexity.ai/perplexitybot)",
+      "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)",
+      "Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)",
     ]) expect(isBlockedAgent(ua), ua).toBe(false);
   });
 
@@ -23,7 +25,7 @@ describe("хто може читати сайт", () => {
     for (const ua of [
       "CCBot/2.0 (https://commoncrawl.org/faq/)",
       "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)",
-      "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)",
+      "Mozilla/5.0 (compatible; MJ12bot/v1.4.8; http://mj12bot.com/)",
       "python-requests/2.32.3",
       "curl/8.9.1",
       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0 Safari/537.36",
