@@ -26,6 +26,7 @@ const Schema = z.object({
   style: z.string().max(40).optional(),
   topic: z.string().max(40).optional(),
   companions: z.array(z.string().trim().max(120)).max(4).optional(),
+  cast: z.array(z.string().trim().max(200)).max(6).optional(),
   hasPhoto: z.boolean().optional(),
   page: z.number().int().min(0).max(40).optional(),
   reference: z

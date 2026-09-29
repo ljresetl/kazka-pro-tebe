@@ -63,6 +63,7 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       style: story.options?.style,
       topic: story.options?.topic && findTopic(story.options.topic) ? story.options.topic : undefined,
       companions: companions(story),
+      cast: story.cast?.slice(0, 6).map((c) => `${c.name}: ${c.look}`.slice(0, 200)),
       hasPhoto: part.kind === "cover" && Boolean(reference) && part.photo,
       kind: part.kind,
       page: part.page,
