@@ -73,7 +73,21 @@ export type IllustrationRequest = {
   companions?: string[];
   /** Батьки завантажили фото дитини (передається разом із запитом). */
   hasPhoto?: boolean;
+  /** Номер сторінки (0–11) — щоб чергувати плани кадру. */
+  page?: number;
 };
+
+/** Різні плани кадру для сторінок, щоб ілюстрації не повторювали одна одну. */
+const SHOTS = [
+  "wide establishing shot showing the whole place, the child small in the scene",
+  "medium shot from the side, the child in motion",
+  "close-up on the child's face and hands showing emotion",
+  "low angle looking up at the child and something big",
+  "view from behind the child looking at what they discover",
+  "bird's-eye view from above",
+  "over-the-shoulder shot from the companion's point of view",
+  "dynamic diagonal composition, the child mid-action",
+];
 
 /** Точний запит до художника-ШІ, зібраний із налаштувань казки. */
 export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fromCover?: boolean } = {}) {
@@ -103,6 +117,7 @@ export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fro
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
     what,
+    r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. Give the child a pose and action that fit this exact moment.` : null,
     "Square 1:1 composition (the book page shows the picture above the text), the main character clearly visible, gentle and safe for children.",
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
     "IMPORTANT: the picture must contain no text at all — no title, names, letters, words or numbers on vehicles, signs, books, banners or clothes.",
@@ -144,7 +159,7 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
   const prompt =
     buildPrompt(r, { fromCover }) +
     (fromCover
-      ? "\nUse the attached cover as the reference: keep the main character's face, hair colour, hairstyle and clothes and the art style exactly the same."
+      ? "\nThe attached cover is ONLY a reference for how the main character looks (face, hair colour, hairstyle, clothes) and for the art style. Do NOT copy the cover's composition, pose, background, props or other characters — draw a completely new scene for this moment of the story."
       : "");
 
   const response = await ai.models.generateContent({

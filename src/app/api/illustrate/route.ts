@@ -27,6 +27,7 @@ const Schema = z.object({
   topic: z.string().max(40).optional(),
   companions: z.array(z.string().trim().max(120)).max(4).optional(),
   hasPhoto: z.boolean().optional(),
+  page: z.number().int().min(0).max(40).optional(),
   reference: z
     .object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(4_000_000) })
     .optional(),
