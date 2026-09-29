@@ -2,7 +2,7 @@
 //   npx tsx --conditions=react-server scripts/compare-models.mts <вихідна-тека>
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type OverlayOptions } from "sharp";
 
 for (const line of readFileSync(".env.local", "utf8").split(/\r?\n/)) {
   const m = line.match(/^\s*([A-Z_]+)\s*=\s*"?(.*?)"?\s*$/);
@@ -39,7 +39,7 @@ for (const model of MODELS) {
 // Одна картинка для порівняння: рядок — сторінка, колонки — моделі.
 const S = 512;
 const HEAD = 60;
-const tiles: sharp.OverlayOptions[] = [];
+const tiles: OverlayOptions[] = [];
 MODELS.forEach((model, c) => {
   const label = `<svg width="${S}" height="${HEAD}"><rect width="100%" height="100%" fill="#1f2b3a"/><text x="50%" y="40" font-size="28" font-family="Arial" fill="#fff" text-anchor="middle">${model.replace("gemini-", "")}</text></svg>`;
   tiles.push({ input: Buffer.from(label), left: c * S, top: 0 });
