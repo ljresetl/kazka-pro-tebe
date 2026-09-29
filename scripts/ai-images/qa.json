@@ -1,0 +1,1418 @@
+{
+ "styl/3d": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/kazky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "book/foto-pryklad": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/pryntsesy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/druzhba": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/pryntsesy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "pryvid/mykolai": {
+  "issues": [],
+  "attempts": 2
+ },
+ "imya/avrora": {
+  "issues": [
+   "mismatch"
+  ],
+  "attempts": 2
+ },
+ "vik-rik/nemovlia": {
+  "issues": [
+   "mismatch"
+  ],
+  "attempts": 2
+ },
+ "dodatky/lystivka": {
+  "issues": [
+   "text",
+   "mismatch"
+  ],
+  "attempts": 2
+ },
+ "pryklad-foto/mariyka-i-zoryanyi-kyt": {
+  "issues": [],
+  "attempts": 1
+ },
+ "blog/koza-dereza-moral-kazky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "mozhlyvosti/temy": {
+  "issues": [
+   "text",
+   "mismatch"
+  ],
+  "attempts": 2
+ },
+ "book/hardcover": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/svity": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/zaniattia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/sviata": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/pryhody": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 2
+ },
+ "rozdil/rodyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/istorii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "rozdil/navchalni": {
+  "issues": [],
+  "attempts": 2
+ },
+ "rozdil/pochuttia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/pryroda": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/liubov": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/napolehlyvist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/dilytysia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/akvarel": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/heometriia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/chesnist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "moral/povaha": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/plastylin": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/naklieiky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/huash": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/anime": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/kubyky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/kolazh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "styl/komiks": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/lytsari": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/fei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/yedynorohy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/charivnyi-lis": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/rusalky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/veletni": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/hnomy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/charivna-shkola": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kazka-na-nich": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/chariviyky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/budivelna-tekhnika": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/smittievoz": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/perehony": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/litak": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pozhezhnyky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/politsiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/dynozavry": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/piraty": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/superheroi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kempinh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/skarb": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/taiemna-misiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/podorozhi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/budynok-pryvydiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/sport": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/podorozh-u-chasi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/tantsi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/muzyka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/maliuvannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kukhnia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/sadivnytstvo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/zoopark": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/park-rozvah": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/tsyrk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/likar": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/biblioteka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/stomatoloh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/budynochok-na-derevi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/hry-nadvori": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/potiah": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/perevdiahannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pliazh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/ferma": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/tvorchist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kosmos": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/dzhunhli": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/turbota-tvaryny": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/savana": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pivnichnyi-polius": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pidvodnyi-svit": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kraina-solodoshchiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/dykyi-zakhid": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/yehypet": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kamianyi-vik": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/hretsiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/vikinhy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/seredniovichchia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/tysiacha-nochei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/maibutnie": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kozatska-sich": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/ukrainske-selo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-narodzhennia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/mykolai": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/rizdvo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/novyi-rik": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/velykden": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-materi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-batka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-babusi-didusia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-ditei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/imenyny": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pershyi-dzvonyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kupala": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/vypusknyi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/valentyn": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/helovin": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-nezalezhnosti": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/karnaval": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/den-vyshyvanky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/bratyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/maliatko": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/sestrychka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/uliublenets": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/vesillia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/nochivlia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pereizd": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/vidpustka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/rozluchennia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/zmishana-rodyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/babusia-didus": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/proshchannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pershi-slova": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kolory-formy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/abetka": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/pory-roku": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/chastyny-tila": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/horshchyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/lichba": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/pustushka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/chyshchennia-zubiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/velosyped": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/shnurky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/prybyrannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/hodynnyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kharchuvannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/kyshenkovi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/pershi-kroky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/palchyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/sorom-iazlyvist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/strakh-temriavy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/hniv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/tuha": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/revnoshchi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/vpevnenist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/buling": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/nevpevnenist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/emotsii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/vplyv-druziv": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema/hordist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/smishni": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema/mriia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/charivnyi-lis": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/lytsari": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/yedynorohy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/fei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/veletni": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/rusalky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/charivna-shkola": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hnomy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/chariviyky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kazka-na-nich": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/budivelna-tekhnika": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/perehony": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/litak": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/smittievoz": {
+  "issues": [
+   "deformed"
+  ],
+  "attempts": 2
+ },
+ "tema-velyka/pozhezhnyky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/piraty": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/dynozavry": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/superheroi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/politsiia": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/kempinh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/podorozhi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/skarb": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/taiemna-misiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/budynok-pryvydiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/sport": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/tantsi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/muzyka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/podorozh-u-chasi": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 2
+ },
+ "tema-velyka/maliuvannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kukhnia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/sadivnytstvo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/park-rozvah": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/tsyrk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/biblioteka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/zoopark": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/stomatoloh": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/likar": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/budynochok-na-derevi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hry-nadvori": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/perevdiahannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/ferma": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/potiah": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/turbota-tvaryny": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kosmos": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/dzhunhli": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/tvorchist": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/pivnichnyi-polius": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/pidvodnyi-svit": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kraina-solodoshchiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/dykyi-zakhid": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hretsiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/yehypet": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kamianyi-vik": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/maibutnie": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/seredniovichchia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/tysiacha-nochei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vikinhy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/ukrainske-selo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kozatska-sich": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-narodzhennia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/mykolai": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/rizdvo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/velykden": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-materi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/novyi-rik": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-batka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-ditei": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/imenyny": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/pershyi-dzvonyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vypusknyi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-babusi-didusia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kupala": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/valentyn": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/karnaval": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/helovin": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-nezalezhnosti": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/den-vyshyvanky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/sestrychka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/bratyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/maliatko": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/uliublenets": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/pereizd": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/nochivlia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vidpustka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vesillia": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/babusia-didus": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/rozluchennia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/proshchannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/zmishana-rodyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/abetka": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 2
+ },
+ "tema-velyka/pershi-slova": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kolory-formy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/lichba": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 2
+ },
+ "tema-velyka/pory-roku": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/chastyny-tila": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/horshchyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/pustushka": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/chyshchennia-zubiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/velosyped": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/shnurky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/prybyrannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kyshenkovi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/kharchuvannia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/pershi-kroky": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/palchyk": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hodynnyk": {
+  "issues": [],
+  "attempts": 2
+ },
+ "tema-velyka/strakh-temriavy": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/sorom-iazlyvist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hniv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/tuha": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/revnoshchi": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vpevnenist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/buling": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/nevpevnenist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/vplyv-druziv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/emotsii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/hordist": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/mriia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/ahata": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/ada": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/ahniia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/adam": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/adelina": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/adrian": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/alevtyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/alina": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/adriana": {
+  "issues": [],
+  "attempts": 2
+ },
+ "imya/alla": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/alisa": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/albert": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anastasiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anatolii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/ameliia": {
+  "issues": [],
+  "attempts": 2
+ },
+ "imya/anhelika": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anhelina": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/andrii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anisiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/anton": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/antonina": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/aryna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/arkadii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/arsen": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/arsenii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/arseniia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/artem": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/artur": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/askold": {
+  "issues": [],
+  "attempts": 2
+ },
+ "imya/bohdan": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bohdana": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bohodar": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bohuslav": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bohuslava": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bozhena": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bozhydar": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/borys": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/bronyslav": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/viacheslav": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vadym": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/valentyn": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/valerii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/valeriia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/varvara": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/valentyna": {
+  "issues": [],
+  "attempts": 2
+ },
+ "imya/vasylyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vasylysa": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vasyl": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/velymyr": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/veniamin": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/veronika": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/veselyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vesna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/viktor": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/violetta": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/viktoriia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vira": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vladyslav": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vitalii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vitalina": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vladyslava": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vlas": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vlasta": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/volodymyr": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/vsevolod": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/havrylo": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/halyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/habriela": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/hanna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/heorhii": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/hlib": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/hnat": {
+  "issues": [],
+  "attempts": 1
+ }
+}

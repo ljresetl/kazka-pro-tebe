@@ -130,7 +130,7 @@ export const CATEGORIES: Category[] = [
       t("den-materi", "День матері", "Mother's Day", "a bouquet of tulips with a heart"),
       t("den-batka", "День батька", "Father's Day", "a toolbox with a heart"),
       t("den-ditei", "День захисту дітей", "Children's Day", "balloons and a kite"),
-      t("den-babusi-didusia", "День бабусі й дідуся", "Grandparents Day", "a rocking chair with knitting and a pipe"),
+      t("den-babusi-didusia", "День бабусі й дідуся", "Grandparents Day", "a rocking chair with knitting and a pair of reading glasses"),
       t("imenyny", "Іменини", "a name day", "a gift with a name tag"),
       t("pershyi-dzvonyk", "Перший дзвоник", "the first day of school", "a school bell with a flower bouquet"),
       t("vypusknyi", "Випускний у садочку", "kindergarten graduation", "a graduation cap on a teddy bear"),
