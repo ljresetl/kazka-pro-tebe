@@ -18,6 +18,7 @@ import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
 import StoryEditor from "@/components/StoryEditor";
 import { EBOOK, HARDCOVER } from "@/lib/offer";
 import { formatUah } from "@/lib/prices";
+import { PAYMENT_MODE } from "@/lib/payment";
 import { addToCart, saveStory, useStory } from "@/lib/storage";
 import { plotCount, yearsWord } from "@/lib/template-story";
 import { getTheme } from "@/lib/themes";
@@ -56,8 +57,26 @@ export default function StoryView({ id }: { id: string }) {
     if (!story?.paid || story.illustrate !== "started" || restStarted.current || drawing) return;
     if (!AI_IMAGES || STATIC_SITE || CREATION_PAUSED) return;
     restStarted.current = true;
-    // Уже намальовані сторінки illustrateStory пропускає, тож зайвих запитів не буде.
-    illustrateStory(story, (done, total) => setRest(done < total ? [done, total] : null))
+    (async () => {
+      let paidStory = story;
+      // Казки, «оплачені» в тестовому режимі до появи підпису оплати, отримують його зараз.
+      if (!story.paidTicket && PAYMENT_MODE === "test") {
+        const tickets = await fetch("/api/payment/test", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ storyIds: [story.id] }),
+        })
+          .then((r) => r.json() as Promise<{ tickets?: Record<string, string> }>)
+          .then((d) => d.tickets)
+          .catch(() => undefined);
+        if (tickets?.[story.id]) {
+          paidStory = { ...story, paidTicket: tickets[story.id] };
+          saveStory(paidStory);
+        }
+      }
+      // Уже намальовані сторінки illustrateStory пропускає, тож зайвих запитів не буде.
+      await illustrateStory(paidStory, (done, total) => setRest(done < total ? [done, total] : null));
+    })()
       .catch((err) => setDrawError(err instanceof Error ? err.message : "Не вдалося намалювати ілюстрації."))
       .finally(() => setRest(null));
   }, [story, drawing]);

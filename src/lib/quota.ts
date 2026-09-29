@@ -93,6 +93,26 @@ export function validTicket(storyId: string, ticket: string | undefined) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+/**
+ * Підпис оплати: зберігається в самій казці (у браузері покупця) й надсилається з кожним запитом.
+ * Так оплата не губиться, навіть якщо сервер перезапустився чи бази даних немає.
+ */
+export function paidTicket(storyId: string) {
+  return createHmac("sha256", SECRET).update(`paid:${storyId}`).digest("base64url").slice(0, 32);
+}
+
+function validPaidTicket(storyId: string, ticket: string | undefined) {
+  if (!ticket) return false;
+  const a = Buffer.from(paidTicket(storyId));
+  const b = Buffer.from(ticket);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** Підписи оплати для казок замовлення (браузер збереже їх у казках). */
+export function paidTickets(storyIds: string[]) {
+  return Object.fromEntries(storyIds.map((id) => [id, paidTicket(id)]));
+}
+
 // --- Правила ---
 
 const usedKey = (ip: string) => `q:stories:${ip}`;
@@ -118,8 +138,9 @@ export async function markPaid(storyIds: string[], ip?: string) {
 }
 
 /** Чи можна намалювати ще одну картинку до цієї казки. */
-export async function takeImage(storyId: string) {
-  const [paid, drawn] = await Promise.all([get(`q:paid:${storyId}`), get(`q:images:${storyId}`)]);
+export async function takeImage(storyId: string, ticket?: string) {
+  const [flag, drawn] = await Promise.all([get(`q:paid:${storyId}`), get(`q:images:${storyId}`)]);
+  const paid = validPaidTicket(storyId, ticket) || Boolean(flag);
   const limit = paid ? IMAGES_AFTER_PAYMENT : IMAGES_BEFORE_PAYMENT;
   if (drawn >= limit) return { ok: false as const, paid: Boolean(paid) };
   await incr(`q:images:${storyId}`, MONTH);

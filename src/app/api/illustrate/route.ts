@@ -13,6 +13,7 @@ export const maxDuration = 120;
 const Schema = z.object({
   storyId: z.string().max(40),
   ticket: z.string().max(64),
+  paidTicket: z.string().max(64).optional(),
   gender: z.enum(["boy", "girl"]),
   age: z.number().int().min(0).max(16),
   heroSeed: z.number().int().min(0).max(1_000_000),
@@ -52,13 +53,13 @@ export async function POST(request: Request) {
 
   const parsed = Schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Неправильний запит." }, { status: 400 });
-  const { reference, storyId, ticket, ...req } = parsed.data;
+  const { reference, storyId, ticket, paidTicket, ...req } = parsed.data;
 
   // Малюємо лише для казок, створених нашим сервером, і не більше, ніж дозволяє оплата.
   if (!validTicket(storyId, ticket)) {
     return Response.json({ error: "Цю казку створено до оновлення сайту — ілюстрації до неї вже не малюються." }, { status: 403 });
   }
-  const quota = await takeImage(storyId);
+  const quota = await takeImage(storyId, paidTicket);
   if (!quota.ok) {
     return Response.json(
       { error: quota.paid ? "Ліміт перемальовувань для цієї книжки вичерпано." : "Решта ілюстрацій намалюється після оплати.", code: "quota" },

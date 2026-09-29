@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { clientIp, markPaid } from "@/lib/quota";
+import { clientIp, markPaid, paidTickets } from "@/lib/quota";
 
 // Тестовий режим оплати (NEXT_PUBLIC_PAYMENT_MODE не "live"): гроші не списуються,
 // але сервер так само відкриває казки для повного малювання й дає ще одну казку.
@@ -10,6 +10,7 @@ export async function POST(request: Request) {
   if (process.env.NEXT_PUBLIC_PAYMENT_MODE === "live") return Response.json({ error: "Недоступно." }, { status: 404 });
   const parsed = Schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Неправильний запит." }, { status: 400 });
-  await markPaid([...new Set(parsed.data.storyIds)], clientIp(request));
-  return Response.json({ ok: true });
+  const storyIds = [...new Set(parsed.data.storyIds)];
+  await markPaid(storyIds, clientIp(request));
+  return Response.json({ ok: true, tickets: paidTickets(storyIds) });
 }

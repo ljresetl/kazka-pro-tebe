@@ -65,6 +65,8 @@ export type Story = {
   illustrate?: "pending" | "started";
   /** Підпис сервера: без нього ілюстрації не малюються (src/lib/quota.ts). */
   ticket?: string;
+  /** Підпис оплати від сервера: дозволяє домалювати й перемальовувати всю книжку. */
+  paidTicket?: string;
   /** Номер замовлення, яким оплачено е-книгу (для знижки на друк). */
   paidOrder?: string;
   options?: BookOptions;
