@@ -28,7 +28,7 @@ function companions(story: Story) {
  * Зразок героя (обкладинка чи фото), який надсилається з кожним запитом, стискаємо до ~768 px JPEG:
  * великі PNG (старі казки) не вміщуються в запит, а на мобільному інтернеті ще й довго летять.
  */
-async function shrinkReference(img: Img): Promise<Img> {
+export async function shrinkReference(img: Img): Promise<Img> {
   if (img.data.length < 700_000 || typeof document === "undefined") return img;
   try {
     const bytes = Uint8Array.from(atob(img.data), (c) => c.charCodeAt(0));

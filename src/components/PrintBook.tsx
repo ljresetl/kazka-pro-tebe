@@ -2,8 +2,9 @@
 
 import { Palette, Printer } from "lucide-react";
 import { useState } from "react";
+import { aiColoring, canAiColor } from "@/lib/coloring";
 import { lineArt } from "@/lib/line-art";
-import type { Illustration, SceneId } from "@/lib/types";
+import type { Illustration, SceneId, Story } from "@/lib/types";
 import Scene from "./Scene";
 
 type Props = {
@@ -17,9 +18,9 @@ type Props = {
   fontClass?: string;
 };
 
-function Art({ scene, image }: { scene: SceneId; image?: Illustration }) {
+function Art({ scene, image, idx }: { scene: SceneId; image?: Illustration; idx: number }) {
   // eslint-disable-next-line @next/next/no-img-element -- для друку потрібна звичайна картинка без лінивого завантаження
-  return image ? <img src={image.src} alt="" /> : <Scene id={scene} />;
+  return image ? <img src={image.src} alt="" data-idx={idx} /> : <Scene id={scene} />;
 }
 
 // Версія книжки лише для друку, як справжня книжка A4:
@@ -30,7 +31,7 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
   return (
     <div className={`print-book ${fontClass}`} aria-hidden="true">
       <section className="print-page print-cover">
-        <Art scene={cover} image={coverImage} />
+        <Art scene={cover} image={coverImage} idx={-1} />
         <p className="cover-title">{title}</p>
         {mark}
       </section>
@@ -42,7 +43,7 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
       </section>
       {pages.map((p, i) => (
         <section key={i} className="print-page print-story-page">
-          <Art scene={p.scene} image={p.image} />
+          <Art scene={p.scene} image={p.image} idx={i} />
           <p className="story-text">{p.text}</p>
           <span className="page-no">{3 + i}</span>
           {mark}
@@ -57,8 +58,21 @@ export function printPageCount(storyPages: number) {
   return 2 + storyPages;
 }
 
-export function PrintButtons({ note, coloring = true, label = "Роздрукувати або зберегти PDF" }: { note?: string; coloring?: boolean; label?: string }) {
+export function PrintButtons({
+  note,
+  coloring = true,
+  label = "Роздрукувати або зберегти PDF",
+  story,
+}: {
+  note?: string;
+  coloring?: boolean;
+  label?: string;
+  /** Оплачена книжка: розмальовку робить ШІ (чисті контури), інакше — браузер. */
+  story?: Story;
+}) {
   const [preparing, setPreparing] = useState(false);
+  const [progress, setProgress] = useState<[number, number] | null>(null);
+  const [error, setError] = useState("");
 
   const print = async (asColoring: boolean) => {
     const root = document.documentElement;
@@ -66,11 +80,25 @@ export function PrintButtons({ note, coloring = true, label = "Роздруку�
     const swapped: [HTMLImageElement, string][] = [];
     if (asColoring) {
       setPreparing(true);
+      setError("");
+      let ai = new Map<number, string>();
+      if (canAiColor(story)) {
+        try {
+          ai = await aiColoring(story!, (done, total) => setProgress([done, total]));
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Не вдалося зробити розмальовку.");
+          setPreparing(false);
+          setProgress(null);
+          return;
+        }
+        setProgress(null);
+      }
       const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(".print-book img"));
       await Promise.all(
         imgs.map(async (img) => {
           try {
-            const art = await lineArt(img.currentSrc || img.src);
+            const fromAi = ai.get(Number(img.dataset.idx));
+            const art = fromAi ?? (await lineArt(img.currentSrc || img.src));
             swapped.push([img, img.src]);
             img.src = art;
           } catch {
@@ -100,12 +128,17 @@ export function PrintButtons({ note, coloring = true, label = "Роздруку�
       {coloring && (
         <button type="button" className="btn btn-ghost" onClick={() => print(true)} disabled={preparing}>
           <Palette size={18} aria-hidden="true" />
-          {preparing ? "Готуємо контури…" : "Роздрукувати розмальовку"}
+          {progress ? `Малюємо розмальовку: ${progress[0]} з ${progress[1]}…` : preparing ? "Готуємо контури…" : "Роздрукувати розмальовку"}
         </button>
       )}
       <p className="hint">
         {note ?? "У вікні друку оберіть «Зберегти як PDF», щоб отримати файл. Формат A4: обкладинка, титул і сторінки з ілюстрацією й текстом."}
       </p>
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
