@@ -12,7 +12,7 @@ function seedFrom(text: string) {
   return (h >>> 0) % 1_000_000;
 }
 
-type Part = { kind: "cover" | "page"; pageText: string; illustration?: string; photo?: boolean };
+type Part = { kind: "cover" | "page"; pageText: string; illustration?: string; photo?: boolean; page?: number };
 
 const KIND_EN = { person: "person", pet: "animal", object: "toy or object" } as const;
 
@@ -43,6 +43,7 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       companions: companions(story),
       hasPhoto: part.kind === "cover" && Boolean(reference) && part.photo,
       kind: part.kind,
+      page: part.page,
       pageText: part.pageText,
       illustration: part.illustration,
       reference,
@@ -131,7 +132,7 @@ export async function illustrateStory(
     if (have.has(i)) continue;
     const page = story.pages[i];
     try {
-      const img = await drawWithRetry(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover);
+      const img = await drawWithRetry(story, { kind: "page", pageText: page.text, illustration: page.illustration, page: i }, cover);
       await saveImage(story.id, i, img.data, img.mimeType);
       onProgress(++done, total);
     } catch (err) {
@@ -147,6 +148,6 @@ export async function redrawPage(story: Story, index: number) {
   const page = story.pages[index];
   if (!page) return;
   const cover = await loadImage(story.id, -1);
-  const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover ?? undefined);
+  const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration, page: index }, cover ?? undefined);
   await saveImage(story.id, index, img.data, img.mimeType);
 }
