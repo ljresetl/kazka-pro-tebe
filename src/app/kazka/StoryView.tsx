@@ -77,6 +77,7 @@ export default function StoryView({ id }: { id: string }) {
   const pages = story.pages.map((p, i) => ({ ...p, image: images.pages[i] ?? p.image }));
   const printPages = paid ? pages : pages.slice(0, FREE_PAGES);
   const hasAiImages = Boolean(images.cover || images.pages.some(Boolean));
+  const missingImages = (images.cover ? 0 : 1) + story.pages.filter((_, i) => !images.pages[i]).length;
   // Ілюстрації малюються одразу, ще до оплати, — щоб батьки побачили свою книжку повністю.
   const canIllustrate = AI_IMAGES && !STATIC_SITE;
   const aiMode = AI_ENABLED && !STATIC_SITE;
@@ -201,13 +202,13 @@ export default function StoryView({ id }: { id: string }) {
 
         {drawError && (
           <p className="form-error" role="alert" style={{ marginTop: 16 }}>
-            {drawError} Спробуйте ще раз кнопкою нижче.
+            {drawError}
           </p>
         )}
 
         {canIllustrate && (
           <div style={{ marginTop: 24 }}>
-            <IllustrationsPanel story={story} hasImages={hasAiImages} paid={paid} />
+            <IllustrationsPanel story={story} hasImages={hasAiImages} missing={missingImages} paid={paid} />
           </div>
         )}
 
