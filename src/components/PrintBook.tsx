@@ -1,6 +1,8 @@
 "use client";
 
 import { Palette, Printer } from "lucide-react";
+import { useState } from "react";
+import { lineArt } from "@/lib/line-art";
 import type { Illustration, SceneId } from "@/lib/types";
 import Scene from "./Scene";
 
@@ -56,11 +58,33 @@ export function printPageCount(storyPages: number) {
 }
 
 export function PrintButtons({ note, coloring = true, label = "Роздрукувати або зберегти PDF" }: { note?: string; coloring?: boolean; label?: string }) {
-  const print = (asColoring: boolean) => {
+  const [preparing, setPreparing] = useState(false);
+
+  const print = async (asColoring: boolean) => {
     const root = document.documentElement;
+    // Для розмальовки ілюстрації тимчасово замінюються контурами, після друку — повертаються.
+    const swapped: [HTMLImageElement, string][] = [];
+    if (asColoring) {
+      setPreparing(true);
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(".print-book img"));
+      await Promise.all(
+        imgs.map(async (img) => {
+          try {
+            const art = await lineArt(img.currentSrc || img.src);
+            swapped.push([img, img.src]);
+            img.src = art;
+          } catch {
+            // Лишаємо картинку як є — CSS зробить її чорно-білою.
+          }
+        }),
+      );
+      await Promise.all(swapped.map(([img]) => img.decode().catch(() => {})));
+      setPreparing(false);
+    }
     root.classList.toggle("print-coloring", asColoring);
     const cleanup = () => {
       root.classList.remove("print-coloring");
+      swapped.forEach(([img, src]) => (img.src = src));
       window.removeEventListener("afterprint", cleanup);
     };
     window.addEventListener("afterprint", cleanup);
@@ -74,9 +98,9 @@ export function PrintButtons({ note, coloring = true, label = "Роздруку�
         {label}
       </button>
       {coloring && (
-        <button type="button" className="btn btn-ghost" onClick={() => print(true)}>
+        <button type="button" className="btn btn-ghost" onClick={() => print(true)} disabled={preparing}>
           <Palette size={18} aria-hidden="true" />
-          Роздрукувати розмальовку
+          {preparing ? "Готуємо контури…" : "Роздрукувати розмальовку"}
         </button>
       )}
       <p className="hint">

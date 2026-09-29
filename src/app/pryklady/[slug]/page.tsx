@@ -100,7 +100,7 @@ export default async function ExamplePage(props: PageProps<"/pryklady/[slug]">) 
             </dl>
           </div>
           <div className="ex-panel-actions">
-            <PrintButtons coloring={false} note="Приклад можна зберегти як PDF: у вікні друку оберіть «Зберегти як PDF»." label="Завантажити приклад" />
+            <PrintButtons note="Приклад можна зберегти як PDF або роздрукувати розмальовкою: у вікні друку оберіть «Зберегти як PDF»." label="Завантажити приклад" />
             <Link href={`/stvoryty?theme=${ex.theme}`} className="btn btn-primary">
               Створити власну дитячу книжку
             </Link>

@@ -2292,7 +2292,8 @@ textarea.field-input {
 .print-coloring .print-book .scene .scene-bg {
   fill: #fff !important;
 }
-.print-coloring .print-book img {
+/* Запасний варіант, якщо контури не вдалося зробити (lineArt у PrintButtons). */
+.print-coloring .print-book img:not([src^="data:"]) {
   filter: grayscale(1) contrast(1.4) brightness(1.15);
 }
 
