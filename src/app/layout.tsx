@@ -5,7 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import PromoBar from "@/components/PromoBar";
 import SiteHeader from "@/components/SiteHeader";
 import { jsonLd, OG_IMAGE } from "@/lib/seo";
-import { abs, SITE } from "@/lib/site";
+import { abs, INDEXING, SITE } from "@/lib/site";
 import "./globals.css";
 import "./design.css";
 import "./seo-pages.css";
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
+  robots: INDEXING ? undefined : { index: false, follow: false },
   keywords: [
     "іменна казка",
     "персоналізована книга для дитини",

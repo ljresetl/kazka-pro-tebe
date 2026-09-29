@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { abs, SITE } from "./site";
+import { INDEXING, abs, SITE } from "./site";
 
 /** Повна адреса файлу (картинки) без кінцевого слеша. */
 export function absFile(path: string) {
@@ -47,7 +47,7 @@ export function pageMeta({ title, description, path, image, noindex, type = "web
       description,
       images: [img.url],
     },
-    robots: noindex ? { index: false, follow: true } : undefined,
+    robots: !INDEXING ? { index: false, follow: false } : noindex ? { index: false, follow: true } : undefined,
   };
 }
 
