@@ -17,6 +17,47 @@ for (const line of readFileSync(".env.local", "utf8").split(/\r?\n/)) {
 
 const { EXAMPLES } = await import("../src/lib/examples");
 const { drawIllustration } = await import("../src/lib/ai-images");
+const { GoogleGenAI } = await import("@google/genai");
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const TEXT_MODEL = "gemini-flash-latest";
+
+/**
+ * Українського тексту художнику не даємо — інакше він вписує слова в картинку.
+ * Дешева текстова модель описує кожну сторінку англійською (один запит на приклад).
+ */
+async function describe(title: string, pages: string[]): Promise<string[]> {
+  const res = await ai.models.generateContent({
+    model: TEXT_MODEL,
+    contents: `A Ukrainian children's picture book «${title}». For each of its ${pages.length} pages write one English sentence (max 35 words) describing what the illustration should show: who does what, where, time of day, mood. Call the main hero "the child", never use names, never mention writing, signs, letters or words. Return a JSON array of ${pages.length} strings.\n\n${pages.map((t, i) => `${i + 1}. ${t}`).join("\n")}`,
+    config: { responseMimeType: "application/json" },
+  });
+  const list = JSON.parse(res.text ?? "[]") as string[];
+  if (!Array.isArray(list) || list.length !== pages.length) throw new Error("Опис сторінок не вийшов");
+  return list;
+}
+
+/** Перевірка готової картинки: чи немає написів. */
+async function hasText(webp: Buffer): Promise<boolean> {
+  const jpeg = await sharp(webp).resize(512, 512).jpeg({ quality: 80 }).toBuffer();
+  const res = await ai.models.generateContent({
+    model: TEXT_MODEL,
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { text: 'Does this illustration contain any written letters, words, names or numbers (not counting abstract decorations)? Answer JSON {"text": true|false}.' },
+          { inlineData: { mimeType: "image/jpeg", data: jpeg.toString("base64") } },
+        ],
+      },
+    ],
+    config: { responseMimeType: "application/json" },
+  });
+  try {
+    return Boolean((JSON.parse(res.text ?? "{}") as { text?: boolean }).text);
+  } catch {
+    return false;
+  }
+}
 
 const args = process.argv.slice(2);
 const limitAt = args.indexOf("--limit");
@@ -30,6 +71,8 @@ const jobs: Job[] = [];
 
 for (const ex of EXAMPLES) {
   if (only.length && !only.includes(ex.slug)) continue;
+  let scenes: Promise<string[]> | null = null;
+  const sceneFor = async (i: number) => (await (scenes ??= describe(ex.title, ex.pages.map((p) => p.text))))[i];
   const coverFile = `public/img/pryklad-obkladynka/${ex.slug}.webp`;
   const reference = { mimeType: "image/webp" as const, data: readFileSync(coverFile).toString("base64") };
   mkdirSync(path.join(OUT, ex.slug), { recursive: true });
@@ -49,13 +92,14 @@ for (const ex of EXAMPLES) {
             title: ex.title,
             kind: "page",
             pageText: page.text,
-            illustration: page.illustration,
+            illustration: page.illustration ?? (await sceneFor(index)),
             friend: ex.friend,
             style: ex.style,
           },
           reference,
         );
         const webp = await sharp(Buffer.from(img.data, "base64")).resize(1024, 1024, { fit: "cover" }).webp({ quality: 82 }).toBuffer();
+        if (await hasText(webp)) throw new Error("на картинці є напис");
         writeFileSync(file, webp);
       },
     });
@@ -75,7 +119,8 @@ async function worker() {
         console.log(`✓ ${job.slug} #${job.index + 1} (${++done})`);
         break;
       } catch (err) {
-        if (attempt >= 3) {
+        // Не більше двох спроб на картинку — кожна коштує грошей.
+        if (attempt >= 2) {
           failed++;
           console.log(`✗ ${job.slug} #${job.index + 1}: ${String(err).slice(0, 200)}`);
           break;

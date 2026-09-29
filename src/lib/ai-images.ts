@@ -111,8 +111,25 @@ export function imagesConfigured() {
   return Boolean(process.env.GEMINI_API_KEY);
 }
 
+/**
+ * Український текст сторінки художник-ШІ любить вписувати в картинку (ще й з помилками),
+ * тож дешева текстова модель спершу описує сцену англійською. Якщо не вийшло — малюємо з тексту.
+ */
+async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string | undefined> {
+  try {
+    const res = await ai.models.generateContent({
+      model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
+      contents: `One English sentence (max 35 words) describing the illustration for this page of a Ukrainian children's book: who does what, where, time of day, mood. Call the main hero "the child", never use names, never mention writing, signs, letters or words. Page: «${pageText}»`,
+    });
+    return res.text?.trim().slice(0, 600) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
   const prompt =
     buildPrompt(r) +
     (reference && !r.hasPhoto
