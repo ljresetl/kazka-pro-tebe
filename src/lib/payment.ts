@@ -36,12 +36,15 @@ export async function startPayment(order: Order): Promise<PaymentResult> {
     await new Promise((r) => setTimeout(r, 1200));
     // Сервер теж має знати про «оплату», інакше не домалює книжку (src/lib/quota.ts).
     const storyIds = [...new Set([...(order.items ?? []).map((i) => i.storyId), ...(order.storyId ? [order.storyId] : [])])];
-    await fetch("/api/payment/test", {
+    const tickets = await fetch("/api/payment/test", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ storyIds }),
-    }).catch(() => {});
-    markOrderPaid(order);
+    })
+      .then((r) => r.json() as Promise<{ tickets?: Record<string, string> }>)
+      .then((d) => d.tickets)
+      .catch(() => undefined);
+    markOrderPaid(order, tickets);
     return { status: "paid" };
   }
 
@@ -67,23 +70,25 @@ export async function startPayment(order: Order): Promise<PaymentResult> {
   }
 }
 
-/** Питає сервер, чи оплачено замовлення (після повернення з LiqPay). */
-export async function checkPayment(orderId: string): Promise<boolean> {
+/** Питає сервер, чи оплачено замовлення (після повернення з LiqPay). Оплачено — повертає підписи казок. */
+export async function checkPayment(orderId: string): Promise<Record<string, string> | null> {
   try {
     const res = await fetch(`/api/payment/status?order=${encodeURIComponent(orderId)}`, { cache: "no-store" });
-    const data = (await res.json()) as { paid?: boolean };
-    return Boolean(data.paid);
+    const data = (await res.json()) as { paid?: boolean; tickets?: Record<string, string> };
+    return data.paid ? (data.tickets ?? {}) : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
-/** Викликається після успішної оплати: відкриває всі книжки із замовлення. */
-export function markOrderPaid(order: Order) {
+/** Викликається після успішної оплати: відкриває всі книжки із замовлення й зберігає підписи оплати. */
+export function markOrderPaid(order: Order, tickets?: Record<string, string>) {
   saveOrder({ ...order, status: "paid" });
   const ids = new Set<string>([...(order.items ?? []).map((i) => i.storyId), ...(order.storyId ? [order.storyId] : [])]);
   for (const id of ids) {
     const story = readStory(id);
-    if (story && !story.paid) saveStory({ ...story, paid: true, paidOrder: order.id });
+    if (story && (!story.paid || (tickets?.[id] && !story.paidTicket))) {
+      saveStory({ ...story, paid: true, paidOrder: story.paidOrder ?? order.id, paidTicket: tickets?.[id] ?? story.paidTicket });
+    }
   }
 }

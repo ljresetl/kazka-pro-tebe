@@ -22,9 +22,10 @@ function Result() {
     let cancelled = false;
     (async () => {
       for (let attempt = 0; attempt < 6 && !cancelled; attempt++) {
-        if (await checkPayment(orderId)) {
+        const tickets = await checkPayment(orderId);
+        if (tickets) {
           if (order) {
-            markOrderPaid(order);
+            markOrderPaid(order, tickets);
             if (order.items) clearCart();
           }
           if (!cancelled) setState("paid");

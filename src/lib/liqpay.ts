@@ -65,6 +65,11 @@ export function checkoutUrl({ orderId, amount, description, resultUrl, serverUrl
 
 /** Статус платежу за номером замовлення: "success", "sandbox", "failure", "processing"… */
 export async function paymentStatus(orderId: string): Promise<string> {
+  return (await paymentDetails(orderId)).status;
+}
+
+/** Статус і опис платежу (в описі — номери казок у квадратних дужках, див. /api/payment). */
+export async function paymentDetails(orderId: string): Promise<{ status: string; description: string }> {
   const data = encode({ version: 3, public_key: PUBLIC_KEY, action: "status", order_id: orderId });
   const res = await fetch("https://www.liqpay.ua/api/request", {
     method: "POST",
@@ -72,9 +77,9 @@ export async function paymentStatus(orderId: string): Promise<string> {
     body: new URLSearchParams({ data, signature: sign(data) }),
     cache: "no-store",
   });
-  if (!res.ok) return "error";
-  const json = (await res.json()) as { status?: string };
-  return json.status ?? "error";
+  if (!res.ok) return { status: "error", description: "" };
+  const json = (await res.json()) as { status?: string; description?: string };
+  return { status: json.status ?? "error", description: json.description ?? "" };
 }
 
 export const PAID_STATUSES = new Set(["success", "sandbox"]);

@@ -30,3 +30,15 @@ describe("ліміти казок і ілюстрацій", () => {
     expect(validTicket("abc", "x".repeat(t.length))).toBe(false);
   });
 });
+
+describe("підпис оплати", () => {
+  it("відкриває всю книжку навіть без пам'яті сервера, підробка не працює", async () => {
+    const { paidTicket, takeImage } = await import("@/lib/quota");
+    const id = "story-b";
+    for (let i = 0; i < 6; i++) await takeImage(id);
+    expect((await takeImage(id, "x".repeat(32))).ok).toBe(false);
+    expect((await takeImage(id, paidTicket("інша"))).ok).toBe(false);
+    const ok = await takeImage(id, paidTicket(id));
+    expect(ok).toEqual({ ok: true, paid: true });
+  });
+});

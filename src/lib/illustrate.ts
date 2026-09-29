@@ -31,6 +31,7 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
     body: JSON.stringify({
       storyId: story.id,
       ticket: story.ticket ?? "",
+      paidTicket: story.paidTicket,
       gender: story.gender,
       age: story.age,
       heroSeed: seedFrom(story.id),
@@ -48,11 +49,16 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
     }),
   });
   const data = (await res.json()) as Img & { error?: string };
+  // Ліміт чи потрібна оплата — повтори не допоможуть, зупиняємося одразу.
+  if (res.status === 402 || res.status === 403) throw new StopError(data.error || "Ілюстрації зараз недоступні.");
   if (!res.ok || !data.data) throw new Error(data.error || "Не вдалося намалювати ілюстрацію.");
   return data;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Помилка, після якої малювати далі немає сенсу (ліміт, немає оплати). */
+class StopError extends Error {}
 
 /** На телефоні запит обривається, коли браузер іде у фон, — чекаємо, поки сторінку знову відкриють. */
 function whenVisible() {
@@ -75,6 +81,7 @@ async function drawWithRetry(story: Story, part: Part, reference?: Img): Promise
     try {
       return await draw(story, part, reference);
     } catch (err) {
+      if (err instanceof StopError) throw err;
       last = err;
       await sleep(2000 * (attempt + 1));
     }
@@ -127,7 +134,8 @@ export async function illustrateStory(
       const img = await drawWithRetry(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover);
       await saveImage(story.id, i, img.data, img.mimeType);
       onProgress(++done, total);
-    } catch {
+    } catch (err) {
+      if (err instanceof StopError) throw err;
       failed++;
     }
   }
