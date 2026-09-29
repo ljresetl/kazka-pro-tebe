@@ -42,6 +42,12 @@ export default function LicensesPage() {
         </p>
       </details>
 
+      <h2>Ілюстрації сайту</h2>
+      <p>
+        Частину ілюстрацій сайту (головна сторінка, картки віку) ми створили за власними описами за допомогою
+        штучного інтелекту Google Gemini. Поступово ними замінюються й інші картинки.
+      </p>
+
       <h2>Шрифти</h2>
       <p>
         <strong>Nunito</strong> та інші шрифти книжок (Alegreya, Comfortaa, Rubik Bubbles, Pacifico, Russo One, Caveat,
