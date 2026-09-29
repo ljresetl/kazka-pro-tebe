@@ -2,6 +2,7 @@ import { CREATION_PAUSED, CREATION_PAUSED_MESSAGE } from "@/lib/features";
 import { z } from "zod";
 import { aiStory, hasAiCredentials } from "@/lib/ai-story";
 import { makeTemplateStory } from "@/lib/make-story";
+import { clientIp, FREE_STORIES_PER_DAY, storyTicket, takeStory } from "@/lib/quota";
 import type { Story } from "@/lib/types";
 
 export const maxDuration = 120;
@@ -59,7 +60,7 @@ function tooMany(ip: string) {
 
 export async function POST(request: Request) {
   if (CREATION_PAUSED) return Response.json({ error: CREATION_PAUSED_MESSAGE }, { status: 503 });
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
+  const ip = clientIp(request);
   if (tooMany(ip)) {
     return Response.json(
       { error: "Забагато казок за годину. Спробуйте трохи пізніше або відкрийте вже створені в «Мої казки»." },
@@ -76,6 +77,17 @@ export async function POST(request: Request) {
   }
   const req = parsed.data;
 
+  // Одна безкоштовна казка на добу з адреси; кожна покупка додає ще одну.
+  if (!(await takeStory(ip))) {
+    return Response.json(
+      {
+        error: `Безкоштовно можна створити ${FREE_STORIES_PER_DAY === 1 ? "одну казку" : `${FREE_STORIES_PER_DAY} казки`} на добу. Купіть уже створену книжку — і зможете одразу створити ще одну, або поверніться завтра. Ваші казки — у «Мої казки».`,
+        code: "quota",
+      },
+      { status: 429 },
+    );
+  }
+
   // Випадковий шаблонний сюжет — запасний варіант, якщо ШІ недоступний.
   const story: Story = makeTemplateStory(req);
 
@@ -87,5 +99,5 @@ export async function POST(request: Request) {
     }
   }
 
-  return Response.json(story);
+  return Response.json({ ...story, ticket: storyTicket(story.id) });
 }

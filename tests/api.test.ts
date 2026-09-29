@@ -51,12 +51,14 @@ describe("API /api/story (без ключів ШІ — шаблонні казк
     expect(res.status).toBe(400);
   });
 
-  it("обмежує кількість казок з однієї адреси", async () => {
+  it("одна безкоштовна казка на добу з адреси, з підписом для ілюстрацій", async () => {
     const body = { childName: "Аня", gender: "girl", age: 4, theme: "sea", trait: "доброта" };
-    const statuses: number[] = [];
-    for (let i = 0; i < 10; i++) statuses.push((await createStory(json("http://x/api/story", body, "3.3.3.3"))).status);
-    expect(statuses.slice(0, 8).every((s) => s === 200)).toBe(true);
-    expect(statuses.at(-1)).toBe(429);
+    const first = await createStory(json("http://x/api/story", body, "3.3.3.3"));
+    expect(first.status).toBe(200);
+    expect((await first.json()).ticket).toMatch(/^[\w-]{32}$/);
+    const second = await createStory(json("http://x/api/story", body, "3.3.3.3"));
+    expect(second.status).toBe(429);
+    expect((await second.json()).code).toBe("quota");
   });
 });
 

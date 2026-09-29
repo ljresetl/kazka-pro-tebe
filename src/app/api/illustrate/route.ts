@@ -1,6 +1,7 @@
 import { CREATION_PAUSED, CREATION_PAUSED_MESSAGE } from "@/lib/features";
 import { z } from "zod";
 import { drawIllustration, imagesConfigured } from "@/lib/ai-images";
+import { takeImage, validTicket } from "@/lib/quota";
 
 export const maxDuration = 120;
 
@@ -10,6 +11,8 @@ export const maxDuration = 120;
 // Браузер надсилає лише налаштування казки; сам запит до художника-ШІ
 // збирається на сервері (buildPrompt), тож ключ не використати для сторонніх картинок.
 const Schema = z.object({
+  storyId: z.string().max(40),
+  ticket: z.string().max(64),
   gender: z.enum(["boy", "girl"]),
   age: z.number().int().min(0).max(16),
   heroSeed: z.number().int().min(0).max(1_000_000),
@@ -49,7 +52,19 @@ export async function POST(request: Request) {
 
   const parsed = Schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Неправильний запит." }, { status: 400 });
-  const { reference, ...req } = parsed.data;
+  const { reference, storyId, ticket, ...req } = parsed.data;
+
+  // Малюємо лише для казок, створених нашим сервером, і не більше, ніж дозволяє оплата.
+  if (!validTicket(storyId, ticket)) {
+    return Response.json({ error: "Цю казку створено до оновлення сайту — ілюстрації до неї вже не малюються." }, { status: 403 });
+  }
+  const quota = await takeImage(storyId);
+  if (!quota.ok) {
+    return Response.json(
+      { error: quota.paid ? "Ліміт перемальовувань для цієї книжки вичерпано." : "Решта ілюстрацій намалюється після оплати.", code: "quota" },
+      { status: 402 },
+    );
+  }
 
   try {
     const image = await drawIllustration(req, reference);

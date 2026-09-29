@@ -29,6 +29,8 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      storyId: story.id,
+      ticket: story.ticket ?? "",
       gender: story.gender,
       age: story.age,
       heroSeed: seedFrom(story.id),

@@ -9,7 +9,7 @@ import BookReader from "@/components/BookReader";
 import { bookFontClass } from "@/lib/book-fonts";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
 import IllustrationsPanel from "@/components/IllustrationsPanel";
-import { AI_ENABLED, AI_IMAGES, CREATION_PAUSED, STATIC_SITE } from "@/lib/features";
+import { AI_ENABLED, AI_IMAGES, CREATION_PAUSED, FREE_PAGES, STATIC_SITE } from "@/lib/features";
 import { illustrateStory } from "@/lib/illustrate";
 import { useStoryImages } from "@/lib/image-store";
 import { BOOK_PAGES } from "@/lib/book-facts";
@@ -23,7 +23,6 @@ import { plotCount, yearsWord } from "@/lib/template-story";
 import { getTheme } from "@/lib/themes";
 import type { Story } from "@/lib/types";
 
-const FREE_PAGES = 3;
 
 export default function StoryView({ id }: { id: string }) {
   const story = useStory(id);
@@ -126,6 +125,13 @@ export default function StoryView({ id }: { id: string }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(req),
         });
+        if (res.status === 429) {
+          // Ліміт казок на добу — показуємо пояснення замість шаблонної казки.
+          const data = (await res.json().catch(() => ({}))) as { error?: string };
+          setDrawError(data.error ?? "Ліміт нових казок на сьогодні вичерпано.");
+          setRegenerating(false);
+          return;
+        }
         if (res.ok) next = (await res.json()) as Story;
       } catch {
         // Лишаємо шаблонний варіант.
