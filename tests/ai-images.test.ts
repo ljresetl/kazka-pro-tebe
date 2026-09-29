@@ -43,3 +43,13 @@ describe("запит до художника-ШІ", () => {
     expect(buildPrompt({ ...req, kind: "cover", hasPhoto: true })).toContain("attached photo");
   });
 });
+
+describe("сторінка з обкладинкою-зразком", () => {
+  it("не містить випадкового опису героя, лише вимогу бути як на обкладинці", async () => {
+    const { buildPrompt, heroDescription } = await import("@/lib/ai-images");
+    const req = { gender: "girl" as const, age: 4, heroSeed: 3, theme: "sea", title: "Т", kind: "page" as const, pageText: "текст" };
+    const p = buildPrompt(req, { fromCover: true });
+    expect(p).not.toContain(heroDescription("girl", 4, 3));
+    expect(p).toContain("hair colour");
+  });
+});

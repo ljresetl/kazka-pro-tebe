@@ -76,7 +76,7 @@ export type IllustrationRequest = {
 };
 
 /** Точний запит до художника-ШІ, зібраний із налаштувань казки. */
-export function buildPrompt(r: IllustrationRequest) {
+export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fromCover?: boolean } = {}) {
   const hero = heroDescription(r.gender, r.age, r.heroSeed);
   const topic = r.topic ? findTopic(r.topic) : null;
   const setting = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
@@ -92,9 +92,13 @@ export function buildPrompt(r: IllustrationRequest) {
         : `Illustrate this page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
   return [
     look,
-    r.hasPhoto
-      ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair and skin tone), drawn in the art style above. The same character appears on every page of the book.`
-      : `Main character: ${hero}. The same character appears on every page of the book.`,
+    // Сторінка з обкладинкою-зразком: зовнішність беремо ЛИШЕ з обкладинки. Текстовий опис героя
+    // тут шкодив — художник то слухав його (інший колір волосся), то обкладинку.
+    fromCover
+      ? `Main character: exactly the same ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} as on the attached cover picture — identical face, hair colour, hairstyle, skin tone and clothes. Do not change any of these.`
+      : r.hasPhoto
+        ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair and skin tone), drawn in the art style above. The same character appears on every page of the book.`
+        : `Main character: ${hero}. The same character appears on every page of the book.`,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
@@ -136,10 +140,11 @@ async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string 
 export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
+  const fromCover = Boolean(reference) && !r.hasPhoto;
   const prompt =
-    buildPrompt(r) +
-    (reference && !r.hasPhoto
-      ? "\nUse the attached cover as the reference: keep the main character's face, hair and clothes and the art style exactly the same."
+    buildPrompt(r, { fromCover }) +
+    (fromCover
+      ? "\nUse the attached cover as the reference: keep the main character's face, hair colour, hairstyle and clothes and the art style exactly the same."
       : "");
 
   const response = await ai.models.generateContent({
