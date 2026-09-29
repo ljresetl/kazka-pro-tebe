@@ -91,7 +91,7 @@ describe("шаблонні казки", () => {
   });
 });
 
-describe("26 сторінок книжки", () => {
+describe("14 сторінок книжки", () => {
   it("кожен шаблонний сюжет має рівно 12 сторінок історії", async () => {
     const { PLOTS, templateStory } = await import("@/lib/template-story");
     for (const [theme, plots] of Object.entries(PLOTS)) {

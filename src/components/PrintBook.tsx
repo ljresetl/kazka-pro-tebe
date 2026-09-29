@@ -1,6 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
 import { Palette, Printer } from "lucide-react";
 import type { Illustration, SceneId } from "@/lib/types";
 import Scene from "./Scene";
@@ -22,8 +21,8 @@ function Art({ scene, image }: { scene: SceneId; image?: Illustration }) {
 }
 
 // Версія книжки лише для друку, як справжня книжка A4:
-// обкладинка, титул із передмовою, далі кожна сторінка історії — розворот
-// «ілюстрація + текст». Для 12 сторінок історії виходить 26 сторінок.
+// обкладинка, титул із передмовою, далі кожна сторінка історії — ілюстрація
+// на ~70% аркуша й текст під нею. Для 12 сторінок історії виходить 14 сторінок.
 export default function PrintBook({ title, dedication, cover, coverImage, pages, watermark, fontClass = "" }: Props) {
   const mark = watermark ? <span className="watermark">{watermark}</span> : null;
   return (
@@ -40,26 +39,20 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
         {mark}
       </section>
       {pages.map((p, i) => (
-        <Fragment key={i}>
-          <section className="print-page print-art-page">
-            <Art scene={p.scene} image={p.image} />
-            <span className="page-no">{3 + i * 2}</span>
-            {mark}
-          </section>
-          <section className="print-page print-text-page">
-            <p className="story-text">{p.text}</p>
-            <span className="page-no">{4 + i * 2}</span>
-            {mark}
-          </section>
-        </Fragment>
+        <section key={i} className="print-page print-story-page">
+          <Art scene={p.scene} image={p.image} />
+          <p className="story-text">{p.text}</p>
+          <span className="page-no">{3 + i}</span>
+          {mark}
+        </section>
       ))}
     </div>
   );
 }
 
-/** Скільки сторінок у друкованій книжці: обкладинка, титул і по дві на кожну сторінку історії. */
+/** Скільки сторінок у книжці: обкладинка, титул і по одній на кожну сторінку історії. */
 export function printPageCount(storyPages: number) {
-  return 2 + storyPages * 2;
+  return 2 + storyPages;
 }
 
 export function PrintButtons({ note, coloring = true, label = "Роздрукувати або зберегти PDF" }: { note?: string; coloring?: boolean; label?: string }) {
@@ -87,7 +80,7 @@ export function PrintButtons({ note, coloring = true, label = "Роздруку�
         </button>
       )}
       <p className="hint">
-        {note ?? "У вікні друку оберіть «Зберегти як PDF», щоб отримати файл. Формат A4: обкладинка, титул і розвороти «ілюстрація + текст»."}
+        {note ?? "У вікні друку оберіть «Зберегти як PDF», щоб отримати файл. Формат A4: обкладинка, титул і сторінки з ілюстрацією й текстом."}
       </p>
     </div>
   );

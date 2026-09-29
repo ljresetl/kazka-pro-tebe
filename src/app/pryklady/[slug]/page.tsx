@@ -24,7 +24,7 @@ export async function generateMetadata(props: PageProps<"/pryklady/[slug]">): Pr
     : OG_IMAGE;
   return pageMeta({
     title: `${ex.title} — приклад іменної казки`,
-    description: `${ex.summary} Читайте повністю онлайн: книжка на 26 сторінок, для дітей ${ex.ageLabel}. Створіть таку саму казку для своєї дитини.`,
+    description: `${ex.summary} Читайте повністю онлайн: книжка на 14 сторінок, для дітей ${ex.ageLabel}. Створіть таку саму казку для своєї дитини.`,
     path: `/pryklady/${ex.slug}`,
     image,
     type: "book",

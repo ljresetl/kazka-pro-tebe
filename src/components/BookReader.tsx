@@ -1,11 +1,12 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import Image from "next/image";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import type { PageFlip } from "page-flip";
 import type { Illustration, SceneId } from "@/lib/types";
 import { Kvitka } from "./Ornament";
+import { printPageCount } from "./PrintBook";
 import Scene from "./Scene";
 
 type Props = {
@@ -14,30 +15,98 @@ type Props = {
   cover: SceneId;
   coverImage?: Illustration;
   pages: { text: string; scene: SceneId; image?: Illustration }[];
-  /** Сторінки з цим індексом і далі показуються розмитими. */
+  /** Сторінки історії з цим індексом і далі показуються розмитими. */
   lockedFrom?: number;
   lockedMessage?: ReactNode;
   /** CSS-клас шрифту книжки (крок «Шрифт» у конструкторі). */
   fontClass?: string;
 };
 
-export default function BookReader({ title, dedication, cover, coverImage, pages, lockedFrom, lockedMessage, fontClass = "" }: Props) {
-  // 0 — обкладинка, далі сторінки казки
-  const [[spread, dir], setSpread] = useState<[number, number]>([0, 0]);
-  const total = pages.length + 1;
-  // Нумерація як у друкованій книжці: обкладинка й титул — 1–2,
-  // далі кожен розворот — ілюстрація (ліва) і текст (права). 12 розворотів → 26 сторінок.
-  const printTotal = 2 + pages.length * 2;
-  const reduce = useReducedMotion();
-
-  const go = useCallback(
-    (delta: number) =>
-      setSpread(([s]) => {
-        const next = Math.min(total - 1, Math.max(0, s + delta));
-        return [next, next === s ? 0 : delta];
-      }),
-    [total],
+function Art({ scene, image, eager }: { scene: SceneId; image?: Illustration; eager?: boolean }) {
+  return image ? (
+    // eslint-disable-next-line @next/next/no-img-element -- сторінки перегортає page-flip, next/image тут лише заважає
+    <img src={image.src} alt="" className="flip-img" loading={eager ? "eager" : "lazy"} draggable={false} />
+  ) : (
+    <Scene id={scene} />
   );
+}
+
+/**
+ * Читалка як справжня книжка: тверда обкладинка, далі сторінки перегортаються з анімацією.
+ * На широкому екрані видно розворот із двох сторінок, на телефоні — одну сторінку.
+ * Сторінки створює page-flip (він сам переставляє DOM), а вміст у них малює React через портали.
+ */
+export default function BookReader({ title, dedication, cover, coverImage, pages, lockedFrom, lockedMessage, fontClass = "" }: Props) {
+  // Обкладинка, титул, сторінки історії й задня обкладинка.
+  const count = pages.length + 3;
+  const printTotal = printPageCount(pages.length);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const flipRef = useRef<PageFlip | null>(null);
+  const [slots, setSlots] = useState<HTMLElement[]>([]);
+  const [current, setCurrent] = useState(0);
+  const [portrait, setPortrait] = useState(true);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const book = document.createElement("div");
+    host.appendChild(book);
+    const els = Array.from({ length: count }, (_, i) => {
+      const el = document.createElement("div");
+      const hard = i === 0 || i === count - 1;
+      el.className = `flip-page${hard ? " is-hard" : ""}`;
+      el.dataset.density = hard ? "hard" : "soft";
+      book.appendChild(el);
+      return el;
+    });
+    setSlots(els);
+    setCurrent(0);
+
+    let pf: PageFlip | null = null;
+    let cancelled = false;
+    import("page-flip").then(({ PageFlip }) => {
+      if (cancelled) return;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      pf = new PageFlip(book, {
+        width: 420,
+        height: 594,
+        size: "stretch",
+        minWidth: 240,
+        maxWidth: 560,
+        minHeight: 340,
+        maxHeight: 792,
+        showCover: true,
+        usePortrait: true,
+        mobileScrollSupport: true,
+        maxShadowOpacity: 0.4,
+        flippingTime: reduce ? 1 : 800,
+        drawShadow: !reduce,
+      });
+      pf.loadFromHTML(els);
+      pf.on("flip", (e) => setCurrent(Number(e.data)));
+      pf.on("changeOrientation", (e) => setPortrait(e.data === "portrait"));
+      setPortrait(pf.getOrientation() === "portrait");
+      flipRef.current = pf;
+    });
+    return () => {
+      cancelled = true;
+      flipRef.current = null;
+      setSlots([]);
+      try {
+        pf?.destroy();
+      } catch {
+        // Уже прибрано.
+      }
+      host.replaceChildren();
+    };
+  }, [count]);
+
+  const go = useCallback((delta: number) => {
+    const pf = flipRef.current;
+    if (!pf) return;
+    if (delta > 0) pf.flipNext();
+    else pf.flipPrev();
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -50,92 +119,93 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
     return () => window.removeEventListener("keydown", onKey);
   }, [go]);
 
-  const page = spread > 0 ? pages[spread - 1] : null;
-  const locked = page !== null && lockedFrom !== undefined && spread - 1 >= lockedFrom;
-  const image = page ? page.image : coverImage;
-  const hasImages = Boolean(coverImage || pages.some((p) => p.image));
-  const offset = reduce ? 0 : 40;
+  // Номери сторінок як у друкованій книжці: обкладинка — 1, титул — 2, історія — 3…
+  const last = count - 1;
+  const label =
+    current === 0
+      ? "Обкладинка"
+      : current === last
+        ? "Кінець"
+        : portrait || current + 1 >= last
+          ? `Сторінка ${current + 1} з ${printTotal}`
+          : `Сторінки ${current + 1}–${current + 2} з ${printTotal}`;
+
+  function content(i: number): ReactNode {
+    if (i === 0) {
+      return (
+        <div className="flip-cover">
+          <Art scene={cover} image={coverImage} eager />
+          <h2 className="cover-title">{title}</h2>
+        </div>
+      );
+    }
+    if (i === 1) {
+      return (
+        <div className="flip-title">
+          <Kvitka size={44} />
+          <p className="cover-title">{title}</p>
+          <p className="cover-dedication">{dedication}</p>
+          <span className="page-no">2</span>
+        </div>
+      );
+    }
+    if (i === last) {
+      return (
+        <div className="flip-back">
+          <Kvitka size={40} />
+          <p className="cover-title">Кінець</p>
+          <p className="cover-dedication">Казкарня</p>
+        </div>
+      );
+    }
+    const n = i - 2;
+    const page = pages[n];
+    const locked = lockedFrom !== undefined && n >= lockedFrom;
+    return (
+      <div className={`flip-story ${locked ? "is-locked" : ""}`}>
+        <div className="flip-art">
+          <Art scene={page.scene} image={page.image} eager={n < 2} />
+        </div>
+        <div className="flip-text">
+          <p className="story-text">{page.text}</p>
+        </div>
+        <span className="page-no">{i + 1}</span>
+        {locked && <div className="lock-overlay">{lockedMessage}</div>}
+      </div>
+    );
+  }
 
   return (
     <div className={`reader ${fontClass}`}>
-      <AnimatePresence mode="wait" initial={false} custom={dir}>
-        <motion.div
-          key={spread}
-          className={`reader-book ${hasImages ? "has-images" : ""}`}
-          aria-live="polite"
-          custom={dir}
-          initial={{ opacity: 0, x: dir * offset }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -dir * offset }}
-          transition={{ duration: reduce ? 0 : 0.22, ease: "easeOut" }}
-          drag={reduce ? false : "x"}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.18}
-          onDragEnd={(_, info) => {
-            if (info.offset.x < -60) go(1);
-            else if (info.offset.x > 60) go(-1);
-          }}
-          style={{ touchAction: "pan-y" }}
-        >
-          <div className="reader-art">
-            {image ? (
-              <Image
-                src={image.src}
-                width={image.width}
-                height={image.height}
-                alt=""
-                className="reader-img"
-                priority={spread === 0}
-                unoptimized={image.src.startsWith("blob:")}
-                draggable={false}
-                sizes="(max-width: 760px) 100vw, 460px"
-              />
-            ) : (
-              <Scene id={page ? page.scene : cover} />
-            )}
-          </div>
-          <div className={`reader-text ${locked ? "is-locked" : ""}`}>
-            {page ? (
-              <>
-                <p className="story-text">{page.text}</p>
-                <span className="page-no">{spread * 2 + 2}</span>
-                {locked && <div className="lock-overlay">{lockedMessage}</div>}
-              </>
-            ) : (
-              <div className="reader-cover">
-                <Kvitka size={44} />
-                <h2 className="cover-title">{title}</h2>
-                <p className="cover-dedication">{dedication}</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      <div className="flip-stage">
+        <div ref={hostRef} className="flip-host" />
+      </div>
+      {slots.map((el, i) => createPortal(content(i), el, `p${i}`))}
 
       <div className="reader-nav">
         <button
           type="button"
           className="btn btn-ghost btn-small"
           onClick={() => go(-1)}
-          disabled={spread === 0}
+          disabled={current === 0}
           aria-label="Попередня сторінка"
         >
           <ChevronLeft size={18} aria-hidden="true" />
           <span className="nav-word">Назад</span>
         </button>
         <div>
-          <div className="reader-count">
-            {spread === 0 ? `Обкладинка й титул · 1–2 з ${printTotal}` : `Сторінки ${spread * 2 + 1}–${spread * 2 + 2} з ${printTotal}`}
+          <div className="reader-count" aria-live="polite">
+            {label}
           </div>
           <div className="reader-progress" aria-hidden="true">
-            <span style={{ width: `${((spread + 1) / total) * 100}%` }} />
+            <span style={{ width: `${((current + 1) / count) * 100}%` }} />
           </div>
         </div>
         <button
           type="button"
           className="btn btn-primary btn-small"
           onClick={() => go(1)}
-          disabled={spread === total - 1}
+          disabled={current >= last - (portrait ? 0 : 1)}
           aria-label="Наступна сторінка"
         >
           <span className="nav-word">Далі</span>
@@ -143,7 +213,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
         </button>
       </div>
       <p className="hint" style={{ textAlign: "center" }}>
-        На телефоні гортайте пальцем, на комп&apos;ютері — стрілками.
+        Гортайте, потягнувши за край сторінки, або кнопками «Назад» і «Далі».
       </p>
     </div>
   );

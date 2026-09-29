@@ -99,7 +99,7 @@ export function buildPrompt(r: IllustrationRequest) {
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
     what,
-    "Landscape 4:3 composition, the main character clearly visible, gentle and safe for children.",
+    "Square 1:1 composition (the book page shows the picture above the text), the main character clearly visible, gentle and safe for children.",
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
     "IMPORTANT: the picture must contain no text at all — no title, names, letters, words or numbers on vehicles, signs, books, banners or clothes.",
   ]
@@ -129,7 +129,7 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
     ],
     config: {
       responseModalities: [Modality.IMAGE],
-      imageConfig: { aspectRatio: "4:3" },
+      imageConfig: { aspectRatio: "1:1" },
     },
   });
 
