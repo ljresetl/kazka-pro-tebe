@@ -26,6 +26,8 @@ function open(): Promise<IDBDatabase> {
 
 /** Фото дитини від батьків (лише для малювання, потім видаляється). */
 const PHOTO = -2;
+/** Розмальовки (контури від ШІ) зберігаються з індексами від 1000: обкладинка — 1000, сторінка i — 1001 + i. */
+export const COLORING_BASE = 1000;
 
 /** index: -1 — обкладинка, 0… — сторінки. */
 export async function saveImage(storyId: string, index: number, base64: string, mimeType: string) {
@@ -38,7 +40,8 @@ export async function saveImage(storyId: string, index: number, base64: string, 
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
-  window.dispatchEvent(new Event(EVENT));
+  // Розмальовки книжці не показуються — не змушуємо її перезавантажувати малюнки (старі адреси зламались би).
+  if (index < COLORING_BASE) window.dispatchEvent(new Event(EVENT));
 }
 
 export async function loadImages(storyId: string): Promise<Stored[]> {
@@ -90,7 +93,7 @@ export function useStoryImages(storyId: string) {
             const src = URL.createObjectURL(it.blob);
             urls.push(src);
             const ill = { src, width: W, height: H };
-            if (it.index === PHOTO) continue;
+            if (it.index === PHOTO || it.index >= COLORING_BASE) continue;
             if (it.index === -1) next.cover = ill;
             else next.pages[it.index] = ill;
           }

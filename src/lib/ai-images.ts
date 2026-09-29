@@ -217,3 +217,47 @@ async function mockImage(r: IllustrationRequest): Promise<GeneratedImage> {
   await new Promise((res) => setTimeout(res, 800));
   return compact({ data: png.toString("base64"), mimeType: "image/png" });
 }
+
+const COLORING_PROMPT =
+  "Turn this children's book illustration into a clean coloring page for a 3–6 year old: the same scene, characters and composition, drawn only with clean, smooth, closed black outlines of even medium thickness on a pure white background. No shading, no grey, no gradients, no hatching, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
+
+/**
+ * Розмальовка з готової ілюстрації: ШІ перемальовує сцену чистими контурами (дешевша модель —
+ * кольори тут не потрібні), а потім лінії робимо чорними й товщими, щоб добре друкувались.
+ */
+export async function drawColoring(image: GeneratedImage): Promise<GeneratedImage> {
+  let raw: Buffer;
+  if (process.env.MOCK_IMAGES === "1" && process.env.NODE_ENV !== "production") {
+    raw = Buffer.from(image.data, "base64");
+  } else {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_COLORING_MODEL || "gemini-2.5-flash-image",
+      contents: [{ role: "user", parts: [{ text: COLORING_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
+      config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio: "1:1" } },
+    });
+    logUsage("coloring", response.modelVersion, response.usageMetadata);
+    const out = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+    if (!out?.data) throw new Error("Gemini не повернув розмальовку");
+    raw = Buffer.from(out.data, "base64");
+  }
+  return boldLines(raw);
+}
+
+/** Сірі тонкі лінії → чорні, трохи товщі; усе інше — чисто біле. */
+async function boldLines(input: Buffer): Promise<GeneratedImage> {
+  const sharp = (await import("sharp")).default;
+  const { data, info } = await sharp(input).resize(1024, 1024, { fit: "inside" }).grayscale().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width;
+  const h = info.height;
+  const out = Buffer.alloc(w * h, 255);
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      let dark = false;
+      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (data[(y + dy) * w + x + dx] < 200) { dark = true; break; }
+      if (dark) out[y * w + x] = 0;
+    }
+  }
+  const png = await sharp(out, { raw: { width: w, height: h, channels: 1 } }).png({ compressionLevel: 9 }).toBuffer();
+  return { data: png.toString("base64"), mimeType: "image/png" };
+}

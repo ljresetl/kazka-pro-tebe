@@ -42,3 +42,13 @@ describe("підпис оплати", () => {
     expect(ok).toEqual({ ok: true, paid: true });
   });
 });
+
+describe("розмальовка від ШІ", () => {
+  it("лише для оплачених книжок і не більше 30 сторінок", async () => {
+    const { paidTicket, takeColoring } = await import("@/lib/quota");
+    expect((await takeColoring("c1", undefined)).ok).toBe(false);
+    expect((await takeColoring("c1", paidTicket("c2"))).ok).toBe(false);
+    for (let i = 0; i < 30; i++) expect((await takeColoring("c1", paidTicket("c1"))).ok).toBe(true);
+    expect(await takeColoring("c1", paidTicket("c1"))).toEqual({ ok: false, reason: "limit" });
+  });
+});

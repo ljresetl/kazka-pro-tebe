@@ -264,7 +264,7 @@ export default function StoryView({ id }: { id: string }) {
                 Роздрукуйте книжку або збережіть її як PDF, щоб надіслати бабусі. «Розмальовка» зробить ілюстрації
                 контурами — дитина розфарбує їх сама.
               </p>
-              <PrintButtons />
+              <PrintButtons story={story} />
             </div>
           ) : (
             <div className="panel">

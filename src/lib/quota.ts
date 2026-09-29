@@ -147,6 +147,14 @@ export async function takeImage(storyId: string, ticket?: string) {
   return { ok: true as const, paid: Boolean(paid) };
 }
 
+/** Розмальовка (контури від ШІ) — лише для оплачених книжок і не більше 30 сторінок на книжку. */
+export async function takeColoring(storyId: string, ticket?: string) {
+  if (!validPaidTicket(storyId, ticket)) return { ok: false as const, reason: "unpaid" as const };
+  if ((await get(`q:coloring:${storyId}`)) >= 30) return { ok: false as const, reason: "limit" as const };
+  await incr(`q:coloring:${storyId}`, MONTH);
+  return { ok: true as const };
+}
+
 // Замовлення LiqPay: між створенням платежу й підтвердженням пам'ятаємо, які казки й з якої адреси.
 export async function rememberOrder(orderId: string, storyIds: string[], ip: string) {
   if (!quotaStoreConfigured()) {
