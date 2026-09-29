@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { AI_BOTS } from "@/lib/bots";
+import { BAD_BOTS } from "@/lib/bots";
 import { abs, INDEXING } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -9,8 +9,8 @@ export default function robots(): MetadataRoute.Robots {
   if (!INDEXING) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
     rules: [
-      // ШІ-збирачам текстів і картинок — заборона на весь сайт; пошуковикам — відкрито.
-      { userAgent: AI_BOTS, disallow: "/" },
+      // Збирачам даних — заборона на весь сайт; пошуковикам і офіційним ШІ-ботам — відкрито.
+      { userAgent: BAD_BOTS, disallow: "/" },
       { userAgent: "*", allow: "/", disallow: ["/kazka/", "/moi-kazky/"] },
     ],
     sitemap: `${abs("/")}sitemap.xml`,
