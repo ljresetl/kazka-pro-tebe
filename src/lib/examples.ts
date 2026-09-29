@@ -1,4 +1,5 @@
 import longTexts from "./examples-texts.json";
+import drawnPages from "./example-pages.json";
 import { PLOTS, templateStory, yearsWord } from "./template-story";
 import { AGE_GROUPS as AGE_GROUPS_CATALOG, BOOK_FONTS, findTopic, ILLUSTRATION_STYLES } from "./catalog";
 import { getTheme } from "./themes";
@@ -10,6 +11,8 @@ import type { Gender, Illustration, SceneId, StoryPage, ThemeId } from "./types"
 // там немає тексту, береться шаблонна версія.
 
 const LONG_TEXTS = longTexts as Record<string, string[]>;
+/** Квадратні ШІ-ілюстрації сторінок (scripts/example-pages.mts): slug → індекси намальованих сторінок. */
+const DRAWN_PAGES = drawnPages as Record<string, number[]>;
 
 type ExampleSeed = {
   slug: string;
@@ -195,13 +198,16 @@ function build(seed: ExampleSeed): ExampleStory {
     const image = seed.images?.pages[i];
     if (image) pages[at].image = image;
   });
+  for (const i of DRAWN_PAGES[seed.slug] ?? []) {
+    if (pages[i]) pages[i].image = img(`/img/pryklad-storinky/${seed.slug}/${String(i + 1).padStart(2, "0")}.webp`, 1024, 1024);
+  }
   return {
     ...seed,
     title: story.title,
     dedication: story.dedication,
     cover: getTheme(seed.theme).scene,
-    // Обкладинка: готова ілюстрація або тимчасова з бібліотеки (scripts/library-images).
-    coverImage: seed.images?.cover ?? img(`/img/pryklad-obkladynka/${seed.slug}.webp`, 800, 600),
+    // Обкладинка від Gemini (з фото прикладу); вона ж — зразок героя для сторінок.
+    coverImage: img(`/img/pryklad-obkladynka/${seed.slug}.webp`, 800, 600),
     pages,
     ageLabel: yearsWord(seed.age),
   };
