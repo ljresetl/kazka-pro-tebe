@@ -12,6 +12,7 @@ import IllustrationsPanel from "@/components/IllustrationsPanel";
 import { AI_ENABLED, AI_IMAGES, CREATION_PAUSED, STATIC_SITE } from "@/lib/features";
 import { illustrateStory } from "@/lib/illustrate";
 import { useStoryImages } from "@/lib/image-store";
+import { BOOK_PAGES } from "@/lib/book-facts";
 import { findTopic } from "@/lib/catalog";
 import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
 import StoryEditor from "@/components/StoryEditor";
@@ -34,17 +35,33 @@ export default function StoryView({ id }: { id: string }) {
   const [drawing, setDrawing] = useState<[number, number] | null>(null);
   const [drawError, setDrawError] = useState("");
   const drawStarted = useRef(false);
+  // Після оплати домальовуємо решту сторінок (до оплати малюються лише обкладинка й перші FREE_PAGES).
+  const [rest, setRest] = useState<[number, number] | null>(null);
+  const restStarted = useRef(false);
 
   useEffect(() => {
     if (!story || story.illustrate !== "pending" || drawStarted.current || !AI_IMAGES || STATIC_SITE || CREATION_PAUSED) return;
     drawStarted.current = true;
+    restStarted.current = Boolean(story.paid);
     // Позначаємо одразу: якщо сторінку перезавантажать, вдруге платно малювати не почнемо.
     saveStory({ ...story, illustrate: "started" });
-    setDrawing([0, story.pages.length + 1]);
-    illustrateStory(story, (done, total) => setDrawing([done, total]))
+    // Кожна картинка коштує грошей, тож до оплати малюємо лише те, що людина побачить безкоштовно.
+    const upTo = story.paid ? story.pages.length : FREE_PAGES;
+    setDrawing([0, Math.min(upTo, story.pages.length) + 1]);
+    illustrateStory(story, (done, total) => setDrawing([done, total]), { upTo })
       .catch((err) => setDrawError(err instanceof Error ? err.message : "Не вдалося намалювати ілюстрації."))
       .finally(() => setDrawing(null));
   }, [story]);
+
+  useEffect(() => {
+    if (!story?.paid || story.illustrate !== "started" || restStarted.current || drawing) return;
+    if (!AI_IMAGES || STATIC_SITE || CREATION_PAUSED) return;
+    restStarted.current = true;
+    // Уже намальовані сторінки illustrateStory пропускає, тож зайвих запитів не буде.
+    illustrateStory(story, (done, total) => setRest(done < total ? [done, total] : null))
+      .catch((err) => setDrawError(err instanceof Error ? err.message : "Не вдалося намалювати ілюстрації."))
+      .finally(() => setRest(null));
+  }, [story, drawing]);
 
   if (story === undefined) return <div className="writing" />;
 
@@ -77,8 +94,9 @@ export default function StoryView({ id }: { id: string }) {
   const pages = story.pages.map((p, i) => ({ ...p, image: images.pages[i] ?? p.image }));
   const printPages = paid ? pages : pages.slice(0, FREE_PAGES);
   const hasAiImages = Boolean(images.cover || images.pages.some(Boolean));
-  const missingImages = (images.cover ? 0 : 1) + story.pages.filter((_, i) => !images.pages[i]).length;
-  // Ілюстрації малюються одразу, ще до оплати, — щоб батьки побачили свою книжку повністю.
+  const drawUpTo = paid ? story.pages.length : Math.min(FREE_PAGES, story.pages.length);
+  const missingImages = (images.cover ? 0 : 1) + story.pages.slice(0, drawUpTo).filter((_, i) => !images.pages[i]).length;
+  // До оплати малюються обкладинка й безкоштовні сторінки, решта — одразу після оплати.
   const canIllustrate = AI_IMAGES && !STATIC_SITE && !CREATION_PAUSED;
   const aiMode = AI_ENABLED && !STATIC_SITE;
   const canRegenerate = !CREATION_PAUSED && !paid && (aiMode || plotCount(story.theme) > 1);
@@ -118,8 +136,8 @@ export default function StoryView({ id }: { id: string }) {
     router.push(`/kazka?id=${next.id}`);
   }
 
-  if (drawing || (story.illustrate === "pending" && !CREATION_PAUSED)) {
-    const [done, total] = drawing ?? [0, story.pages.length + 1];
+  if (drawing || rest || (story.illustrate === "pending" && !CREATION_PAUSED)) {
+    const [done, total] = drawing ?? rest ?? [0, (paid ? story.pages.length : Math.min(FREE_PAGES, story.pages.length)) + 1];
     return (
       <div className="writing" role="status">
         <div className="writing-dots" aria-hidden="true">
@@ -127,7 +145,8 @@ export default function StoryView({ id }: { id: string }) {
           <span />
           <span />
         </div>
-        <h2 className="wz-step-title">Малюємо ілюстрації…</h2>
+        {rest && <p style={{ fontWeight: 700 }}>Дякуємо за оплату!</p>}
+        <h2 className="wz-step-title">{rest ? "Домальовуємо вашу книжку…" : "Малюємо ілюстрації…"}</h2>
         <p>
           Готово {done} з {total}
         </p>
@@ -208,7 +227,7 @@ export default function StoryView({ id }: { id: string }) {
 
         {canIllustrate && (
           <div style={{ marginTop: 24 }}>
-            <IllustrationsPanel story={story} hasImages={hasAiImages} missing={missingImages} paid={paid} />
+            <IllustrationsPanel story={story} hasImages={hasAiImages} missing={missingImages} paid={paid} upTo={drawUpTo} />
           </div>
         )}
 
@@ -227,7 +246,7 @@ export default function StoryView({ id }: { id: string }) {
               <h2>Сподобалась книжка?</h2>
               <ul className="offer-list">
                 <li>
-                  <span>Е-книга, 26 сторінок</span>
+                  <span>Е-книга, {BOOK_PAGES} сторінок</span>
                   <strong>{formatUah(EBOOK)}</strong>
                 </li>
                 <li>

@@ -1330,9 +1330,6 @@ textarea.field-input {
 .reader > * {
   min-width: 0;
 }
-.reader-book > * {
-  min-width: 0;
-}
 @media (max-width: 379px) {
   .reader-nav .nav-word {
     display: none;
@@ -1340,40 +1337,116 @@ textarea.field-input {
   .reader-nav .btn-small {
     padding: 8px 12px;
   }
-  .reader-text {
-    padding: 20px 16px 40px;
-  }
-  .story-text {
-    font-size: 18px;
-  }
 }
-.reader-book {
-  display: grid;
-  grid-template-columns: 1fr;
-  background: var(--surface);
-  border-radius: var(--radius-xl);
+/* Книжка з перегортанням (page-flip): обкладинка, далі сторінки
+   «ілюстрація ~70% зверху + текст ~30% знизу». */
+.flip-stage {
+  width: 100%;
+  /* Розворот повністю вміщується на екрані ноутбука (сторінка A4: висота = ширина × 1,414). */
+  max-width: min(1000px, calc((100svh - 190px) * 1.414));
+  margin: 0 auto;
+  padding: 4px 0 8px;
+}
+.flip-host {
+  width: 100%;
+}
+.flip-page {
+  background: #fffdf8;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  container-type: inline-size;
 }
-.reader-art {
+.flip-page.is-hard {
+  background: var(--coral, #e8674a);
+}
+.flip-page > div {
+  position: relative;
+  height: 100%;
+}
+.flip-cover {
+  display: flex;
+  flex-direction: column;
   background: var(--paper-deep);
 }
-.reader-art .scene {
+.flip-cover > img,
+.flip-cover > .scene {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  object-fit: cover;
+}
+.flip-cover .cover-title {
+  flex: 0 0 auto;
+  padding: 5cqw 6cqw 6cqw;
+  font-size: clamp(18px, 7.5cqw, 40px);
+  text-align: center;
+  background: var(--surface);
+}
+.flip-title,
+.flip-back {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4cqw;
+  padding: 10cqw;
+  text-align: center;
+}
+.flip-title .cover-title {
+  font-size: clamp(18px, 7cqw, 36px);
+}
+.flip-back {
+  color: #fff;
+}
+.flip-back .cover-title {
+  font-size: clamp(20px, 8cqw, 40px);
+}
+.flip-back .cover-dedication {
+  color: rgb(255 255 255 / 0.85);
+}
+.flip-story {
+  display: flex;
+  flex-direction: column;
+}
+.flip-art {
+  flex: 1 1 0;
+  min-height: 45%;
+  background: var(--paper-deep);
+  overflow: hidden;
+}
+.flip-art .flip-img,
+.flip-art .scene {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 100%;
+  object-fit: cover;
 }
-.reader-img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.reader-text {
-  position: relative;
-  padding: 24px 22px 44px;
+.flip-text {
+  flex: 0 0 auto;
+  min-height: 30%;
   display: flex;
   align-items: center;
-  min-height: 180px;
+  padding: 4cqw 6cqw 8cqw;
+}
+.flip-page .story-text {
+  font-size: clamp(12px, 3.9cqw, 19px);
+  line-height: 1.5;
+  max-width: none;
+}
+.flip-page .page-no {
+  bottom: 2.5cqw;
+  right: 4cqw;
+  font-size: clamp(10px, 2.6cqw, 14px);
+}
+.flip-story.is-locked .story-text {
+  filter: blur(6px);
+  user-select: none;
+}
+.flip-story .lock-overlay {
+  top: auto;
+  height: 45%;
+  font-size: clamp(13px, 3.8cqw, 17px);
+}
+.flip-story .lock-overlay .btn {
+  font-size: clamp(13px, 3.6cqw, 16px);
 }
 .story-text {
   font-size: 19px;
@@ -1389,10 +1462,6 @@ textarea.field-input {
   font-weight: 700;
   color: var(--muted);
 }
-.reader-cover {
-  display: grid;
-  gap: 12px;
-}
 .cover-title {
   font-family: var(--font-display), sans-serif;
   font-weight: 700;
@@ -1404,10 +1473,6 @@ textarea.field-input {
   font-style: italic;
   color: var(--muted);
   margin: 0;
-}
-.reader-text.is-locked .story-text {
-  filter: blur(7px);
-  user-select: none;
 }
 .lock-overlay {
   position: absolute;
@@ -1452,34 +1517,8 @@ textarea.field-input {
   width: 18px;
 }
 @media (min-width: 760px) {
-  .reader-book {
-    grid-template-columns: 1fr 1fr;
-    min-height: 420px;
-  }
-  .reader-art .scene {
-    height: 100%;
-    aspect-ratio: auto;
-    min-height: 360px;
-  }
-  .reader-book.has-images {
-    grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
-  }
-  .reader-book.has-images .reader-art {
-    display: grid;
-    place-items: center;
-    background: var(--surface);
-  }
-  .reader-img {
-    width: auto;
-    max-width: 100%;
-    height: 520px;
-    object-fit: contain;
-  }
-  .reader-text {
-    padding: 44px 44px 56px;
-  }
   .story-text {
-    font-size: 21px;
+    font-size: 20px;
   }
 }
 
@@ -2196,8 +2235,7 @@ textarea.field-input {
   .print-cover .cover-title {
     font-size: 30pt;
   }
-  .print-title-page,
-  .print-text-page {
+  .print-title-page {
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -2207,14 +2245,23 @@ textarea.field-input {
     font-size: 16pt;
     font-style: italic;
   }
-  .print-art-page .scene,
-  .print-art-page img {
-    height: 250mm;
+  /* Сторінка історії: ілюстрація займає все місце над текстом (~70% аркуша). */
+  .print-story-page {
+    gap: 6mm;
+  }
+  .print-story-page .scene,
+  .print-story-page img {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
     object-fit: cover;
   }
-  .print-text-page .story-text {
-    font-size: 19pt;
-    line-height: 1.7;
+  .print-story-page .story-text {
+    flex: 0 0 auto;
+    min-height: 62mm;
+    padding: 0 6mm 8mm;
+    font-size: 16pt;
+    line-height: 1.55;
   }
   .print-page .page-no {
     bottom: 0;

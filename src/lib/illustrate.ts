@@ -86,14 +86,18 @@ async function drawWithRetry(story: Story, part: Part, reference?: Img): Promise
  * Малює обкладинку й сторінки казки по черзі й зберігає їх у браузері.
  * Уже намальовані картинки пропускає, тож повторний запуск лише домальовує пропущене.
  * Обкладинка стає зразком героя для решти картинок.
+ * `upTo` — скільки перших сторінок малювати (до оплати — лише безкоштовні, решту після оплати).
  */
 export async function illustrateStory(
   story: Story,
   onProgress: (done: number, total: number) => void,
-  { redraw = false }: { redraw?: boolean } = {},
+  { redraw = false, upTo = story.pages.length }: { redraw?: boolean; upTo?: number } = {},
 ) {
-  const total = story.pages.length + 1;
-  const have = new Set(redraw ? [] : (await loadImages(story.id).catch(() => [])).map((i) => i.index));
+  const count = Math.min(upTo, story.pages.length);
+  const total = count + 1;
+  const have = new Set(
+    redraw ? [] : (await loadImages(story.id).catch(() => [])).map((i) => i.index).filter((i) => i < count),
+  );
   let done = have.size;
   onProgress(done, total);
   let failed = 0;
@@ -114,7 +118,7 @@ export async function illustrateStory(
     onProgress(++done, total);
   }
 
-  for (let i = 0; i < story.pages.length; i++) {
+  for (let i = 0; i < count; i++) {
     if (have.has(i)) continue;
     const page = story.pages[i];
     try {
