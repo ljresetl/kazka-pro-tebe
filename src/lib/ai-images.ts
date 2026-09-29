@@ -86,7 +86,7 @@ export function buildPrompt(r: IllustrationRequest) {
     : STYLE;
   const what =
     r.kind === "cover"
-      ? `Book cover illustration for the children's fairy tale "${r.title}". Show the main character happily in the world of the story.`
+      ? `Cover picture for a children's fairy tale (its title, for context only — never write it: «${r.title}»). Show the main character happily in the world of the story.`
       : r.illustration
         ? `Illustrate this moment of the story: ${r.illustration}`
         : `Illustrate this page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
@@ -100,6 +100,8 @@ export function buildPrompt(r: IllustrationRequest) {
     `World of the story: ${setting}.`,
     what,
     "Landscape 4:3 composition, the main character clearly visible, gentle and safe for children.",
+    // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
+    "IMPORTANT: the picture must contain no text at all — no title, names, letters, words or numbers on vehicles, signs, books, banners or clothes.",
   ]
     .filter(Boolean)
     .join("\n");
