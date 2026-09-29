@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 !.env.example
+
+.vercel
+.env*
+!.env.example
+scripts/ai-images/raw/
