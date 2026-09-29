@@ -3,14 +3,16 @@
 import { BookOpen, Library, Pencil, Shuffle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BackLink from "@/components/BackLink";
 import BookReader from "@/components/BookReader";
 import { bookFontClass } from "@/lib/book-fonts";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
 import IllustrationsPanel from "@/components/IllustrationsPanel";
 import { AI_ENABLED, AI_IMAGES, STATIC_SITE } from "@/lib/features";
+import { illustrateStory } from "@/lib/illustrate";
 import { useStoryImages } from "@/lib/image-store";
+import { findTopic } from "@/lib/catalog";
 import { makeTemplateStory, requestFromStory } from "@/lib/make-story";
 import StoryEditor from "@/components/StoryEditor";
 import { EBOOK, HARDCOVER } from "@/lib/offer";
@@ -28,6 +30,21 @@ export default function StoryView({ id }: { id: string }) {
   const [regenerating, setRegenerating] = useState(false);
   const [editing, setEditing] = useState(false);
   const images = useStoryImages(id);
+  // Поки художник-ШІ малює нову казку, показуємо екран очікування, а казку — вже з ілюстраціями.
+  const [drawing, setDrawing] = useState<[number, number] | null>(null);
+  const [drawError, setDrawError] = useState("");
+  const drawStarted = useRef(false);
+
+  useEffect(() => {
+    if (!story || story.illustrate !== "pending" || drawStarted.current || !AI_IMAGES || STATIC_SITE) return;
+    drawStarted.current = true;
+    // Позначаємо одразу: якщо сторінку перезавантажать, вдруге платно малювати не почнемо.
+    saveStory({ ...story, illustrate: "started" });
+    setDrawing([0, story.pages.length + 1]);
+    illustrateStory(story, (done, total) => setDrawing([done, total]))
+      .catch((err) => setDrawError(err instanceof Error ? err.message : "Не вдалося намалювати ілюстрації."))
+      .finally(() => setDrawing(null));
+  }, [story]);
 
   if (story === undefined) return <div className="writing" />;
 
@@ -100,6 +117,24 @@ export default function StoryView({ id }: { id: string }) {
     router.push(`/kazka?id=${next.id}`);
   }
 
+  if (drawing || story.illustrate === "pending") {
+    const [done, total] = drawing ?? [0, story.pages.length + 1];
+    return (
+      <div className="writing" role="status">
+        <div className="writing-dots" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <h2 className="wz-step-title">Малюємо ілюстрації…</h2>
+        <p>
+          Готово {done} з {total}
+        </p>
+        <p className="muted">Зазвичай це займає 1–3 хвилини. Не закривайте сторінку.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="print-root">
       <div className="wrap book-page">
@@ -114,7 +149,7 @@ export default function StoryView({ id }: { id: string }) {
                 {story.childName}, {yearsWord(story.age)}
               </span>
               <span aria-hidden="true">·</span>
-              <span>{theme.label}</span>
+              <span>{(story.options?.topic && findTopic(story.options.topic)?.topic.label) || theme.label}</span>
               {paid ? (
                 <span className="badge is-paid">Оплачено</span>
               ) : (
@@ -163,6 +198,12 @@ export default function StoryView({ id }: { id: string }) {
             </div>
           }
         />
+
+        {drawError && (
+          <p className="form-error" role="alert" style={{ marginTop: 16 }}>
+            {drawError} Спробуйте ще раз кнопкою нижче.
+          </p>
+        )}
 
         {canIllustrate && (
           <div style={{ marginTop: 24 }}>

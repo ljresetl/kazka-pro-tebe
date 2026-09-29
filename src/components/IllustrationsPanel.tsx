@@ -1,25 +1,17 @@
 "use client";
 
 import { Paintbrush } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { illustrateStory } from "@/lib/illustrate";
 import type { Story } from "@/lib/types";
 
 /**
- * Ілюстрації до казки з прогресом. Ще не оплачену казку малюємо автоматично один раз,
+ * Ілюстрації до казки з прогресом. Нову казку StoryView малює автоматично один раз,
  * а «Намалювати ще раз» доступне лише після оплати (кожна картинка коштує грошей).
  */
 export default function IllustrationsPanel({ story, hasImages, paid }: { story: Story; hasImages: boolean; paid: boolean }) {
   const [progress, setProgress] = useState<[number, number] | null>(null);
   const [error, setError] = useState("");
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (hasImages || started.current) return;
-    started.current = true;
-    void run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [story.id]);
 
   async function run() {
     setError("");

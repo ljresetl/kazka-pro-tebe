@@ -61,6 +61,8 @@ export type Story = {
   /** Який шаблонний сюжет використано (для «Інший сюжет»). */
   plotId?: string;
   paid?: boolean;
+  /** Нову казку сайт ілюструє одразу: "pending" — ще не почали, "started" — вже малювали (вдруге не запускаємо). */
+  illustrate?: "pending" | "started";
   /** Номер замовлення, яким оплачено е-книгу (для знижки на друк). */
   paidOrder?: string;
   options?: BookOptions;
