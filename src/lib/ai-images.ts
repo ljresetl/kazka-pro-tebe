@@ -11,7 +11,7 @@ import { findTopic, ILLUSTRATION_STYLES } from "./catalog";
 // Змінні середовища: GEMINI_API_KEY, GEMINI_IMAGE_MODEL (за замовчуванням gemini-2.5-flash-image).
 
 const STYLE =
-  "Children's picture book illustration in a soft modern style: warm pastel palette (sky blue, coral pink, sunny yellow, mint green), gentle paper texture, friendly rounded characters with simple dot eyes, clean composition, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.";
+  "Children's picture book illustration, Pixar-like 3D style: vibrant, bright, highly saturated colours, rich warm lighting with glossy highlights, friendly rounded characters with big expressive eyes and happy faces, detailed colourful background, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.";
 
 const HAIR_GIRL = [
   "long dark hair in two puffy pigtail buns",
@@ -82,7 +82,7 @@ export function buildPrompt(r: IllustrationRequest) {
   const setting = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
   const style = ILLUSTRATION_STYLES.find((s) => s.id === r.style);
   const look = style
-    ? `Children's picture book illustration. Art style: ${style.prompt}. Friendly, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.`
+    ? `Children's picture book illustration. Art style: ${style.prompt}. Vibrant, bright, rich colours, expressive happy faces, friendly, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.`
     : STYLE;
   const what =
     r.kind === "cover"
