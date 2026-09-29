@@ -9,7 +9,7 @@ import BookReader from "@/components/BookReader";
 import { bookFontClass } from "@/lib/book-fonts";
 import PrintBook, { PrintButtons } from "@/components/PrintBook";
 import IllustrationsPanel from "@/components/IllustrationsPanel";
-import { AI_ENABLED, AI_IMAGES, STATIC_SITE } from "@/lib/features";
+import { AI_ENABLED, AI_IMAGES, CREATION_PAUSED, STATIC_SITE } from "@/lib/features";
 import { illustrateStory } from "@/lib/illustrate";
 import { useStoryImages } from "@/lib/image-store";
 import { findTopic } from "@/lib/catalog";
@@ -36,7 +36,7 @@ export default function StoryView({ id }: { id: string }) {
   const drawStarted = useRef(false);
 
   useEffect(() => {
-    if (!story || story.illustrate !== "pending" || drawStarted.current || !AI_IMAGES || STATIC_SITE) return;
+    if (!story || story.illustrate !== "pending" || drawStarted.current || !AI_IMAGES || STATIC_SITE || CREATION_PAUSED) return;
     drawStarted.current = true;
     // Позначаємо одразу: якщо сторінку перезавантажать, вдруге платно малювати не почнемо.
     saveStory({ ...story, illustrate: "started" });
@@ -79,9 +79,9 @@ export default function StoryView({ id }: { id: string }) {
   const hasAiImages = Boolean(images.cover || images.pages.some(Boolean));
   const missingImages = (images.cover ? 0 : 1) + story.pages.filter((_, i) => !images.pages[i]).length;
   // Ілюстрації малюються одразу, ще до оплати, — щоб батьки побачили свою книжку повністю.
-  const canIllustrate = AI_IMAGES && !STATIC_SITE;
+  const canIllustrate = AI_IMAGES && !STATIC_SITE && !CREATION_PAUSED;
   const aiMode = AI_ENABLED && !STATIC_SITE;
-  const canRegenerate = !paid && (aiMode || plotCount(story.theme) > 1);
+  const canRegenerate = !CREATION_PAUSED && !paid && (aiMode || plotCount(story.theme) > 1);
 
   function buy(kind: "ebook" | "hardcover") {
     if (!story) return;
@@ -118,7 +118,7 @@ export default function StoryView({ id }: { id: string }) {
     router.push(`/kazka?id=${next.id}`);
   }
 
-  if (drawing || story.illustrate === "pending") {
+  if (drawing || (story.illustrate === "pending" && !CREATION_PAUSED)) {
     const [done, total] = drawing ?? [0, story.pages.length + 1];
     return (
       <div className="writing" role="status">

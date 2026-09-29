@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { CREATION_PAUSED, CREATION_PAUSED_MESSAGE } from "@/lib/features";
 import { useStory } from "@/lib/storage";
 import CreateWizard from "./CreateWizard";
 
@@ -62,9 +63,28 @@ function CreateFromQuery() {
 export default function CreatePage() {
   return (
     <>
-      <Suspense fallback={<div className="writing" />}>
-        <CreateFromQuery />
-      </Suspense>
+      {CREATION_PAUSED ? (
+        <div className="wrap">
+          <div className="empty" style={{ margin: "48px auto", maxWidth: 560 }}>
+            <h1 className="display" style={{ fontSize: 26 }}>
+              Конструктор на паузі
+            </h1>
+            <p>{CREATION_PAUSED_MESSAGE}</p>
+            <div className="button-row" style={{ justifyContent: "center" }}>
+              <Link href="/pryklady" className="btn btn-primary">
+                Переглянути приклади
+              </Link>
+              <Link href="/" className="btn btn-ghost">
+                На головну
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Suspense fallback={<div className="writing" />}>
+          <CreateFromQuery />
+        </Suspense>
+      )}
       {/* У конструкторі, як на зразку, замість повного підвалу — три посилання. */}
       <nav className="wz-mini-footer" aria-label="Корисне">
         <Link href="/dopomoha">Центр допомоги</Link>
