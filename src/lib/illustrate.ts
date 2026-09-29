@@ -24,7 +24,29 @@ function companions(story: Story) {
   return list.length ? list : undefined;
 }
 
+/**
+ * Зразок героя (обкладинка чи фото), який надсилається з кожним запитом, стискаємо до ~768 px JPEG:
+ * великі PNG (старі казки) не вміщуються в запит, а на мобільному інтернеті ще й довго летять.
+ */
+async function shrinkReference(img: Img): Promise<Img> {
+  if (img.data.length < 700_000 || typeof document === "undefined") return img;
+  try {
+    const bytes = Uint8Array.from(atob(img.data), (c) => c.charCodeAt(0));
+    const bitmap = await createImageBitmap(new Blob([bytes], { type: img.mimeType }));
+    const scale = Math.min(1, 768 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const url = canvas.toDataURL("image/jpeg", 0.86);
+    return { data: url.slice(url.indexOf(",") + 1), mimeType: "image/jpeg" };
+  } catch {
+    return img;
+  }
+}
+
 async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
+  if (reference) reference = await shrinkReference(reference);
   const res = await fetch("/api/illustrate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
