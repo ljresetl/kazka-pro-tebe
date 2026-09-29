@@ -212,6 +212,7 @@ export default function CreateWizard({ init }: { init: WizardInit }) {
         if (!res.ok) throw new Error(data.error ?? "Не вдалося створити казку.");
         story = data as Story;
       }
+      if (AI_IMAGES && !STATIC_SITE) story = { ...story, illustrate: "pending" };
       saveStory(story);
       if (photo && photoConsent && PHOTOS_ON) await savePhoto(story.id, photo.data, photo.mimeType).catch(() => {});
       router.push(`/kazka?id=${story.id}`);
