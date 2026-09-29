@@ -153,6 +153,8 @@ async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string 
 }
 
 export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage> {
+  // Лише для локальної перевірки без витрат: MOCK_IMAGES=1 — кольоровий квадрат замість ШІ.
+  if (process.env.MOCK_IMAGES === "1" && process.env.NODE_ENV !== "production") return mockImage(r);
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
   const fromCover = Boolean(reference) && !r.hasPhoto;
@@ -180,5 +182,33 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
   const parts = response.candidates?.[0]?.content?.parts ?? [];
   const image = parts.find((p) => p.inlineData?.data)?.inlineData;
   if (!image?.data) throw new Error("Gemini не повернув зображення");
-  return { data: image.data, mimeType: image.mimeType ?? "image/png" };
+  return compact({ data: image.data, mimeType: image.mimeType ?? "image/png" });
+}
+
+/**
+ * PNG від Gemini важить 2–3 МБ: на мобільному інтернеті такі відповіді обриваються, а як зразок
+ * героя (його надсилають з кожною сторінкою) не вміщуються в запит. WebP 1024 px — ~200 КБ.
+ */
+async function compact(img: GeneratedImage): Promise<GeneratedImage> {
+  try {
+    const sharp = (await import("sharp")).default;
+    const out = await sharp(Buffer.from(img.data, "base64"))
+      .resize(1024, 1024, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 84 })
+      .toBuffer();
+    return { data: out.toString("base64"), mimeType: "image/webp" };
+  } catch {
+    return img;
+  }
+}
+
+async function mockImage(r: IllustrationRequest): Promise<GeneratedImage> {
+  const sharp = (await import("sharp")).default;
+  const hue = r.kind === "cover" ? 20 : ((r.page ?? 0) * 37) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><rect width="100%" height="100%" fill="hsl(${hue},70%,60%)"/><circle cx="512" cy="512" r="300" fill="white" opacity=".5"/></svg>`;
+  // Шум — щоб розмір був як у справжньої картинки (~2 МБ PNG).
+  const noise = await sharp({ create: { width: 1024, height: 1024, channels: 3, background: "#808080", noise: { type: "gaussian", mean: 128, sigma: 40 } } }).png().toBuffer();
+  const png = await sharp(noise).composite([{ input: Buffer.from(svg), blend: "overlay" }]).png().toBuffer();
+  await new Promise((res) => setTimeout(res, 800));
+  return compact({ data: png.toString("base64"), mimeType: "image/png" });
 }
