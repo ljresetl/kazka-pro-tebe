@@ -29,7 +29,7 @@ jobs:
       # На Pages немає сервера: серверний генератор казок не потрібен,
       # казки складаються прямо в браузері.
       # Тести вже пройшли вище; без api вони не компілюються.
-      - run: rm -rf src/app/api tests
+      - run: rm -rf src/app/api src/proxy.ts tests
       - run: npm run build
         env:
           GITHUB_PAGES: "1"

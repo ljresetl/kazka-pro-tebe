@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import ConsentBanner from "@/components/ConsentBanner";
+import ContentGuard from "@/components/ContentGuard";
 import SiteFooter from "@/components/SiteFooter";
 import PromoBar from "@/components/PromoBar";
 import SiteHeader from "@/components/SiteHeader";
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main">{children}</main>
         <SiteFooter />
         <ConsentBanner />
+        <ContentGuard />
       </body>
     </html>
   );

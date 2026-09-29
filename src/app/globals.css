@@ -2307,3 +2307,33 @@ textarea.field-input {
   white-space: nowrap;
   border: 0;
 }
+
+/* Захист від копіювання: текст не виділяється, картинки не перетягуються
+   й не зберігаються довгим натиском на телефоні. У полях форм усе працює. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input,
+textarea,
+select,
+[contenteditable="true"],
+.allow-copy {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+img {
+  -webkit-user-drag: none;
+}
+/* Вікно без фокуса або натиснуто Print Screen — вміст розмитий (ContentGuard). */
+html.guard-hide main {
+  filter: blur(22px);
+  transition: none;
+}
+@media print {
+  html.guard-hide main {
+    filter: none;
+  }
+}
