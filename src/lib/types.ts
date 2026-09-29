@@ -33,6 +33,9 @@ export type Illustration = {
   height: number;
 };
 
+/** Герой казки, що повторюється на сторінках: ім'я й точний вигляд англійською (для художника). */
+export type CastMember = { name: string; look: string };
+
 export type StoryPage = {
   text: string;
   scene: SceneId;
@@ -63,6 +66,8 @@ export type Story = {
   paid?: boolean;
   /** Нову казку сайт ілюструє одразу: "pending" — ще не почали, "started" — вже малювали (вдруге не запускаємо). */
   illustrate?: "pending" | "started";
+  /** «Паспорти» героїв, що повторюються, — щоб художник малював їх однаково. */
+  cast?: CastMember[];
   /** Підпис сервера: без нього ілюстрації не малюються (src/lib/quota.ts). */
   ticket?: string;
   /** Підпис оплати від сервера: дозволяє домалювати й перемальовувати всю книжку. */

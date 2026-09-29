@@ -18,4 +18,5 @@ const story = await aiStory({
   hobbies: "танці",
 });
 console.log(`# ${story.title}\n`);
+console.log("Паспорти героїв:", JSON.stringify(story.cast, null, 1), "\n");
 story.pages.forEach((p, i) => console.log(`${i + 1}. (${p.text.length} зн.) ${p.text}\n   [${p.illustration}]\n`));

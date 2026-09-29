@@ -5,7 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { describeOptions } from "./story-options";
 import { getTheme } from "./themes";
-import { SCENES, type StoryPage, type StoryRequest } from "./types";
+import { SCENES, type CastMember, type StoryPage, type StoryRequest } from "./types";
 
 // Генерація казки через ШІ. Постачальник обирається змінною AI_PROVIDER:
 //   "claude" — Anthropic Claude (ANTHROPIC_API_KEY);
@@ -27,9 +27,12 @@ const StorySchema = z.object({
       }),
     )
     .length(STORY_PAGES),
+  cast: z
+    .array(z.object({ name: z.string(), look: z.string() }))
+    .max(6),
 });
 
-type AiStory = { title: string; dedication: string; pages: StoryPage[] };
+type AiStory = { title: string; dedication: string; pages: StoryPage[]; cast?: CastMember[] };
 
 const SYSTEM = `Ти — українська дитяча письменниця. Пишеш добрі, цікаві казки, де головний герой — конкретна дитина.
 
@@ -45,6 +48,7 @@ const SYSTEM = `Ти — українська дитяча письменниц�
 - Для кожної сторінки:
   • "scene" — сцена з дозволеного списку, що найкраще пасує до тексту;
   • "illustration" — опис ілюстрації АНГЛІЙСЬКОЮ (1–2 речення): конкретна дія й поза героя (біжить, лізе, пливе, ховається, обіймає, дивиться вгору…), місце, пора доби, план кадру (wide shot / close-up / from behind / low angle / bird's-eye view). Ілюстрації мають бути різними: не повторюй ту саму позу, місце чи план на сусідніх сторінках. Героя називай "the child", без імені, без опису зовнішності.
+- "cast" — «паспорт» КОЖНОГО героя, крім самої дитини, який з'являється більш ніж на одній сторінці (друг, тварина, іграшка, дракончик…): "name" — ім'я як у тексті, "look" — АНГЛІЙСЬКОЮ точний вигляд: вид істоти, розмір, кольори, прикмети, одяг чи аксесуари (наприклад: "a small purple octopus with pink spots and big round eyes"). В описах ілюстрацій ("illustration") називай цих героїв так само (вид + ім'я), а не загальними словами на кшталт «тваринка» чи «друг».
 - Назва — коротка, з іменем дитини. Присвята — одне тепле речення до дитини; якщо батьки дали своє звернення, використай його дослівно.`;
 
 function brief(req: StoryRequest) {

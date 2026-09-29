@@ -71,6 +71,8 @@ export type IllustrationRequest = {
   topic?: string;
   /** Інші герої: «песик Бублик», «братик Остап (3 роки)». */
   companions?: string[];
+  /** «Паспорти» героїв казки: «Лоло: a small red crab with big eyes». */
+  cast?: string[];
   /** Батьки завантажили фото дитини (передається разом із запитом). */
   hasPhoto?: boolean;
   /** Номер сторінки (0–11) — щоб чергувати плани кадру. */
@@ -114,6 +116,9 @@ export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fro
         ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair colour, hairstyle and skin tone; choose an outfit that suits the story), drawn in the art style above. The same character appears on every page of the book.`
         : `Main character: ${hero}. The same character appears on every page of the book.`,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
+    r.cast?.length
+      ? `Recurring characters — whenever one of them appears, draw it EXACTLY like this on every page (same species, colours and features; never replace it with a different animal): ${r.cast.join("; ")}.`
+      : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
     what,
