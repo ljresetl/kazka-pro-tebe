@@ -2196,6 +2196,8 @@ textarea.field-input {
 @media print {
   .site-header,
   .site-footer,
+  .promo-bar,
+  .consent,
   .mobile-menu,
   .skip-link,
   main > *:not(.print-root) {
