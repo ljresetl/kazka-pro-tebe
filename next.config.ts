@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   ...(isPages ? { output: "export", trailingSlash: true } : {}),
   basePath,
   images: { unoptimized: isPages },
+  // Поки сайт закритий від індексації (INDEXING у src/lib/site.ts), Vercel додає заголовок noindex до всього.
+  // Відкриваючи сайт для пошуку, приберіть і цей блок.
+  ...(isPages
+    ? {}
+    : { headers: async () => [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }] }),
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
     NEXT_PUBLIC_SITE_URL: siteUrl,
