@@ -1,36 +1,20 @@
-// Хто може читати сайт автоматично. Пошуковики (Google, Bing, DuckDuckGo, Apple, Yandex тощо)
-// та прев'ю посилань у месенджерах пускаємо; ШІ-збирачі текстів і програми-скрапери — ні.
+// Хто може читати сайт автоматично. Пускаємо пошуковики (Google, Bing, DuckDuckGo, Apple, Yandex…),
+// прев'ю посилань у месенджерах і офіційних ШІ-ботів великих компаній (OpenAI, Anthropic, Google,
+// Apple, Microsoft, Perplexity, Meta, Amazon) — щоб сайт з'являвся у відповідях ChatGPT, Claude,
+// Gemini, Perplexity. Анонімні збирачі даних, SEO-скрапери й програми для скачування — ні.
 
-/** ШІ-боти, які збирають тексти й картинки для навчання моделей (для robots.txt). */
-export const AI_BOTS = [
-  "GPTBot",
-  "ChatGPT-User",
-  "OAI-SearchBot",
-  "ClaudeBot",
-  "Claude-Web",
-  "Claude-User",
-  "Claude-SearchBot",
-  "anthropic-ai",
-  "Google-Extended",
-  "Applebot-Extended",
+/** Збирачі даних без користі для сайту (для robots.txt і блокування на сервері). */
+export const BAD_BOTS = [
   "CCBot",
-  "PerplexityBot",
-  "Perplexity-User",
   "Bytespider",
-  "Amazonbot",
-  "meta-externalagent",
-  "meta-externalfetcher",
-  "FacebookBot",
-  "cohere-ai",
-  "cohere-training-data-crawler",
   "Diffbot",
   "ImagesiftBot",
   "Omgilibot",
   "Omgili",
   "Timpibot",
-  "YouBot",
   "AI2Bot",
   "Ai2Bot-Dolma",
+  "cohere-training-data-crawler",
   "Scrapy",
   "img2dataset",
   "AhrefsBot",
@@ -69,7 +53,7 @@ const TOOLS = [
   "img2dataset",
 ];
 
-const BLOCKED = new RegExp([...AI_BOTS, ...TOOLS].map((s) => s.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")).join("|"), "i");
+const BLOCKED = new RegExp([...BAD_BOTS, ...TOOLS].map((s) => s.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")).join("|"), "i");
 
 /** Чи треба відмовити цьому запиту (порожній User-Agent — теж скрипт). */
 export function isBlockedAgent(userAgent: string | null) {
