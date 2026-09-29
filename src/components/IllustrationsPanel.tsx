@@ -33,9 +33,9 @@ export default function IllustrationsPanel({ story, hasImages, paid }: { story: 
 
   return (
     <div className="panel">
-      <h2>{hasImages ? "Ілюстрації готові" : "Намалюймо ілюстрації"}</h2>
+      <h2>{progress ? "Малюємо ілюстрації" : hasImages ? "Ілюстрації готові" : "Намалюймо ілюстрації"}</h2>
       <p>
-        {hasImages
+        {hasImages && !progress
           ? paid
             ? "Художник-ШІ намалював кожну сторінку. Якщо щось не сподобалося — намалюйте ще раз."
             : "Художник-ШІ намалював обкладинку й кожну сторінку. Після оплати їх можна буде перемалювати."
