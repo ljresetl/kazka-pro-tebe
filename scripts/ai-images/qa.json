@@ -1414,5 +1414,1080 @@
  "imya/hnat": {
   "issues": [],
   "attempts": 1
+ },
+ "imya/davyd": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/hennadii": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/hryhorii": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "tema-velyka/smishni": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "moral/smilyvist": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "tema-velyka/pliazh": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/damian": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/daniel": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/dana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/daryna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/danylo": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/daria": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/dmytro": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/demyd": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/dariia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/demian": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/daryslava": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/dobromyla": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/emiliia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/elza": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/dobromyr": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/emma": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/emil": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yevhen": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yevdokiia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yevstakhii": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yevheniia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yelyzaveta": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yehor": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yelysei": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zhdan": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zenon": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zynovii": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zoreslava": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zlatoslava": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zorian": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zoriana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ivan": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/zoia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ihor": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/izabela": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ilarion": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ilona": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ilko": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/iryna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/inesa": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kalyna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yosyp": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kamila": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/karina": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/karpo": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kateryna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kyrylo": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kvitoslava": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kindrat": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/klyment": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kornii": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kseniia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kostiantyn": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/kuzma": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/lazar": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/larysa": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/les": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/lukash": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liubko": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/lidiia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liubomyr": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liuboslav": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/makar": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liubomyra": {
+  "issues": [
+   "deformed"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liuboslava": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/liudmyla": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/leonid": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/mariana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/marko": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/marta": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/mariia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/martyna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/myrra": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/milan": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/melissa": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/milana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/nataliia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/naum": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/nykodym": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/nina": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oleh": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oleksa": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/malva": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oleksandr": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oliana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oresta": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/oskar": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/olena": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ostap": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/ostromyr": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/panas": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/petro": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/pylyp": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/radomyr": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/radym": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/renat": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/renata": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/rostyk": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/svyryd": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/sofiia": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/severyn": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/stella": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/sara": {
+  "issues": [
+   "deformed"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/rodion": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/frosyna": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/khrystyna": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/yaropolk": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yana": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yarema": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/tamila": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/1-rik": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "imya/yaroslava": {
+  "issues": [],
+  "attempts": 1
+ },
+ "imya/yaroslav": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/2-roky": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/4-roky": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/6-rokiv": {
+  "issues": [],
+  "attempts": 2
+ },
+ "vik-rik/5-rokiv": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/7-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/3-roky": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/9-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/10-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/12-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/14-rokiv": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/8-rokiv": {
+  "issues": [],
+  "attempts": 1
+ },
+ "vik-rik/13-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/11-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "vik-rik/15-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/rizdvo": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/narodzhennia-dytyny": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/den-narodzhennia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/imenyny": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/velykden": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/den-ditei": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/valentyn": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/den-batka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/den-materi": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/litni-kanikuly": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/do-shkoly": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "dodatky/polotno": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "dodatky/kalendar": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "dodatky/rozmalovka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/heroi": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/uliublenets": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/styli": {
+  "issues": [],
+  "attempts": 1
+ },
+ "mozhlyvosti/shryft": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/vik": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/redahuvannia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/peredmova": {
+  "issues": [
+   "deformed"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryvid/starshyi-brat-sestra": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/rozmalovka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/tymko-i-taiemnytsia-lisu": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "mozhlyvosti/prodovzhennia": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/danylko-i-dyplodok": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/solomiia-i-mushlia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/zlata-i-drakon": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/ostap-i-kvitkove-sviato": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/veronika-i-sumnyi-misyats": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/maksym-i-mayak": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/andriiko-i-solovei": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "pryklad-foto/sofiyka-i-yaitse": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/kolobok-chogo-navchaie": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/rukavychka-pro-shcho-kazka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/shcho-take-personalna-dytiacha-knyzhka": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhka-pro-uliubleny-tsia": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/yak-personalni-istorii-rozvyvaiut-uiavu": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/podarunok-na-valentyna-dlia-dytyny": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/populiarni-temy-dytiachykh-knyzhok": {
+  "issues": [],
+  "attempts": 1
+ },
+ "blog/chomu-chytannia-vgolos-vazhlyve": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/personalni-podarunky-dlia-ditei-hid": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/spilnyi-chas-stvoriuemo-knyzhku-razom": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/yak-rozvyvaty-fantaziiu-chytanniam": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/pryhodnytski-istorii-chomu-dity-ikh-liubliat": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/podarunky-do-dnia-materi-i-batka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhky-za-vikom-dytyny": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/personalna-chy-zvychaina-knyzhka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/novyi-bratyk-chy-sestrychka-yak-dopomozhe-knyzhka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/suchasna-kazka-klasyka-po-novomu": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhky-empatiia-emotsiinyi-intelekt": {
+  "issues": [],
+  "attempts": 1
+ },
+ "blog/rytual-chytannia-yak-pochaty-i-zberehty": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/podarunok-vid-babusi-i-didusia": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhka-v-dorohu-litnii-podorozhnyi-druh": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhka-yak-opora-pry-rozluchenni-chy-vtrati": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/stili-iliustratsii-dytiachoi-knyzhky": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/shcho-podaruvaty-dytyni-v-yakoi-vse-ie": {
+  "issues": [
+   "deformed"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/znovu-do-shkoly-nova-knyzhka": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/tvaryny-v-dytiachykh-knyzhkakh": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/fentezi-dlia-ditei-drakony-charivnyky": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/knyzhky-dlia-dytei-z-tryvohoiu": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/koly-dytyna-ne-khoche-chytaty": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/nauka-pro-personalne-chytannia": {
+  "issues": [
+   "text"
+  ],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/osinni-knyzhky-dlia-ditei": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/podarunok-na-den-narodzhennia-3-8-rokiv": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/top-10-podarunkiv-dlia-ditei-na-sviata": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/hrudnevi-podarunky-dlia-ditei-tradytsii": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/spilne-chytannia-7-idei": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/rizdvianyi-podarunok-personalna-knyzhka": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/yak-ukrainska-mova-v-knyzhkakh-dopomahaie": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/chomu-dity-liubliat-kazky-na-nich": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/pereizd-z-ditmy-knyzhka-yak-opora": {
+  "issues": [],
+  "attempts": 1,
+  "batch": true
+ },
+ "blog/litnie-chytannia-bez-provalu": {
+  "issues": [],
+  "attempts": 1
+ },
+ "tema-velyka/savana": {
+  "issues": [],
+  "attempts": 1
  }
 }
