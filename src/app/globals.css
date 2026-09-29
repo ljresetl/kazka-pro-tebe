@@ -9,38 +9,40 @@
    ========================================================= */
 
 :root {
-  /* Теплий кремовий фон, помаранчевий акцент, округлі картки */
-  --bg: #fff8ee;
+  /* Українська палітра, м'яка для очей: молочний льон, синє небо, золота пшениця,
+     червоний вишиванки для дрібних акцентів. (--coral — історична назва головного кольору.) */
+  --bg: #f7f4ec;
   --surface: #ffffff;
-  --ink: #33241a;
-  --muted: #7a6656;
-  --line: #f1e2cf;
+  --ink: #1f2b3a;
+  --muted: #5d6a78;
+  --line: #e4ddcd;
 
-  --coral: #ff7a1a;
-  --coral-strong: #e2600a;
-  --coral-soft: #ffead6;
-  --sky: #3f8cff;
-  --sky-soft: #e8f1ff;
-  --sun: #ffc53d;
-  --sun-soft: #fff3d1;
-  --mint: #22bf95;
-  --mint-soft: #ddf7ee;
-  --cream-deep: #fdeedb;
+  --coral: #2b5fad;
+  --coral-strong: #1f4a8a;
+  --coral-soft: #e4ecf7;
+  --sky: #4a90d9;
+  --sky-soft: #e8f1fb;
+  --sun: #f2b90f;
+  --sun-soft: #fbf0cc;
+  --mint: #3e9b6e;
+  --mint-soft: #e1f2e8;
+  --cream-deep: #efe8d8;
+  --embroidery: #d6453d;
 
   /* Кольори SVG-сцен */
-  --riso-pink: #ff5c7a;
+  --riso-pink: var(--embroidery);
   --riso-blue: var(--sky);
   --riso-yellow: var(--sun);
   --riso-green: var(--mint);
   --paper: #ffffff;
-  --paper-deep: #fff3e3;
+  --paper-deep: #f2ecdf;
 
   --radius-xl: 32px;
   --radius-lg: 24px;
   --radius-md: 16px;
-  --shadow-sm: 0 1px 2px rgb(84 50 20 / 0.06);
-  --shadow: 0 1px 2px rgb(84 50 20 / 0.05), 0 10px 30px rgb(84 50 20 / 0.08);
-  --shadow-lg: 0 2px 6px rgb(84 50 20 / 0.06), 0 24px 60px rgb(84 50 20 / 0.14);
+  --shadow-sm: 0 1px 2px rgb(30 45 70 / 0.06);
+  --shadow: 0 1px 2px rgb(30 45 70 / 0.05), 0 10px 30px rgb(30 45 70 / 0.08);
+  --shadow-lg: 0 2px 6px rgb(30 45 70 / 0.06), 0 24px 60px rgb(30 45 70 / 0.14);
 
   --font-display: var(--font-body);
   --gutter: 16px;
@@ -219,7 +221,7 @@ img {
 .btn-primary {
   background: var(--coral);
   color: #fff;
-  box-shadow: 0 6px 18px rgb(255 122 26 / 0.35);
+  box-shadow: 0 6px 18px rgb(43 95 173 / 0.3);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--coral-strong);
@@ -262,7 +264,7 @@ img {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgb(255 248 238 / 0.92);
+  background: rgb(247 244 236 / 0.92);
   backdrop-filter: saturate(1.4) blur(12px);
   -webkit-backdrop-filter: saturate(1.4) blur(12px);
   border-bottom: 1px solid var(--line);
@@ -419,7 +421,7 @@ img {
   padding-top: 20px;
   padding-bottom: 32px;
   font-size: 14px;
-  color: #bba998;
+  color: #a39a88;
 }
 @media (min-width: 640px) {
   .footer-grid {
@@ -1013,7 +1015,7 @@ textarea.field-input {
   color: #b8a898;
 }
 .field-input:hover {
-  border-color: #e6d3bd;
+  border-color: #d9cfbb;
 }
 .field-input:focus {
   outline: none;
@@ -1171,7 +1173,7 @@ textarea.field-input {
 }
 .product-option:has(input:checked) {
   box-shadow: inset 0 0 0 2px var(--coral);
-  background: #fffaf4;
+  background: #fbf8f1;
 }
 
 .checkbox {
@@ -1224,7 +1226,7 @@ textarea.field-input {
   z-index: 10;
   margin: 0 calc(var(--gutter) * -1);
   padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
-  background: rgb(255 248 238 / 0.94);
+  background: rgb(247 244 236 / 0.94);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
@@ -1908,7 +1910,7 @@ textarea.field-input {
   padding: 40px 20px;
   background: var(--surface);
   border-radius: var(--radius-xl);
-  border: 1px dashed #e6d3bd;
+  border: 1px dashed #d9cfbb;
 }
 .empty h2 {
   font-size: 22px;
@@ -2027,14 +2029,14 @@ textarea.field-input {
 }
 .article-lead {
   font-size: 20px;
-  color: #4a3526;
+  color: #2a3646;
 }
 .article h2 {
   font-size: 22px;
   margin: 32px 0 10px;
 }
 .article section p {
-  color: #4a3526;
+  color: #2a3646;
   margin: 0 0 14px;
 }
 .article-toc {
@@ -2105,7 +2107,7 @@ textarea.field-input {
 }
 .prose p,
 .prose li {
-  color: #4a3526;
+  color: #2a3646;
 }
 .prose ul,
 .prose ol {
@@ -2272,7 +2274,7 @@ textarea.field-input {
     left: 0;
     bottom: 0;
     font-size: 10pt;
-    color: #bba998;
+    color: #a39a88;
   }
   * {
     -webkit-print-color-adjust: exact;

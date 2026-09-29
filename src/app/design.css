@@ -54,9 +54,9 @@
   width: 100%;
   display: grid;
   place-items: center;
-  border: 2px dashed #f0b27a;
+  border: 2px dashed #c9b98f;
   border-radius: var(--radius-lg);
-  background: repeating-linear-gradient(-45deg, #fff4e6 0 14px, #ffeedb 14px 28px);
+  background: repeating-linear-gradient(-45deg, #f7f1e3 0 14px, #f1e9d6 14px 28px);
   color: var(--ink);
   overflow: hidden;
 }
@@ -241,14 +241,14 @@
     transform 0.15s ease;
 }
 .wz-tile:hover {
-  border-color: #ffc28f;
+  border-color: #9db8de;
 }
 .wz-tile:active {
   transform: scale(0.98);
 }
 .wz-tile[aria-pressed="true"] {
   border-color: var(--coral);
-  background: #fff9f2;
+  background: #f6f9fd;
 }
 .wz-tile strong {
   font-size: 16px;
@@ -269,9 +269,9 @@
 .wz-tile-ph {
   display: grid;
   place-items: center;
-  border: 2px dashed #f0b27a;
-  background: repeating-linear-gradient(-45deg, #fff4e6 0 8px, #ffeedb 8px 16px);
-  color: #c47a3a;
+  border: 2px dashed #c9b98f;
+  background: repeating-linear-gradient(-45deg, #f7f1e3 0 8px, #f1e9d6 8px 16px);
+  color: #8a7440;
   font-size: 11px;
   font-weight: 800;
 }
@@ -343,9 +343,9 @@
   gap: 10px;
   min-height: 88px;
   padding: 16px;
-  border: 2px dashed #f0b27a;
+  border: 2px dashed #c9b98f;
   border-radius: var(--radius-md);
-  background: #fffaf3;
+  background: #fbf8f1;
   color: var(--coral-strong);
   font-weight: 800;
   text-align: center;
@@ -546,7 +546,7 @@
   align-items: center;
   padding: 22px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #ffe2c4 0%, #ffd0a6 100%);
+  background: linear-gradient(135deg, #fbf0cc 0%, #e4ecf7 100%);
 }
 .holiday-band h2 {
   font-size: clamp(22px, 5.6vw, 32px);
