@@ -15,5 +15,5 @@ export const AI_IMAGES = process.env.NEXT_PUBLIC_AI_IMAGES === "1";
  * Вимикає конструктор, «Інший сюжет», малювання й серверні /api/story та /api/illustrate.
  * Щоб відкрити — поставте false.
  */
-export const CREATION_PAUSED = true;
+export const CREATION_PAUSED = false;
 export const CREATION_PAUSED_MESSAGE = "Створення нових казок тимчасово призупинене. Зовсім скоро відкриємо знову!";
