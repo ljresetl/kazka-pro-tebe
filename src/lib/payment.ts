@@ -34,6 +34,13 @@ export async function startPayment(order: Order): Promise<PaymentResult> {
 
   if (PAYMENT_MODE === "test") {
     await new Promise((r) => setTimeout(r, 1200));
+    // Сервер теж має знати про «оплату», інакше не домалює книжку (src/lib/quota.ts).
+    const storyIds = [...new Set([...(order.items ?? []).map((i) => i.storyId), ...(order.storyId ? [order.storyId] : [])])];
+    await fetch("/api/payment/test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ storyIds }),
+    }).catch(() => {});
     markOrderPaid(order);
     return { status: "paid" };
   }

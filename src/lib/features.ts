@@ -16,4 +16,7 @@ export const AI_IMAGES = process.env.NEXT_PUBLIC_AI_IMAGES === "1";
  * Щоб відкрити — поставте false.
  */
 export const CREATION_PAUSED = false;
+/** Скільки перших сторінок казки видно й малюється до оплати. */
+export const FREE_PAGES = 3;
+
 export const CREATION_PAUSED_MESSAGE = "Створення нових казок тимчасово призупинене. Зовсім скоро відкриємо знову!";

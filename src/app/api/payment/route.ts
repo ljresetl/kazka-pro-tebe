@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { lineName, priceCart, REFERRAL_RE, type CartLine } from "@/lib/cart";
 import { checkoutUrl, liqpayConfigured, PAID_STATUSES, paymentStatus } from "@/lib/liqpay";
+import { clientIp, rememberOrder } from "@/lib/quota";
 import { SITE } from "@/lib/site";
 
 // Створює платіж і повертає посилання на сторінку оплати LiqPay.
@@ -75,6 +76,8 @@ export async function POST(request: Request) {
   ]
     .filter(Boolean)
     .join(" | ");
+
+  await rememberOrder(order.id, [...new Set(order.items.map((l) => l.storyId))], clientIp(request));
 
   const url = checkoutUrl({
     orderId: order.id,

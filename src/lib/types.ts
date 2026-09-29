@@ -63,6 +63,8 @@ export type Story = {
   paid?: boolean;
   /** Нову казку сайт ілюструє одразу: "pending" — ще не почали, "started" — вже малювали (вдруге не запускаємо). */
   illustrate?: "pending" | "started";
+  /** Підпис сервера: без нього ілюстрації не малюються (src/lib/quota.ts). */
+  ticket?: string;
   /** Номер замовлення, яким оплачено е-книгу (для знижки на друк). */
   paidOrder?: string;
   options?: BookOptions;
