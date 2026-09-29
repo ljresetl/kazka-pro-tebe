@@ -22,9 +22,10 @@ describe("приклади казок", () => {
     }
   });
 
-  it("у казки про Соломію є готові картинки на основних сторінках", () => {
-    const s = EXAMPLES.find((e) => e.slug === "solomiia-i-mushlia")!;
-    expect(s.coverImage).toBeDefined();
-    expect(s.pages.filter((p) => p.image)).toHaveLength(6);
+  it("у кожного прикладу ШІ-обкладинка й ШІ-ілюстрація на кожній сторінці", () => {
+    for (const e of EXAMPLES) {
+      expect(e.coverImage, e.slug).toBeDefined();
+      expect(e.pages.filter((p) => p.image?.src.includes("/img/pryklad-storinky/")), e.slug).toHaveLength(e.pages.length);
+    }
   });
 });
