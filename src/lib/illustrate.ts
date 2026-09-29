@@ -1,6 +1,6 @@
 "use client";
 
-import { deletePhoto, loadImage, loadPhoto, saveImage } from "./image-store";
+import { deletePhoto, loadImage, loadImages, loadPhoto, saveImage } from "./image-store";
 import { findTopic } from "./catalog";
 import type { Story } from "./types";
 
@@ -50,32 +50,82 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
   return data;
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** На телефоні запит обривається, коли браузер іде у фон, — чекаємо, поки сторінку знову відкриють. */
+function whenVisible() {
+  if (typeof document === "undefined" || document.visibilityState === "visible") return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    const on = () => {
+      if (document.visibilityState !== "visible") return;
+      document.removeEventListener("visibilitychange", on);
+      resolve();
+    };
+    document.addEventListener("visibilitychange", on);
+  });
+}
+
+/** Малює з повторами: обірваний зв'язок чи тимчасова помилка сервера не зупиняють усю книжку. */
+async function drawWithRetry(story: Story, part: Part, reference?: Img): Promise<Img> {
+  let last: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await whenVisible();
+    try {
+      return await draw(story, part, reference);
+    } catch (err) {
+      last = err;
+      await sleep(2000 * (attempt + 1));
+    }
+  }
+  // «Failed to fetch» — це обрив мережі; батькам пояснюємо по-людськи.
+  if (last instanceof TypeError) throw new Error("Немає зв'язку з сервером.");
+  throw last;
+}
+
 /**
- * Малює обкладинку й усі сторінки казки по черзі й зберігає їх у браузері.
+ * Малює обкладинку й сторінки казки по черзі й зберігає їх у браузері.
+ * Уже намальовані картинки пропускає, тож повторний запуск лише домальовує пропущене.
  * Обкладинка стає зразком героя для решти картинок.
  */
-export async function illustrateStory(story: Story, onProgress: (done: number, total: number) => void) {
+export async function illustrateStory(
+  story: Story,
+  onProgress: (done: number, total: number) => void,
+  { redraw = false }: { redraw?: boolean } = {},
+) {
   const total = story.pages.length + 1;
-  onProgress(0, total);
-  const first = story.pages[0];
-  // Фото дитини (якщо батьки його дали) потрібне лише для обкладинки.
-  const photo = await loadPhoto(story.id);
-  const cover = await draw(
-    story,
-    { kind: "cover", pageText: first.text, illustration: first.illustration, photo: Boolean(photo) },
-    photo ?? undefined,
-  );
-  // Обіцяли батькам: фото не зберігаємо довше, ніж потрібно.
-  if (photo) await deletePhoto(story.id);
-  await saveImage(story.id, -1, cover.data, cover.mimeType);
-  onProgress(1, total);
+  const have = new Set(redraw ? [] : (await loadImages(story.id).catch(() => [])).map((i) => i.index));
+  let done = have.size;
+  onProgress(done, total);
+  let failed = 0;
+
+  let cover = have.has(-1) ? await loadImage(story.id, -1) : null;
+  if (!cover) {
+    const first = story.pages[0];
+    // Фото дитини (якщо батьки його дали) потрібне лише для обкладинки.
+    const photo = await loadPhoto(story.id);
+    cover = await drawWithRetry(
+      story,
+      { kind: "cover", pageText: first.text, illustration: first.illustration, photo: Boolean(photo) },
+      photo ?? undefined,
+    );
+    // Обіцяли батькам: фото не зберігаємо довше, ніж потрібно.
+    if (photo) await deletePhoto(story.id);
+    await saveImage(story.id, -1, cover.data, cover.mimeType);
+    onProgress(++done, total);
+  }
 
   for (let i = 0; i < story.pages.length; i++) {
+    if (have.has(i)) continue;
     const page = story.pages[i];
-    const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover);
-    await saveImage(story.id, i, img.data, img.mimeType);
-    onProgress(i + 2, total);
+    try {
+      const img = await drawWithRetry(story, { kind: "page", pageText: page.text, illustration: page.illustration }, cover);
+      await saveImage(story.id, i, img.data, img.mimeType);
+      onProgress(++done, total);
+    } catch {
+      failed++;
+    }
   }
+  if (failed) throw new Error(`Не вдалося намалювати ${failed} з ${total} ілюстрацій. Натисніть «Домалювати».`);
 }
 
 /** Перемальовує одну сторінку (обкладинка — зразок героя, щоб він лишався схожим). */

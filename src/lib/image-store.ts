@@ -41,7 +41,7 @@ export async function saveImage(storyId: string, index: number, base64: string, 
   window.dispatchEvent(new Event(EVENT));
 }
 
-async function loadImages(storyId: string): Promise<Stored[]> {
+export async function loadImages(storyId: string): Promise<Stored[]> {
   const db = await open();
   return new Promise((resolve, reject) => {
     const req = db.transaction(STORE).objectStore(STORE).index("storyId").getAll(storyId);
