@@ -60,7 +60,8 @@ export default function StoryView({ id }: { id: string }) {
   const pages = story.pages.map((p, i) => ({ ...p, image: images.pages[i] ?? p.image }));
   const printPages = paid ? pages : pages.slice(0, FREE_PAGES);
   const hasAiImages = Boolean(images.cover || images.pages.some(Boolean));
-  const canIllustrate = AI_IMAGES && !STATIC_SITE && paid;
+  // Ілюстрації малюються одразу, ще до оплати, — щоб батьки побачили свою книжку повністю.
+  const canIllustrate = AI_IMAGES && !STATIC_SITE;
   const aiMode = AI_ENABLED && !STATIC_SITE;
   const canRegenerate = !paid && (aiMode || plotCount(story.theme) > 1);
 
@@ -141,7 +142,7 @@ export default function StoryView({ id }: { id: string }) {
 
         {editing && (
           <div style={{ marginBottom: 24 }}>
-            <StoryEditor story={story} canRedraw={canIllustrate && hasAiImages} onClose={() => setEditing(false)} />
+            <StoryEditor story={story} canRedraw={canIllustrate && paid && hasAiImages} onClose={() => setEditing(false)} />
           </div>
         )}
 
@@ -165,7 +166,7 @@ export default function StoryView({ id }: { id: string }) {
 
         {canIllustrate && (
           <div style={{ marginTop: 24 }}>
-            <IllustrationsPanel story={story} hasImages={hasAiImages} />
+            <IllustrationsPanel story={story} hasImages={hasAiImages} paid={paid} />
           </div>
         )}
 
