@@ -195,14 +195,13 @@ def book_cover(art: Image.Image, slug: str, w: int, h: int) -> Image.Image:
     sh = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     ImageDraw.Draw(sh).rounded_rectangle([x0 + 14, y0 + 20, x0 + bw + 14, y0 + bh + 20], 24, fill=(90, 50, 20, 90))
     c.alpha_composite(sh.filter(ImageFilter.GaussianBlur(18)))
-    book = fit_cover(art.convert("RGBA"), bw, bh)
-    d = ImageDraw.Draw(book, "RGBA")
-    # світла плашка під назву, щоб читалася на будь-якому небі
+    # назва — на світлій смузі над ілюстрацією (не поверх неї, щоб не закривати героя)
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
     f = font(int(bw * 0.085))
     words, lines, line = n["title"].split(), [], ""
     for word in words:
         test = (line + " " + word).strip()
-        if d.textlength(test, font=f) <= bw * 0.8:
+        if probe.textlength(test, font=f) <= bw * 0.8:
             line = test
         else:
             lines.append(line)
@@ -210,13 +209,12 @@ def book_cover(art: Image.Image, slug: str, w: int, h: int) -> Image.Image:
     if line:
         lines.append(line)
     lh = int(f.size * 1.18)
-    band = int(bh * 0.05) + lh * len(lines) + int(bh * 0.04)
-    grad = Image.new("L", (1, band + 60))
-    for y in range(band + 60):
-        grad.putpixel((0, y), 225 if y < band else int(225 * (1 - (y - band) / 60)))
-    book.alpha_composite(Image.merge("RGBA", [Image.new("L", (bw, band + 60), 255)] * 3 + [grad.resize((bw, band + 60))]))
-    y = int(bh * 0.05)
+    band = int(bh * 0.045) + lh * len(lines) + int(bh * 0.035)
     col = tuple(int(ink[i:i + 2], 16) for i in (1, 3, 5))
+    book = Image.new("RGBA", (bw, bh), (255, 251, 244, 255))
+    book.paste(fit_cover(art.convert("RGBA"), bw, bh - band), (0, band))
+    d = ImageDraw.Draw(book, "RGBA")
+    y = int(bh * 0.045)
     for ln in lines:
         tw = d.textlength(ln, font=f)
         d.text(((bw - tw) / 2, y), ln, font=f, fill=col + (255,))
