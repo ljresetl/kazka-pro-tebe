@@ -97,7 +97,7 @@ export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fro
     fromCover
       ? `Main character: exactly the same ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} as on the attached cover picture — identical face, hair colour, hairstyle, skin tone and clothes. Do not change any of these.`
       : r.hasPhoto
-        ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair and skin tone), drawn in the art style above. The same character appears on every page of the book.`
+        ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair colour, hairstyle, skin tone, and the same clothes and accessories with the same colours as in the photo), drawn in the art style above. The same character appears on every page of the book.`
         : `Main character: ${hero}. The same character appears on every page of the book.`,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
