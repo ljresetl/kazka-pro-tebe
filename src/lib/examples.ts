@@ -201,7 +201,7 @@ function build(seed: ExampleSeed): ExampleStory {
     dedication: story.dedication,
     cover: getTheme(seed.theme).scene,
     // Обкладинка: готова ілюстрація або тимчасова з бібліотеки (scripts/library-images).
-    coverImage: seed.images?.cover ?? img(`/img/pryklad-obkladynka/${seed.slug}.webp`, 600, 800),
+    coverImage: seed.images?.cover ?? img(`/img/pryklad-obkladynka/${seed.slug}.webp`, 800, 600),
     pages,
     ageLabel: yearsWord(seed.age),
   };

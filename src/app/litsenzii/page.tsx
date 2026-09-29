@@ -13,39 +13,14 @@ export default function LicensesPage() {
   return (
     <InfoPage title="Авторські права й ліцензії" updated="29 вересня 2026 року">
       <p>
-        Тексти, історії й дизайн сайту {SITE.name} створені нами. Для частини зображень ми використовуємо відкриті
-        бібліотеки, ліцензії яких дозволяють комерційне використання. Нижче — перелік джерел.
+        Тексти, історії й дизайн сайту {SITE.name} створені нами. Нижче — звідки на сайті ілюстрації й шрифти.
       </p>
-
-      <h2>3D-іконки й персонажі</h2>
-      <p>
-        <strong>Microsoft Fluent Emoji</strong> — © Microsoft Corporation, ліцензія MIT.{" "}
-        <a href="https://github.com/microsoft/fluentui-emoji" rel="noopener">
-          github.com/microsoft/fluentui-emoji
-        </a>
-        . З цих іконок ми склали ілюстрації тем, обкладинки книжок з іменами, картки віку, подарунків і статей блогу.
-      </p>
-      <details>
-        <summary>Текст ліцензії MIT</summary>
-        <p>
-          Copyright (c) Microsoft Corporation. Permission is hereby granted, free of charge, to any person obtaining a
-          copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software
-          without restriction, including without limitation the rights to use, copy, modify, merge, publish,
-          distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
-          furnished to do so, subject to the following conditions: The above copyright notice and this permission
-          notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED
-          &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-          WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-          CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-          DEALINGS IN THE SOFTWARE.
-        </p>
-      </details>
 
       <h2>Ілюстрації сайту</h2>
       <p>
-        Частину ілюстрацій сайту (головна сторінка, картки віку) ми створили за власними описами за допомогою
-        штучного інтелекту Google Gemini. Поступово ними замінюються й інші картинки.
+        Ілюстрації сайту (головна сторінка, теми, обкладинки з іменами, статті блогу, приклади) ми створили за
+        власними описами за допомогою штучного інтелекту Google Gemini. Фото дітей на сторінці прикладів теж
+        згенеровані й зображають вигаданих дітей; обкладинки прикладів намальовані з цих фото нашим конструктором.
       </p>
 
       <h2>Шрифти</h2>
