@@ -11,7 +11,7 @@ import { findTopic, ILLUSTRATION_STYLES } from "./catalog";
 // Змінні середовища: GEMINI_API_KEY, GEMINI_IMAGE_MODEL (за замовчуванням gemini-2.5-flash-image).
 
 const STYLE =
-  "Children's picture book illustration, Pixar-like 3D style: vibrant, bright, highly saturated colours, rich warm lighting with glossy highlights, friendly rounded characters with big expressive eyes and happy faces, detailed colourful background, cozy and joyful mood.";
+  "Children's picture book illustration, Pixar-like 3D style: vibrant, bright, highly saturated colours, rich warm lighting with glossy highlights, friendly rounded characters with big expressive eyes and faces that show each moment's feeling, detailed colourful background, cozy and joyful mood.";
 
 const HAIR_GIRL = [
   "long dark hair in two puffy pigtail buns",
@@ -114,7 +114,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
   const world = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
   const style = ILLUSTRATION_STYLES.find((s) => s.id === r.style);
   const styleText = style
-    ? `${style.prompt}; vibrant, bright, rich colours, expressive happy faces, friendly, cozy and joyful mood`
+    ? `${style.prompt}; vibrant, bright, rich colours, expressive faces that show each moment's feeling, friendly and cozy overall mood`
     : STYLE;
 
   const intent =
@@ -147,7 +147,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
         : null
       : refA
         ? r.heroLook
-          ? `The child, named "the child": ${r.heroLook}. This outfit stays the same on every page, even if the scene mentions other clothes; only when the scene says the child puts something on (a coat, a raincoat, pyjamas at bedtime) is that item added.`
+          ? `The child, named "the child": ${r.heroLook}. This outfit stays the same on every page, even if the scene mentions other clothes; ${r.outerwear ? "outerwear follows the rule below; " : ""}only when the scene says the child puts something on (a raincoat, pyjamas at bedtime${r.outerwear ? "" : ", a coat"}) is that item added.`
           : null
         : r.outfit
           ? `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed).replace(/, wearing .*$/, "").replace(/ with an? (yellow hairband|pink bow)$/, "")}, wearing ${r.outfit} — this outfit for the whole book.`
@@ -179,7 +179,7 @@ ${r.illustration}`
     r.cast?.length
       ? r.kind === "sheet"
         ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
-          `Exactly ${r.cast.length} recurring characters and objects, each drawn once: ${r.cast.map((c, i) => `${i + 1}) ${c.split(":").slice(1).join(":").trim() || c}`).join("; ")}.`
+          `Exactly ${r.cast.length} recurring characters and objects, each drawn once (a person whose description has outdoor clothes gets a second small view in them, side by side): ${r.cast.map((c, i) => `${i + 1}) ${c.split(":").slice(1).join(":").trim() || c}`).join("; ")}.`
         : `Recurring characters and objects, each always drawn identically (same species, count, colours, features, patterns and emblems — nothing added or removed — and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
     // Є паспорти від автора — герої батьків уже там латиницею; кирилиця з конструктора художник вписував підписами.

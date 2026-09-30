@@ -74,7 +74,7 @@ const SYSTEM = `Ти — українська дитяча письменниц�
   • "scene" — сцена з дозволеного списку, що найкраще пасує до тексту;
   • "illustration" — завдання художнику АНГЛІЙСЬКОЮ, рівно 5 рядків-полів у такому порядку (так роблять розкадровки ілюстраторів — художник-ШІ найкраще слухається саме такого формату):
     "Time: …" — пора доби й небо, завжди, навіть якщо не змінилась ("sunny daytime, clear blue sky", "golden sunset", "night, crescent moon and stars"). Пора доби йде лише вперед за сюжетом (день → вечір → ніч) і збігається з текстом сторінки: якщо в тексті ще день — ніякого місяця.
-    "In the picture: …" — ПОВНИЙ список, хто й що є в кадрі, з місцем у кадрі й розміром: спершу "the child", далі герої й предмети з "cast" (вид + ім'я, наприклад "palm-sized crab Lolo on the right") і нові важливі предмети сторінки з розміром ("a small rainbow shell in the child's hands"). Лише те, що є в тексті цієї сторінки або потрібне для дії; більше нікого в кадрі не буде.
+    "In the picture: …" — ПОВНИЙ список, хто й що є в кадрі, з місцем у кадрі й розміром: спершу "the child", далі герої й предмети з "cast" (вид + ім'я, наприклад "palm-sized crab Lolo on the right") і нові важливі предмети сторінки з розміром ("a small rainbow shell in the child's hands"). Усе, що герої за текстом тримають, дають чи використовують, — з тим, хто це тримає (наприклад, "grandma Hanna waving a glowing lantern"). Лише те, що є в тексті цієї сторінки або потрібне для дії; більше нікого в кадрі не буде.
     "Action: …" — ГОЛОВНА подія саме цієї сторінки точно як у тексті: хто що робить, дає, тримає, обіймає; поза дитини (біжить, лізе, пливе, ховається, обіймає, дивиться вгору…). Нічого не додавай і не змінюй проти тексту (не спить, якщо в тексті лише позіхає; без ковдри, якщо її немає в тексті).
     "Feeling: …" — почуття дитини й героїв на цій сторінці, як у тексті (curious, scared but brave, joyful, sleepy and calm), — обличчя мають його показувати.
     "Place and shot: …" — місце (коротко, те саме місце — ті самі прикмети) і план кадру (wide shot / close-up / from behind / low angle / bird's-eye view). Сусідні сторінки мають різний план і позу.
@@ -145,6 +145,7 @@ export async function aiStory(req: StoryRequest): Promise<AiStory> {
 
 const MissingCastSchema = z.object({
   missing: z.array(z.object({ name: z.string(), en: z.string(), look: z.string() })).max(4),
+  pageFixes: z.array(z.object({ page: z.number().int(), add: z.string() })).max(12),
 });
 
 /**
@@ -161,17 +162,27 @@ async function completeCast(story: AiStory): Promise<AiStory> {
       model: geminiTextModels()[0],
       contents: `Below is a children's picture book: page texts (Ukrainian) and storyboard notes for the illustrator.
 Already described recurring characters and objects: ${known || "none"}.
-Find every OTHER character or object, besides the main child, that appears in the pictures on two or more pages (for example a found treasure, a gift, a steering wheel, a bell, a berry). For each give: "name" — its Ukrainian name as in the text, "en" — a short English name in Latin letters used in the storyboard, "look" — an exact English description with size relative to the child, colours, material and markings (or "plain, no pattern"), consistent with the text. Return {"missing": []} if nothing is missing.
+Find every OTHER character or object, besides the main child, that appears in the pictures on two or more pages (for example a found treasure, a gift, a steering wheel, a bell, a berry). For each give: "name" — its Ukrainian name as in the text, "en" — a short English name in Latin letters used in the storyboard, "look" — an exact English description with size relative to the child, colours, material and markings (or "plain, no pattern"), consistent with the text. Also compare every page text with its storyboard note: if the text says someone holds, uses, gives or waves something (a lantern, a gift, a key) or does a visible action that the "In the picture"/"Action" lines miss, add a "pageFixes" item: "page" — page number, "add" — a short English phrase to add to "In the picture" in storyboard wording (for example "grandma Hanna waving a glowing lantern in her raised hand"). Return {"missing": [], "pageFixes": []} if nothing is missing.
 
 ${board}`,
       config: { responseMimeType: "application/json", responseJsonSchema: z.toJSONSchema(MissingCastSchema), temperature: 0.2 },
     });
     console.log(`[usage] ${JSON.stringify({ what: "cast-check", model: res.modelVersion, usage: res.usageMetadata })}`);
     const parsed = MissingCastSchema.safeParse(JSON.parse(res.text ?? "{}"));
-    if (!parsed.success || !parsed.data.missing.length) return story;
+    if (!parsed.success) return story;
     const have = new Set((story.cast ?? []).map((c) => c.name.toLowerCase()));
     const added = parsed.data.missing.filter((c) => !have.has(c.name.toLowerCase()));
-    return { ...story, cast: [...(story.cast ?? []), ...added].slice(0, 8) };
+    const pages = story.pages.map((p, i) => {
+      const adds = parsed.data.pageFixes.filter((f) => f.page === i + 1).map((f) => f.add.trim()).filter(Boolean);
+      if (!adds.length || !p.illustration) return p;
+      // Дописуємо в рядок «In the picture», бо художник малює саме цей список.
+      const line = /^(\s*In the picture:.*)$/im;
+      const illustration = line.test(p.illustration)
+        ? p.illustration.replace(line, (m) => `${m.replace(/[.\s]+$/, "")}, ${adds.join(", ")}`)
+        : `${p.illustration}\nIn the picture also: ${adds.join(", ")}`;
+      return { ...p, illustration };
+    });
+    return { ...story, pages, cast: [...(story.cast ?? []), ...added].slice(0, 8) };
   } catch (err) {
     console.error("cast-check:", String(err).slice(0, 200));
     return story;
