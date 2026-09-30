@@ -93,7 +93,8 @@ export function useStoryImages(storyId: string) {
             const src = URL.createObjectURL(it.blob);
             urls.push(src);
             const ill = { src, width: W, height: H };
-            if (it.index === PHOTO || it.index >= COLORING_BASE) continue;
+            // Фото (-2), лист персонажів (-3) і розмальовки книжці не показуються.
+            if (it.index < -1 || it.index >= COLORING_BASE) continue;
             if (it.index === -1) next.cover = ill;
             else next.pages[it.index] = ill;
           }

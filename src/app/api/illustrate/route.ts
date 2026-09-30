@@ -19,7 +19,7 @@ const Schema = z.object({
   heroSeed: z.number().int().min(0).max(1_000_000),
   theme: z.enum(["space", "forest", "sea", "dino", "castle", "meadow"]),
   title: z.string().trim().min(1).max(120),
-  kind: z.enum(["cover", "page"]),
+  kind: z.enum(["sheet", "cover", "page"]),
   pageText: z.string().trim().min(1).max(1500),
   illustration: z.string().trim().max(600).optional(),
   friend: z.string().trim().max(40).optional(),
@@ -31,8 +31,13 @@ const Schema = z.object({
   heroLook: z.string().trim().max(600).optional(),
   hasPhoto: z.boolean().optional(),
   page: z.number().int().min(0).max(40).optional(),
+  /** Зразок A (фото, лист персонажів або обкладинка) і його роль; зразок B — попередня сторінка. */
   reference: z
-    .object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(4_000_000) })
+    .object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(2_500_000) })
+    .optional(),
+  refRole: z.enum(["photo", "sheet", "cover"]).optional(),
+  reference2: z
+    .object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(2_500_000) })
     .optional(),
 });
 
@@ -57,7 +62,7 @@ export async function POST(request: Request) {
 
   const parsed = Schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Неправильний запит." }, { status: 400 });
-  const { reference, storyId, ticket, paidTicket, ...req } = parsed.data;
+  const { reference, refRole, reference2, storyId, ticket, paidTicket, ...req } = parsed.data;
 
   // Малюємо лише для казок, створених нашим сервером, і не більше, ніж дозволяє оплата.
   if (!validTicket(storyId, ticket)) {
@@ -72,7 +77,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const image = await drawIllustration(req, reference);
+    const image = await drawIllustration(req, {
+      a: reference,
+      aRole: refRole ?? (req.hasPhoto ? "photo" : "cover"),
+      b: reference2,
+    });
     return Response.json(image);
   } catch (err) {
     console.error("Illustration failed:", err);

@@ -96,7 +96,7 @@ for (const ex of EXAMPLES) {
             friend: ex.friend,
             style: ex.style,
           },
-          reference,
+          { a: reference, aRole: "cover" },
         );
         const webp = await sharp(Buffer.from(img.data, "base64")).resize(1024, 1024, { fit: "cover" }).webp({ quality: 82 }).toBuffer();
         if (await hasText(webp)) throw new Error("на картинці є напис");
