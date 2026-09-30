@@ -3,3 +3,8 @@ export function textSize(text: string) {
   // Короткий текст (книжки для найменших) — більший шрифт, як у справжніх книжках для малечі.
   return text.length > 420 ? "len-l" : text.length > 330 ? "len-m" : text.length < 160 ? "len-xs" : text.length < 300 ? "len-s" : "";
 }
+
+/** Один розмір шрифту на всю книжку — за найдовшою сторінкою, як у справжніх книжках. */
+export function bookTextSize(texts: string[]) {
+  return textSize(texts.reduce((a, b) => (b.length > a.length ? b : a), ""));
+}

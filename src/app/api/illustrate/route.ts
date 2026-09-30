@@ -30,6 +30,7 @@ const Schema = z.object({
   setting: z.string().trim().max(400).optional(),
   heroLook: z.string().trim().max(600).optional(),
   outfit: z.string().trim().max(300).optional(),
+  outerwear: z.string().trim().max(300).optional(),
   hasPhoto: z.boolean().optional(),
   page: z.number().int().min(0).max(40).optional(),
   /** Зразок A (фото, лист персонажів або обкладинка) і його роль; зразок B — попередня сторінка. */
