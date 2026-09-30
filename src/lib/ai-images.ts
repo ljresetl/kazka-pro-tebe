@@ -169,7 +169,7 @@ ${r.illustration}`
     r.cast?.length
       ? r.kind === "sheet"
         ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
-          `Recurring characters and objects: ${r.cast.map((c) => c.split(":").slice(1).join(":").trim() || c).join("; ")}.`
+          `Exactly ${r.cast.length} recurring characters and objects, each drawn once: ${r.cast.map((c, i) => `${i + 1}) ${c.split(":").slice(1).join(":").trim() || c}`).join("; ")}.`
         : `Recurring characters and objects, each always drawn identically (same species, count, colours, features, patterns and emblems — nothing added or removed — and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,

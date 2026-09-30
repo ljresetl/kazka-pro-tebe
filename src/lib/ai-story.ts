@@ -136,9 +136,44 @@ export function hasAiCredentials(): boolean {
 
 export async function aiStory(req: StoryRequest): Promise<AiStory> {
   const provider = aiProvider();
-  if (provider === "gemini") return geminiStory(req);
-  if (provider === "claude") return claudeStory(req);
-  throw new Error("Немає ключа для ШІ");
+  const story = provider === "gemini" ? await geminiStory(req) : provider === "claude" ? await claudeStory(req) : null;
+  if (!story) throw new Error("Немає ключа для ШІ");
+  return completeCast(story);
+}
+
+const MissingCastSchema = z.object({
+  missing: z.array(z.object({ name: z.string(), en: z.string(), look: z.string() })).max(4),
+});
+
+/**
+ * Автор часто не записує в паспорти речі, що з'являються лише наприкінці (кермо, дзвіночок),
+ * і художник малює їх щоразу інакше. Дешева модель (~0,1 Kč) читає розкадровку й дописує пропущене.
+ */
+async function completeCast(story: AiStory): Promise<AiStory> {
+  if (!process.env.GEMINI_API_KEY) return story;
+  const known = (story.cast ?? []).map((c) => `${c.name} / ${c.en ?? ""}`).join("; ");
+  const board = story.pages.map((p, i) => `Page ${i + 1}: ${p.text}\n${p.illustration}`).join("\n\n");
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const res = await ai.models.generateContent({
+      model: geminiTextModels()[0],
+      contents: `Below is a children's picture book: page texts (Ukrainian) and storyboard notes for the illustrator.
+Already described recurring characters and objects: ${known || "none"}.
+Find every OTHER character or object, besides the main child, that appears in the pictures on two or more pages (for example a found treasure, a gift, a steering wheel, a bell, a berry). For each give: "name" — its Ukrainian name as in the text, "en" — a short English name in Latin letters used in the storyboard, "look" — an exact English description with size relative to the child, colours, material and markings (or "plain, no pattern"), consistent with the text. Return {"missing": []} if nothing is missing.
+
+${board}`,
+      config: { responseMimeType: "application/json", responseJsonSchema: z.toJSONSchema(MissingCastSchema), temperature: 0.2 },
+    });
+    console.log(`[usage] ${JSON.stringify({ what: "cast-check", model: res.modelVersion, usage: res.usageMetadata })}`);
+    const parsed = MissingCastSchema.safeParse(JSON.parse(res.text ?? "{}"));
+    if (!parsed.success || !parsed.data.missing.length) return story;
+    const have = new Set((story.cast ?? []).map((c) => c.name.toLowerCase()));
+    const added = parsed.data.missing.filter((c) => !have.has(c.name.toLowerCase()));
+    return { ...story, cast: [...(story.cast ?? []), ...added].slice(0, 8) };
+  } catch (err) {
+    console.error("cast-check:", String(err).slice(0, 200));
+    return story;
+  }
 }
 
 function validate(story: AiStory | null | undefined): AiStory {

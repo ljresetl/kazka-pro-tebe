@@ -1431,8 +1431,11 @@ textarea.field-input {
   padding: 3cqw 6cqw 7cqw;
 }
 /* Довший текст — трохи менший шрифт, щоб уміститися у свою частину сторінки. */
-.flip-page .flip-text.len-s .story-text {
+.flip-page .flip-text.len-xs .story-text {
   font-size: clamp(15px, 5cqw, 24px);
+}
+.flip-page .flip-text.len-s .story-text {
+  font-size: clamp(13px, 4.4cqw, 21px);
 }
 .flip-page .flip-text.len-m .story-text {
   font-size: clamp(11px, 3.5cqw, 17px);
@@ -2275,12 +2278,18 @@ textarea.field-input {
   }
   .print-story-page .story-text {
     flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 0 6mm 8mm;
     font-size: 16pt;
     line-height: 1.55;
   }
+  .print-story-page .story-text.len-xs {
+    font-size: 22pt;
+  }
   .print-story-page .story-text.len-s {
-    font-size: 20pt;
+    font-size: 19pt;
   }
   .print-story-page .story-text.len-m {
     font-size: 15pt;
