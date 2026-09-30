@@ -14,9 +14,9 @@ describe("ліміти казок і ілюстрацій", () => {
     expect(await takeStory("10.0.0.2")).toBe(true);
   });
 
-  it("до оплати — обкладинка, 3 сторінки й 2 повтори; після оплати — вся книжка", async () => {
+  it("до оплати — лист персонажів, обкладинка, 3 сторінки й 2 повтори; після оплати — вся книжка", async () => {
     const id = "story-a";
-    for (let i = 0; i < 6; i++) expect((await takeImage(id)).ok).toBe(true);
+    for (let i = 0; i < 7; i++) expect((await takeImage(id)).ok).toBe(true);
     expect((await takeImage(id)).ok).toBe(false);
     await markPaid([id]);
     for (let i = 0; i < 10; i++) expect((await takeImage(id)).ok).toBe(true);
@@ -35,7 +35,7 @@ describe("підпис оплати", () => {
   it("відкриває всю книжку навіть без пам'яті сервера, підробка не працює", async () => {
     const { paidTicket, takeImage } = await import("@/lib/quota");
     const id = "story-b";
-    for (let i = 0; i < 6; i++) await takeImage(id);
+    for (let i = 0; i < 7; i++) await takeImage(id);
     expect((await takeImage(id, "x".repeat(32))).ok).toBe(false);
     expect((await takeImage(id, paidTicket("інша"))).ok).toBe(false);
     const ok = await takeImage(id, paidTicket(id));

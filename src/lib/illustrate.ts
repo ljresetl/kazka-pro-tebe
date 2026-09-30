@@ -13,7 +13,12 @@ function seedFrom(text: string) {
   return (h >>> 0) % 1_000_000;
 }
 
-type Part = { kind: "cover" | "page"; pageText: string; illustration?: string; photo?: boolean; page?: number };
+type Part = { kind: "sheet" | "cover" | "page"; pageText: string; illustration?: string; page?: number };
+/** Зразок A і його роль: фото дитини, лист персонажів або обкладинка (старі казки без листа). */
+type Refs = { a?: Img; aRole?: "photo" | "sheet" | "cover"; b?: Img };
+
+/** Лист персонажів зберігається поруч із малюнками під цим номером (книжці не показується). */
+const SHEET = -3;
 
 const KIND_EN = { person: "person", pet: "animal", object: "toy or object" } as const;
 
@@ -46,8 +51,9 @@ export async function shrinkReference(img: Img): Promise<Img> {
   }
 }
 
-async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
-  if (reference) reference = await shrinkReference(reference);
+async function draw(story: Story, part: Part, refs: Refs = {}): Promise<Img & { heroLook?: string }> {
+  const reference = refs.a ? await shrinkReference(refs.a) : undefined;
+  const reference2 = refs.b ? await shrinkReference(refs.b) : undefined;
   const res = await fetch("/api/illustrate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -66,13 +72,15 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       companions: companions(story),
       cast: story.cast?.slice(0, 8).map((c) => `${c.name}: ${c.look}`.slice(0, 200)),
       setting: story.setting?.slice(0, 400),
-      heroLook: part.kind === "page" ? story.heroLook?.slice(0, 600) : undefined,
-      hasPhoto: part.kind === "cover" && Boolean(reference) && part.photo,
+      heroLook: part.kind === "sheet" ? undefined : story.heroLook?.slice(0, 600),
+      hasPhoto: refs.aRole === "photo",
       kind: part.kind,
       page: part.page,
       pageText: part.pageText,
       illustration: part.illustration,
       reference,
+      refRole: reference ? refs.aRole : undefined,
+      reference2,
     }),
   });
   const data = (await res.json()) as Img & { error?: string; heroLook?: string };
@@ -101,12 +109,12 @@ function whenVisible() {
 }
 
 /** Малює з повторами: обірваний зв'язок чи тимчасова помилка сервера не зупиняють усю книжку. */
-async function drawWithRetry(story: Story, part: Part, reference?: Img): Promise<Img> {
+async function drawWithRetry(story: Story, part: Part, refs: Refs = {}): Promise<Img & { heroLook?: string }> {
   let last: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
     await whenVisible();
     try {
-      return await draw(story, part, reference);
+      return await draw(story, part, refs);
     } catch (err) {
       if (err instanceof StopError) throw err;
       last = err;
@@ -118,11 +126,21 @@ async function drawWithRetry(story: Story, part: Part, reference?: Img): Promise
   throw last;
 }
 
+/** Запам'ятовує опис героя в казці — для всіх наступних сторінок. */
+function rememberHero(story: Story, heroLook: string | undefined): Story {
+  if (!heroLook) return story;
+  const saved = readStory(story.id);
+  if (saved) saveStory({ ...saved, heroLook });
+  return { ...story, heroLook };
+}
+
 /**
- * Малює обкладинку й сторінки казки по черзі й зберігає їх у браузері.
- * Уже намальовані картинки пропускає, тож повторний запуск лише домальовує пропущене.
- * Обкладинка стає зразком героя для решти картинок.
+ * Малює книжку по черзі й зберігає малюнки в браузері:
+ * 1) лист персонажів (з фото дитини, якщо його дали) — зразок для всіх малюнків;
+ * 2) обкладинку; 3) сторінки — зі зразками «лист персонажів» і «попередня сторінка».
+ * Уже намальоване пропускає, тож повторний запуск лише домальовує пропущене.
  * `upTo` — скільки перших сторінок малювати (до оплати — лише безкоштовні, решту після оплати).
+ * Старі казки (обкладинка є, листа немає) малюють далі за обкладинкою.
  */
 export async function illustrateStory(
   story: Story,
@@ -130,57 +148,77 @@ export async function illustrateStory(
   { redraw = false, upTo = story.pages.length }: { redraw?: boolean; upTo?: number } = {},
 ) {
   const count = Math.min(upTo, story.pages.length);
-  const total = count + 1;
-  const have = new Set(
-    redraw ? [] : (await loadImages(story.id).catch(() => [])).map((i) => i.index).filter((i) => i < count),
-  );
-  let done = have.size;
+  const stored = redraw ? [] : await loadImages(story.id).catch(() => []);
+  const have = new Set(stored.map((i) => i.index));
+  let sheet = have.has(SHEET) ? await loadImage(story.id, SHEET) : null;
+  let cover = have.has(-1) ? await loadImage(story.id, -1) : null;
+  const needSheet = !sheet && !cover;
+  const total = count + 1 + (needSheet ? 1 : 0);
+  let done = [-1, ...Array.from({ length: count }, (_, i) => i)].filter((i) => have.has(i)).length;
   onProgress(done, total);
   let failed = 0;
+  const first = story.pages[0];
 
-  let cover = have.has(-1) ? await loadImage(story.id, -1) : null;
-  if (!cover) {
-    const first = story.pages[0];
-    // Фото дитини (якщо батьки його дали) потрібне лише для обкладинки.
+  if (needSheet) {
+    // Фото дитини (якщо батьки його дали) потрібне лише для листа персонажів.
     const photo = await loadPhoto(story.id);
-    cover = await drawWithRetry(
+    const drawn = await drawWithRetry(
       story,
-      { kind: "cover", pageText: first.text, illustration: first.illustration, photo: Boolean(photo) },
-      photo ?? undefined,
+      { kind: "sheet", pageText: first.text, illustration: first.illustration },
+      photo ? { a: photo, aRole: "photo" } : {},
     );
     // Обіцяли батькам: фото не зберігаємо довше, ніж потрібно.
     if (photo) await deletePhoto(story.id);
-    await saveImage(story.id, -1, cover.data, cover.mimeType);
-    // Опис героя з обкладинки — для всіх сторінок (одяг, візерунки не губляться).
-    const heroLook = (cover as Img & { heroLook?: string }).heroLook;
-    if (heroLook) {
-      story = { ...story, heroLook };
-      const saved = readStory(story.id);
-      if (saved) saveStory({ ...saved, heroLook });
-    }
+    sheet = { data: drawn.data, mimeType: drawn.mimeType };
+    await saveImage(story.id, SHEET, sheet.data, sheet.mimeType);
+    story = rememberHero(story, drawn.heroLook);
     onProgress(++done, total);
   }
 
+  const main: Refs = sheet ? { a: sheet, aRole: "sheet" } : cover ? { a: cover, aRole: "cover" } : {};
+
+  if (!cover) {
+    const drawn = await drawWithRetry(story, { kind: "cover", pageText: first.text, illustration: first.illustration }, main);
+    cover = { data: drawn.data, mimeType: drawn.mimeType };
+    await saveImage(story.id, -1, cover.data, cover.mimeType);
+    if (!sheet) story = rememberHero(story, drawn.heroLook);
+    onProgress(++done, total);
+  }
+
+  const pageRefs: Refs = main.a ? main : { a: cover, aRole: "cover" };
+  let prev: Img | null = cover;
   for (let i = 0; i < count; i++) {
-    if (have.has(i)) continue;
+    if (have.has(i)) {
+      prev = await loadImage(story.id, i);
+      continue;
+    }
     const page = story.pages[i];
     try {
-      const img = await drawWithRetry(story, { kind: "page", pageText: page.text, illustration: page.illustration, page: i }, cover);
+      const img = await drawWithRetry(
+        story,
+        { kind: "page", pageText: page.text, illustration: page.illustration, page: i },
+        { ...pageRefs, b: prev ?? undefined },
+      );
       await saveImage(story.id, i, img.data, img.mimeType);
+      prev = { data: img.data, mimeType: img.mimeType };
       onProgress(++done, total);
     } catch (err) {
       if (err instanceof StopError) throw err;
       failed++;
+      prev = null;
     }
   }
   if (failed) throw new Error(`Не вдалося намалювати ${failed} з ${total} ілюстрацій. Натисніть «Домалювати».`);
 }
 
-/** Перемальовує одну сторінку (обкладинка — зразок героя, щоб він лишався схожим). */
+/** Перемальовує одну сторінку: зразки — лист персонажів (або обкладинка) і попередня сторінка. */
 export async function redrawPage(story: Story, index: number) {
   const page = story.pages[index];
   if (!page) return;
+  const sheet = await loadImage(story.id, SHEET);
   const cover = await loadImage(story.id, -1);
-  const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration, page: index }, cover ?? undefined);
+  const prev = index > 0 ? await loadImage(story.id, index - 1) : cover;
+  const main: Refs = sheet ? { a: sheet, aRole: "sheet" } : cover ? { a: cover, aRole: "cover" } : {};
+  const img = await draw(story, { kind: "page", pageText: page.text, illustration: page.illustration, page: index }, { ...main, b: prev ?? undefined });
   await saveImage(story.id, index, img.data, img.mimeType);
 }

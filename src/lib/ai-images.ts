@@ -11,7 +11,7 @@ import { findTopic, ILLUSTRATION_STYLES } from "./catalog";
 // Змінні середовища: GEMINI_API_KEY, GEMINI_IMAGE_MODEL (за замовчуванням gemini-2.5-flash-image).
 
 const STYLE =
-  "Children's picture book illustration, Pixar-like 3D style: vibrant, bright, highly saturated colours, rich warm lighting with glossy highlights, friendly rounded characters with big expressive eyes and happy faces, detailed colourful background, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.";
+  "Children's picture book illustration, Pixar-like 3D style: vibrant, bright, highly saturated colours, rich warm lighting with glossy highlights, friendly rounded characters with big expressive eyes and happy faces, detailed colourful background, cozy and joyful mood.";
 
 const HAIR_GIRL = [
   "long dark hair in two puffy pigtail buns",
@@ -58,7 +58,7 @@ export type IllustrationRequest = {
   heroSeed: number;
   theme: string;
   title: string;
-  kind: "cover" | "page";
+  kind: "sheet" | "cover" | "page";
   /** Текст сторінки казки (українською). */
   pageText: string;
   /** Опис ілюстрації від ШІ-письменника (англійською), якщо є. */
@@ -95,43 +95,83 @@ const SHOTS = [
   "dynamic diagonal composition, the child mid-action",
 ];
 
-/** Точний запит до художника-ШІ, зібраний із налаштувань казки. */
-export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fromCover?: boolean } = {}) {
-  const hero = heroDescription(r.gender, r.age, r.heroSeed);
+/** Хто на зразку A: фото дитини, лист персонажів, обкладинка (старі казки без листа). */
+export type RefRole = "photo" | "sheet" | "cover";
+
+/**
+ * Точний запит до художника-ШІ за порадами Google (Nano Banana) і ілюстраторів дитячих книжок:
+ * мета → стиль → ролі зразків → герої й предмети → світ і час → дія → композиція → якість.
+ * Бажане описуємо позитивно (заборони модель інколи «бачить» і малює навпаки).
+ */
+export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { refA?: RefRole; prev?: boolean } = {}) {
+  const who = r.gender === "girl" ? "girl" : "boy";
   const topic = r.topic ? findTopic(r.topic) : null;
-  const setting = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
+  const world = topic ? `${topic.topic.en} (${topic.category.en})` : (THEME_SETTING[r.theme] ?? THEME_SETTING.meadow);
   const style = ILLUSTRATION_STYLES.find((s) => s.id === r.style);
-  const look = style
-    ? `Children's picture book illustration. Art style: ${style.prompt}. Vibrant, bright, rich colours, expressive happy faces, friendly, cozy and joyful mood. Absolutely no text, letters, words or captions in the image.`
+  const styleText = style
+    ? `${style.prompt}; vibrant, bright, rich colours, expressive happy faces, friendly, cozy and joyful mood`
     : STYLE;
-  const what =
-    r.kind === "cover"
-      ? `Cover picture for a children's fairy tale (its title, for context only — never write it: «${r.title}»). Show the main character happily in the world of the story.`
-      : r.illustration
-        ? `Illustrate this moment of the story: ${r.illustration}`
-        : `Illustrate this page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
-  return [
-    look,
-    // Сторінка з обкладинкою-зразком: зовнішність беремо ЛИШЕ з обкладинки. Текстовий опис героя
-    // тут шкодив — художник то слухав його (інший колір волосся), то обкладинку.
-    fromCover
-      ? `Main character: exactly the same ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} as on the attached cover picture — identical face, hair colour, hairstyle, skin tone and clothes. Do not change any of these.${r.heroLook ? ` Exact look: ${r.heroLook} (keep every pattern and colour of the outfit; add a coat or jacket only if the scene says so).` : ""}`
-      : r.hasPhoto
-        ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair colour, hairstyle and skin tone; choose an outfit that suits the story), drawn in the art style above. The same character appears on every page of the book.`
-        : `Main character: ${hero}. The same character appears on every page of the book.`,
-    r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
-    r.setting ? `Time and atmosphere of the whole story: ${r.setting}. Every picture must match it (same time of day, same sky and moon shape) unless this moment clearly happens at another time.` : null,
-    "Correct anatomy: every person, animal and character (including toys and vehicles with faces) has exactly two eyes and one mouth, no extra limbs.",
-    r.cast?.length
-      ? `Recurring characters and objects — whenever one of them appears, draw it EXACTLY like this on every page (same species, colours and features; never replace it with a different animal): ${r.cast.join("; ")}.`
+
+  const intent =
+    r.kind === "sheet"
+      ? `Character reference sheet for a Ukrainian children's picture book (its title, for context only: «${r.title}»).`
+      : r.kind === "cover"
+        ? `Cover illustration for a Ukrainian children's picture book (its title, for context only: «${r.title}»). The title is added later by the book designer.`
+        : `Illustration for page ${(r.page ?? 0) + 1} of 12 of a Ukrainian children's picture book.`;
+
+  const refs = [
+    refA === "photo"
+      ? `Image A is a photo of the real child: draw the child as a ${r.age}-year-old ${who} with the same face, hair colour, hairstyle and skin tone, in the art style above, wearing an outfit that suits the story.`
       : null,
-    !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
-    `World of the story: ${setting}.`,
+    refA === "sheet"
+      ? "Image A is the character reference sheet of this book: every character and object looks exactly as on it — faces, hair, outfits with all their patterns and colours, species, sizes and colours."
+      : null,
+    refA === "cover" ? `Image A is the book cover: the main ${who} looks exactly as there — face, hair colour, hairstyle and the outfit with all its patterns and colours.` : null,
+    prev
+      ? "Image B is the previous page of the book: keep continuity with it — the same clothes, props and their colours, time of day, lighting and sky."
+      : null,
+    r.kind !== "sheet" && (refA === "sheet" || refA === "cover" || prev)
+      ? "Use the reference images for how things look; compose a brand-new scene for this moment with its own pose, camera angle and background."
+      : null,
+  ];
+
+  const child =
+    refA === "photo"
+      ? null
+      : refA
+        ? r.heroLook
+          ? `The child, named "the child": ${r.heroLook}. The outfit stays the same on every page; a coat or jacket is added only when the scene says so.`
+          : null
+        : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
+
+  const what =
+    r.kind === "sheet"
+      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, in the same art style."
+      : r.kind === "cover"
+        ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
+        : r.illustration
+          ? `This moment of the story: ${r.illustration}`
+          : `This page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
+
+  return [
+    intent,
+    `Art style: ${styleText}.`,
+    ...refs,
+    child,
+    r.cast?.length ? `Recurring characters and objects, each always drawn identically (same species, count, colours and features): ${r.cast.join("; ")}.` : null,
+    r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
+    !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
+    `World of the story: ${world}.`,
+    r.setting && r.kind !== "sheet"
+      ? `Time, weather and light of the whole story: ${r.setting}. Every picture keeps this time of day, sky, moon shape and colour palette unless this moment happens at another time.`
+      : null,
     what,
-    r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. Give the child a pose and action that fit this exact moment.` : null,
-    "Square 1:1 composition (the book page shows the picture above the text), the main character clearly visible, gentle and safe for children.",
+    r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
+    "Square 1:1 composition with the main character clearly visible.",
+    "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
-    "IMPORTANT: the picture must contain no text at all — no title, names, letters, words or numbers on vehicles, signs, books, banners or clothes.",
+    "Pure visual storytelling: all signs, books, banners, clothes and vehicles are blank or decorated only with simple shapes and pictures, without any letters or numbers.",
+    "Gentle, safe and joyful for young children.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -188,38 +228,84 @@ async function describeHero(ai: GoogleGenAI, cover: GeneratedImage): Promise<str
   }
 }
 
-export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage & { heroLook?: string }> {
+type Refs = { a?: GeneratedImage; aRole?: RefRole; b?: GeneratedImage };
+
+async function paint(ai: GoogleGenAI, r: IllustrationRequest, refs: Refs, fix?: string): Promise<GeneratedImage> {
+  const prompt = buildPrompt(r, { refA: refs.a ? refs.aRole : undefined, prev: Boolean(refs.b) }) + (fix ? `\nThis is a second attempt; correct these problems of the first one: ${fix}` : "");
+  const images = [refs.a, refs.b].filter((x): x is GeneratedImage => Boolean(x));
+  const response = await ai.models.generateContent({
+    model: process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image",
+    contents: [{ role: "user", parts: [{ text: prompt }, ...images.map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }))] }],
+    config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio: "1:1" } },
+  });
+  logUsage(fix ? `${r.kind}-redraw` : r.kind, response.modelVersion, response.usageMetadata);
+  const image = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+  if (!image?.data) throw new Error("Gemini не повернув зображення");
+  return compact({ data: image.data, mimeType: image.mimeType ?? "image/png" });
+}
+
+/**
+ * Перевірка готової сторінки дешевою моделлю (~0,05 Kč): зайві очі чи пальці, написи, не та пора доби,
+ * інший одяг героя, зниклий або підмінений герой чи предмет. Повертає опис проблем або нічого.
+ */
+async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationRequest): Promise<string | undefined> {
+  const expected = [
+    r.illustration ? `Scene: ${r.illustration}` : null,
+    r.setting ? `Time and light of the story: ${r.setting}` : null,
+    r.heroLook ? `Main child: ${r.heroLook}` : null,
+    r.cast?.length ? `Recurring characters/objects: ${r.cast.join("; ")}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  try {
+    const res = await ai.models.generateContent({
+      model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only CLEAR problems: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair or outfit clearly different from the description; a recurring character or object from the scene that is missing, replaced by a different one, or has wrong colours. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+            },
+            { inlineData: { mimeType: img.mimeType, data: img.data } },
+          ],
+        },
+      ],
+      config: { responseMimeType: "application/json" },
+    });
+    logUsage("review", res.modelVersion, res.usageMetadata);
+    const v = JSON.parse(res.text ?? "{}") as { ok?: boolean; problems?: string };
+    return v.ok === false && v.problems ? String(v.problems).slice(0, 400) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Малює лист персонажів, обкладинку чи сторінку. Зразок A — лист персонажів (або фото/обкладинка),
+ * зразок B — попередня сторінка (одяг, предмети, світло переходять далі). Сторінку й обкладинку
+ * перевіряє дешева модель; якщо є явні помилки — один раз перемальовуємо з підказкою, що виправити.
+ */
+export async function drawIllustration(
+  r: IllustrationRequest,
+  refs: Refs = {},
+): Promise<GeneratedImage & { heroLook?: string }> {
   // Лише для локальної перевірки без витрат: MOCK_IMAGES=1 — кольоровий квадрат замість ШІ.
   if (process.env.MOCK_IMAGES === "1" && process.env.NODE_ENV !== "production") return mockImage(r);
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
-  const fromCover = Boolean(reference) && !r.hasPhoto;
-  const prompt =
-    buildPrompt(r, { fromCover }) +
-    (fromCover
-      ? "\nThe attached cover is ONLY a reference for how the main character looks (face, hair colour, hairstyle, clothes) and for the art style. Do NOT copy the cover's composition, pose, background, props or other characters — draw a completely new scene for this moment of the story."
-      : "");
 
-  const response = await ai.models.generateContent({
-    model: process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image",
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: prompt }, ...(reference ? [{ inlineData: { mimeType: reference.mimeType, data: reference.data } }] : [])],
-      },
-    ],
-    config: {
-      responseModalities: [Modality.IMAGE],
-      imageConfig: { aspectRatio: "1:1" },
-    },
-  });
-
-  logUsage(r.kind, response.modelVersion, response.usageMetadata);
-  const parts = response.candidates?.[0]?.content?.parts ?? [];
-  const image = parts.find((p) => p.inlineData?.data)?.inlineData;
-  if (!image?.data) throw new Error("Gemini не повернув зображення");
-  const result = await compact({ data: image.data, mimeType: image.mimeType ?? "image/png" });
-  return r.kind === "cover" ? { ...result, heroLook: await describeHero(ai, result) } : result;
+  let result = await paint(ai, r, refs);
+  if (r.kind !== "sheet") {
+    const problems = await review(ai, result, r);
+    if (problems) {
+      console.log(`[review] ${r.kind} ${r.page ?? ""}: ${problems}`);
+      result = await paint(ai, r, refs, problems).catch(() => result);
+    }
+  }
+  // Опис героя — з листа персонажів (або з обкладинки старих казок), для всіх наступних сторінок.
+  const describe = r.kind === "sheet" || (r.kind === "cover" && refs.aRole !== "sheet");
+  return describe ? { ...result, heroLook: await describeHero(ai, result) } : result;
 }
 
 /**

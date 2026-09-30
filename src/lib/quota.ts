@@ -15,8 +15,8 @@ const DAY = 24 * 60 * 60;
 const MONTH = 30 * DAY;
 /** Скільки казок на добу без покупки. */
 export const FREE_STORIES_PER_DAY = 1;
-/** Картинок до оплати: обкладинка + FREE_PAGES сторінок + 2 повтори на обрив зв'язку. */
-const IMAGES_BEFORE_PAYMENT = 1 + FREE_PAGES + 2;
+/** Картинок до оплати: лист персонажів + обкладинка + FREE_PAGES сторінок + 2 повтори на обрив зв'язку. */
+const IMAGES_BEFORE_PAYMENT = 2 + FREE_PAGES + 2;
 /** Картинок після оплати: вся книжка й перемальовування. */
 const IMAGES_AFTER_PAYMENT = 40;
 

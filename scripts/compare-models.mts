@@ -28,7 +28,7 @@ for (const model of MODELS) {
       const t = Date.now();
       const img = await drawIllustration(
         { gender: ex.gender, age: ex.age, heroSeed: 1, theme: ex.theme, title: ex.title, kind: "page", pageText: ex.pages[i].text, page: i, friend: ex.friend, style: ex.style },
-        reference,
+        { a: reference, aRole: "cover" },
       );
       writeFileSync(path.join(OUT, `${model}-${i + 1}.webp`), Buffer.from(img.data, "base64"));
       console.log(`${model} сторінка ${i + 1}: ${((Date.now() - t) / 1000).toFixed(1)} с`);
