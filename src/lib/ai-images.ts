@@ -131,7 +131,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       : null,
     refA === "cover" ? `Image A is the book cover: the main ${who} looks exactly as there — face, hair colour, hairstyle and the outfit with all its patterns and colours.` : null,
     prev
-      ? "Image B is the previous page of the book: keep continuity with it — the same clothes, props, their colours and markings; keep its time of day and sky unless this moment names a later time."
+      ? "Image B is the previous page of the book: use it only for how things look — the same clothes, colours and markings — and keep its time of day and sky unless this moment names a later time. Who and what is in this picture comes only from this moment's list below: characters and objects of image B or of the reference sheet that are not listed stay out of this picture."
       : null,
     r.kind !== "sheet" && (refA === "sheet" || refA === "cover" || prev)
       ? "Use the reference images for how things look; compose a brand-new scene for this moment with its own pose, camera angle and background."
@@ -184,7 +184,7 @@ ${r.illustration}`
       : null,
     r.kind === "page" && r.page !== undefined ? `${/Place and shot:/i.test(r.illustration ?? "") ? "Camera: as in the storyboard note." : `Camera: ${SHOTS[r.page % SHOTS.length]}.`} The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
     r.kind !== "sheet"
-      ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures, or faces on the sky, stars or objects, that this moment does not mention."
+      ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures that this moment does not mention. Furniture, lamps, night-lights, stars, the sky and other objects are plain, without faces, unless they are listed characters."
       : null,
     "Square 1:1 composition with the main character clearly visible.",
     "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
@@ -276,6 +276,7 @@ export async function review(
 ): Promise<string | undefined> {
   const expected = [
     r.kind === "page" && r.illustration ? `Scene: ${r.illustration}` : null,
+    r.kind === "page" && r.pageText ? `Page text (Ukrainian): ${r.pageText}` : null,
     r.setting ? `Time and light of the story: ${r.setting}` : null,
     r.heroLook ? `Main child: ${r.heroLook}` : null,
     r.cast?.length ? `Recurring characters/objects: ${r.cast.join("; ")}` : null,
@@ -298,7 +299,7 @@ export async function review(
                 ]
               : []),
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that contradicts the page text (an object in a different place than the text says), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],
