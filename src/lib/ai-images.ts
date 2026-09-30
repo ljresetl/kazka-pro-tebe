@@ -159,19 +159,25 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
     ...refs,
     child,
     r.cast?.length
-      ? `Recurring characters and objects, each always drawn identically (same species, count, colours, features and the same size relative to the child): ${r.cast.join("; ")}.`
+      ? r.kind === "sheet"
+        ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
+          `Recurring characters and objects: ${r.cast.map((c) => c.split(":").slice(1).join(":").trim() || c).join("; ")}.`
+        : `Recurring characters and objects, each always drawn identically (same species, count, colours, features and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
     `World of the story: ${world}.`,
     r.setting && r.kind !== "sheet"
-      ? `Time, weather and light of the whole story: ${r.setting}. Every picture keeps this time of day, sky, moon shape and colour palette unless this moment happens at another time.`
+      ? `Time, weather and light of the whole story: ${r.setting}. Every picture keeps this sky, moon shape and colour palette, but the time of day named in this moment wins: daytime pictures have a sunny sky with no moon and no stars; the moon and stars appear only at twilight or night.`
       : null,
     what,
     r.cast?.length && r.kind !== "sheet"
       ? `Sizes relative to the child, kept in every shot: ${r.cast.map((c) => c.split(":")[0]).join(", ")} — exactly as sized in their descriptions above; small characters stay small even in the foreground or in close-ups.`
       : null,
     r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
+    r.kind !== "sheet"
+      ? "Each recurring character and object appears at most once in a picture: no second boat, pet or look-alike in the background, and no extra creatures or faces on the sky, stars or objects that this moment does not mention."
+      : null,
     "Square 1:1 composition with the main character clearly visible.",
     "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
