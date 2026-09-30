@@ -11,12 +11,12 @@ const story = await aiStory({
   childName: "Соломія",
   gender: "girl",
   age: 3,
-  theme: "castle",
+  theme: "meadow",
   trait: "доброта",
   friend: "крабик Лоло",
-  food: "шоколад",
-  hobbies: "танці",
+  hobbies: "м'ячики",
+  wish: "Нічна пригода: Соломія допомагає веселій сміттєвій машинці прибрати місто",
 });
 console.log(`# ${story.title}\n`);
-console.log("Паспорти героїв:", JSON.stringify(story.cast, null, 1), "\n");
+console.log("Атмосфера:", story.setting, "\nПаспорти героїв і предметів:", JSON.stringify(story.cast, null, 1), "\n");
 story.pages.forEach((p, i) => console.log(`${i + 1}. (${p.text.length} зн.) ${p.text}\n   [${p.illustration}]\n`));

@@ -73,6 +73,10 @@ export type IllustrationRequest = {
   companions?: string[];
   /** «Паспорти» героїв казки: «Лоло: a small red crab with big eyes». */
   cast?: string[];
+  /** Атмосфера всієї казки: пора доби, погода, місяць. */
+  setting?: string;
+  /** Точний опис героя з обкладинки. */
+  heroLook?: string;
   /** Батьки завантажили фото дитини (передається разом із запитом). */
   hasPhoto?: boolean;
   /** Номер сторінки (0–11) — щоб чергувати плани кадру. */
@@ -111,13 +115,15 @@ export function buildPrompt(r: IllustrationRequest, { fromCover = false }: { fro
     // Сторінка з обкладинкою-зразком: зовнішність беремо ЛИШЕ з обкладинки. Текстовий опис героя
     // тут шкодив — художник то слухав його (інший колір волосся), то обкладинку.
     fromCover
-      ? `Main character: exactly the same ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} as on the attached cover picture — identical face, hair colour, hairstyle, skin tone and clothes. Do not change any of these.`
+      ? `Main character: exactly the same ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} as on the attached cover picture — identical face, hair colour, hairstyle, skin tone and clothes. Do not change any of these.${r.heroLook ? ` Exact look: ${r.heroLook} (keep every pattern and colour of the outfit; add a coat or jacket only if the scene says so).` : ""}`
       : r.hasPhoto
         ? `Main character: a ${r.age}-year-old ${r.gender === "girl" ? "girl" : "boy"} who looks like the child in the attached photo (same face, hair colour, hairstyle and skin tone; choose an outfit that suits the story), drawn in the art style above. The same character appears on every page of the book.`
         : `Main character: ${hero}. The same character appears on every page of the book.`,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}. Draw them when they fit the moment.` : null,
+    r.setting ? `Time and atmosphere of the whole story: ${r.setting}. Every picture must match it (same time of day, same sky and moon shape) unless this moment clearly happens at another time.` : null,
+    "Correct anatomy: every person, animal and character (including toys and vehicles with faces) has exactly two eyes and one mouth, no extra limbs.",
     r.cast?.length
-      ? `Recurring characters — whenever one of them appears, draw it EXACTLY like this on every page (same species, colours and features; never replace it with a different animal): ${r.cast.join("; ")}.`
+      ? `Recurring characters and objects — whenever one of them appears, draw it EXACTLY like this on every page (same species, colours and features; never replace it with a different animal): ${r.cast.join("; ")}.`
       : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" accompanies them — draw it as a cute companion if it fits the moment.` : null,
     `World of the story: ${setting}.`,
@@ -157,7 +163,32 @@ async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string 
   }
 }
 
-export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage> {
+/**
+ * Опис героя з намальованої обкладинки (дешева текстова модель): волосся, одяг із візерунками, аксесуари.
+ * Йде в запит кожної сторінки — так дрібні деталі (крабики на сукні) не губляться.
+ */
+async function describeHero(ai: GoogleGenAI, cover: GeneratedImage): Promise<string | undefined> {
+  try {
+    const res = await ai.models.generateContent({
+      model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: "Describe the main child character in this picture for an illustrator in one English sentence (max 45 words): hair colour and style, skin tone, every piece of clothing with its colours and patterns, shoes, accessories. No background, no names." },
+            { inlineData: { mimeType: cover.mimeType, data: cover.data } },
+          ],
+        },
+      ],
+    });
+    logUsage("hero", res.modelVersion, res.usageMetadata);
+    return res.text?.trim().slice(0, 500) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function drawIllustration(r: IllustrationRequest, reference?: GeneratedImage): Promise<GeneratedImage & { heroLook?: string }> {
   // Лише для локальної перевірки без витрат: MOCK_IMAGES=1 — кольоровий квадрат замість ШІ.
   if (process.env.MOCK_IMAGES === "1" && process.env.NODE_ENV !== "production") return mockImage(r);
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -187,7 +218,8 @@ export async function drawIllustration(r: IllustrationRequest, reference?: Gener
   const parts = response.candidates?.[0]?.content?.parts ?? [];
   const image = parts.find((p) => p.inlineData?.data)?.inlineData;
   if (!image?.data) throw new Error("Gemini не повернув зображення");
-  return compact({ data: image.data, mimeType: image.mimeType ?? "image/png" });
+  const result = await compact({ data: image.data, mimeType: image.mimeType ?? "image/png" });
+  return r.kind === "cover" ? { ...result, heroLook: await describeHero(ai, result) } : result;
 }
 
 /**
