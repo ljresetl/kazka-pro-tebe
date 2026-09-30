@@ -128,7 +128,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       : null,
     refA === "cover" ? `Image A is the book cover: the main ${who} looks exactly as there — face, hair colour, hairstyle and the outfit with all its patterns and colours.` : null,
     prev
-      ? "Image B is the previous page of the book: keep continuity with it — the same clothes, props and their colours, time of day, lighting and sky."
+      ? "Image B is the previous page of the book: keep continuity with it — the same clothes, props, their colours and markings; keep its time of day and sky unless this moment names a later time."
       : null,
     r.kind !== "sheet" && (refA === "sheet" || refA === "cover" || prev)
       ? "Use the reference images for how things look; compose a brand-new scene for this moment with its own pose, camera angle and background."
@@ -146,7 +146,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const what =
     r.kind === "sheet"
-      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style; a wordless model sheet made of pictures only."
+      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only."
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
@@ -162,7 +162,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       ? r.kind === "sheet"
         ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
           `Recurring characters and objects: ${r.cast.map((c) => c.split(":").slice(1).join(":").trim() || c).join("; ")}.`
-        : `Recurring characters and objects, each always drawn identically (same species, count, colours, features and the same size relative to the child): ${r.cast.join("; ")}.`
+        : `Recurring characters and objects, each always drawn identically (same species, count, colours, features, patterns and emblems — nothing added or removed — and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
