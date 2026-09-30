@@ -70,7 +70,7 @@ async function draw(story: Story, part: Part, refs: Refs = {}): Promise<Img & { 
       style: story.options?.style,
       topic: story.options?.topic && findTopic(story.options.topic) ? story.options.topic : undefined,
       companions: companions(story),
-      cast: story.cast?.slice(0, 8).map((c) => `${c.en || c.name}: ${c.look}`.slice(0, 200)),
+      cast: story.cast?.slice(0, 8).map((c) => `${c.en || c.name}: ${c.look}${c.body ? ` Body: ${c.body}` : ""}`.slice(0, 400)),
       outfit: story.outfit?.slice(0, 300),
       outerwear: story.outerwear?.slice(0, 300) || undefined,
       setting: story.setting?.slice(0, 400),

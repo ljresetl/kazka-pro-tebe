@@ -34,7 +34,14 @@ export type Illustration = {
 };
 
 /** Герой казки, що повторюється на сторінках: ім'я й точний вигляд англійською (для художника). */
-export type CastMember = { name: string; look: string; /** Ім'я латиницею для художника (кирилицю він вписує в малюнок). */ en?: string };
+export type CastMember = {
+  name: string;
+  look: string;
+  /** Ім'я латиницею для художника (кирилицю він вписує в малюнок). */
+  en?: string;
+  /** Точна будова з числами (дві руки, чотири лапи…) — окремо для кожного героя, не загальним правилом. */
+  body?: string;
+};
 
 export type StoryPage = {
   text: string;
