@@ -148,7 +148,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
           ? `The child, named "the child": ${r.heroLook}. This outfit stays the same on every page, even if the scene mentions other clothes; only when the scene says the child puts something on (a coat, a raincoat, pyjamas at bedtime) is that item added.`
           : null
         : r.outfit
-          ? `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed).replace(/, wearing .*$/, "")}, wearing ${r.outfit} — this outfit for the whole book.`
+          ? `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed).replace(/, wearing .*$/, "").replace(/ with an? (yellow hairband|pink bow)$/, "")}, wearing ${r.outfit} — this outfit for the whole book.`
           : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
 
   const what =
@@ -184,7 +184,7 @@ ${r.illustration}`
       : null,
     r.kind === "page" && r.page !== undefined ? `${/Place and shot:/i.test(r.illustration ?? "") ? "Camera: as in the storyboard note." : `Camera: ${SHOTS[r.page % SHOTS.length]}.`} The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
     r.kind !== "sheet"
-      ? "Each recurring character and object appears at most once in a picture: no second boat, pet or look-alike in the background, and no extra creatures or faces on the sky, stars or objects that this moment does not mention."
+      ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures, or faces on the sky, stars or objects, that this moment does not mention."
       : null,
     "Square 1:1 composition with the main character clearly visible.",
     "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
