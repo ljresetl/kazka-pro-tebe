@@ -34,7 +34,7 @@ export type Illustration = {
 };
 
 /** Герой казки, що повторюється на сторінках: ім'я й точний вигляд англійською (для художника). */
-export type CastMember = { name: string; look: string };
+export type CastMember = { name: string; look: string; /** Ім'я латиницею для художника (кирилицю він вписує в малюнок). */ en?: string };
 
 export type StoryPage = {
   text: string;
@@ -70,6 +70,8 @@ export type Story = {
   cast?: CastMember[];
   /** Атмосфера всієї казки для художника (пора доби, погода, місяць…). */
   setting?: string;
+  /** Одяг дитини на всю казку (під пору року й сюжет) — для листа персонажів. */
+  outfit?: string;
   /** Точний опис героя з намальованої обкладинки (одяг, візерунки) — для всіх сторінок. */
   heroLook?: string;
   /** Підпис сервера: без нього ілюстрації не малюються (src/lib/quota.ts). */

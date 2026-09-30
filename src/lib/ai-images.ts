@@ -43,13 +43,14 @@ export function heroDescription(gender: "boy" | "girl", age: number, seed: numbe
 export type GeneratedImage = { data: string; mimeType: string };
 
 /** Як виглядає світ кожної пригоди — щоб усі картинки книжки були в одному місці. */
+// Лише місця, без істот: тварини з опису світу з'являлися на сторінках зайвими героями.
 const THEME_SETTING: Record<string, string> = {
-  space: "a magical night sky and outer space with colourful planets, twinkling stars and a gentle glowing whale",
-  forest: "a sunny enchanted Ukrainian forest with tall oaks, mossy stumps, mushrooms and friendly forest animals",
-  sea: "a bright seaside with a small sandy island, a palm tree, colourful scallop shells, dolphins and a little pink crab",
-  dino: "a lush prehistoric valley with giant ferns, warm springs and friendly cartoon dinosaurs",
-  castle: "a fairy-tale castle with red towers and little flags on a green hill, and a small shy green dragon",
-  meadow: "a blooming Ukrainian meadow with poppies, cornflowers, daisies and busy cheerful bees",
+  space: "a magical night sky and outer space with colourful planets and twinkling stars",
+  forest: "a sunny enchanted Ukrainian forest with tall oaks, mossy stumps and mushrooms",
+  sea: "a bright seaside with a small sandy island, a palm tree and colourful scallop shells",
+  dino: "a lush prehistoric valley with giant ferns and warm springs",
+  castle: "a fairy-tale castle with red towers and little flags on a green hill",
+  meadow: "a blooming Ukrainian meadow with poppies, cornflowers and daisies",
 };
 
 export type IllustrationRequest = {
@@ -77,6 +78,8 @@ export type IllustrationRequest = {
   setting?: string;
   /** Точний опис героя з обкладинки. */
   heroLook?: string;
+  /** Одяг дитини на всю казку від ШІ-автора — для листа персонажів. */
+  outfit?: string;
   /** Батьки завантажили фото дитини (передається разом із запитом). */
   hasPhoto?: boolean;
   /** Номер сторінки (0–11) — щоб чергувати плани кадру. */
@@ -121,7 +124,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const refs = [
     refA === "photo"
-      ? `Image A is a photo of the real child: draw the child as a ${r.age}-year-old ${who} with the same face, hair colour, hairstyle and skin tone, in the art style above, wearing an outfit that suits the story.`
+      ? `Image A is a photo of the real child: draw the child as a ${r.age}-year-old ${who} with the same face, hair colour, hairstyle and skin tone, in the art style above${r.outfit ? "." : ", wearing an outfit that suits the story."}`
       : null,
     refA === "sheet"
       ? "Image A is the character reference sheet of this book: every character and object looks exactly as on it — faces, hair, outfits with all their patterns and colours, species, sizes and colours."
@@ -137,12 +140,16 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const child =
     refA === "photo"
-      ? null
+      ? r.outfit
+        ? `The child wears this outfit for the whole book: ${r.outfit}.`
+        : null
       : refA
         ? r.heroLook
           ? `The child, named "the child": ${r.heroLook}. This outfit stays the same on every page, even if the scene mentions other clothes; only when the scene says the child puts something on (a coat, a raincoat, pyjamas at bedtime) is that item added.`
           : null
-        : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
+        : r.outfit
+          ? `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed).replace(/, wearing .*$/, "")}, wearing ${r.outfit} — this outfit for the whole book.`
+          : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
 
   const what =
     r.kind === "sheet"
@@ -156,7 +163,7 @@ ${r.illustration}`
 
   return [
     intent,
-    `Art style: ${styleText}.`,
+    `Art style: ${styleText.replace(/\.+$/, "")}.`,
     ...refs,
     child,
     r.cast?.length
@@ -169,13 +176,13 @@ ${r.illustration}`
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
     `World of the story: ${world}.`,
     r.setting && r.kind !== "sheet"
-      ? `Time, weather and light of the whole story: ${r.setting}. Every picture keeps this sky, moon shape and colour palette, but the time of day named in this moment wins: daytime pictures have a sunny sky with no moon and no stars; the moon and stars appear only at twilight or night.`
+      ? `Time, weather and light of the whole story: ${r.setting.replace(/\.+$/, "")}. Every picture keeps this sky, moon shape and colour palette, but the time of day named in this moment wins: daytime pictures have a sunny sky with no moon and no stars; the moon and stars appear only at twilight or night.`
       : null,
     what,
     r.cast?.length && r.kind !== "sheet"
       ? `Sizes relative to the child, kept in every shot: ${r.cast.map((c) => c.split(":")[0]).join(", ")} — exactly as sized in their descriptions above; small characters stay small even in the foreground or in close-ups.`
       : null,
-    r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
+    r.kind === "page" && r.page !== undefined ? `${/Place and shot:/i.test(r.illustration ?? "") ? "Camera: as in the storyboard note." : `Camera: ${SHOTS[r.page % SHOTS.length]}.`} The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
     r.kind !== "sheet"
       ? "Each recurring character and object appears at most once in a picture: no second boat, pet or look-alike in the background, and no extra creatures or faces on the sky, stars or objects that this moment does not mention."
       : null,
@@ -206,10 +213,11 @@ async function describeScene(ai: GoogleGenAI, pageText: string): Promise<string 
   try {
     const res = await ai.models.generateContent({
       model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
-      contents: `One English sentence (max 35 words) describing the illustration for this page of a Ukrainian children's book: who does what, where, time of day, mood. Call the main hero "the child", never use names, never mention writing, signs, letters or words. Page: «${pageText}»`,
+      // Той самий формат розкадровки, що пише ШІ-автор, — для шаблонних казок.
+      contents: `Storyboard note in English for the illustration of this page of a Ukrainian children's book, exactly 5 short lines:\nTime: time of day and sky as the text implies (daytime has no moon)\nIn the picture: everyone and every important object in the frame, with position and size relative to the child — only what the text needs\nAction: the main event of this page exactly as the text says (who does, gives, holds or hugs what)\nFeeling: the child's feeling as in the text\nPlace and shot: the place and a camera shot\nCall the main hero "the child", never use names, never mention writing, signs, letters or words; do not describe the child's clothes. Page: «${pageText}»`,
     });
     logUsage("scene", res.modelVersion, res.usageMetadata);
-    return res.text?.trim().slice(0, 600) || undefined;
+    return res.text?.trim().slice(0, 1200) || undefined;
   } catch {
     return undefined;
   }

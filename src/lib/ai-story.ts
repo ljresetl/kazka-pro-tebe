@@ -28,12 +28,13 @@ const StorySchema = z.object({
     )
     .length(STORY_PAGES),
   setting: z.string(),
+  outfit: z.string(),
   cast: z
-    .array(z.object({ name: z.string(), look: z.string() }))
+    .array(z.object({ name: z.string(), en: z.string(), look: z.string() }))
     .max(6),
 });
 
-type AiStory = { title: string; dedication: string; pages: StoryPage[]; cast?: CastMember[]; setting?: string };
+type AiStory = { title: string; dedication: string; pages: StoryPage[]; cast?: CastMember[]; setting?: string; outfit?: string };
 
 const SYSTEM = `Ти — українська дитяча письменниця. Пишеш добрі, цікаві казки, де головний герой — конкретна дитина.
 
@@ -68,7 +69,8 @@ const SYSTEM = `Ти — українська дитяча письменниц�
     "Place and shot: …" — місце (коротко, те саме місце — ті самі прикмети) і план кадру (wide shot / close-up / from behind / low angle / bird's-eye view). Сусідні сторінки мають різний план і позу.
     Звичайний одяг дитини НЕ описуй (його візьмуть з листа персонажів); згадуй одяг лише коли дитина щось вдягає за сюжетом (куртка надворі вночі, піжама перед сном). Героя називай "the child", без імені й опису зовнішності.
 - "setting" — АНГЛІЙСЬКОЮ 1–2 речення про атмосферу всієї казки для художника: пора доби (якщо дія вночі — "night throughout the whole story"), пора року, погода, освітлення, вигляд неба й місяця (наприклад: "night throughout, a thin crescent moon, starry sky, cool autumn weather"). Якщо пора доби змінюється, вкажи, на яких сторінках яка (наприклад: "pages 1–8 sunny day, pages 9–10 sunset, pages 11–12 night with a crescent moon").
-- "cast" — «паспорт» КОЖНОГО героя й ПРЕДМЕТА, крім самої дитини, який з'являється більш ніж на одній сторінці (друг, тварина, іграшка, машинка, м'ячики, чарівна річ…), а також місце, куди герої повертаються (дім, острів, галявина): "name" — ім'я як у тексті, "look" — АНГЛІЙСЬКОЮ точний вигляд: вид істоти, розмір, кольори, прикмети, одяг чи аксесуари, а для речей — УСІ візерунки й знаки на них або прямо "plain, no pattern" (наприклад, "a plain white sail with no emblem") (наприклад: "a small purple octopus with pink spots and big round eyes"). Обов'язково вкажи РОЗМІР відносно дитини і повтори його в кожному описі сцени з цим героєм (наприклад, "palm-sized crab Lolo") (наприклад: "palm-sized", "reaches the child's knee", "a real garbage truck about twice as tall as the child"), і він не змінюється протягом казки. Для груп предметів вкажи точну кількість (не більше 4) і колір кожного (наприклад: "exactly three rubber balls: one red, one green, one blue"). В описах ілюстрацій ("illustration") називай цих героїв так само (вид + ім'я), а не загальними словами на кшталт «тваринка» чи «друг».
+- "outfit" — АНГЛІЙСЬКОЮ одяг дитини на всю казку, під пору року, погоду й сюжет, з кольорами (наприклад: "a warm red winter jacket, a knitted blue hat, dark blue trousers, brown boots" взимку; "a yellow t-shirt with a small sun, green shorts, white sneakers" влітку). Якщо в тексті згадано одяг чи аксесуар дитини (шарфик, штанці, чобітки, кишеня), він має бути тут з першої сторінки. Звичайний одяг — лише тут, у сценах його не описуй; піжама перед сном — у сцені.
+- "cast" — «паспорт» КОЖНОГО героя й ПРЕДМЕТА, крім самої дитини, який з'являється більш ніж на одній сторінці (друг, тварина, іграшка, машинка, м'ячики, чарівна річ…), а також місце, куди герої повертаються (дім, острів, галявина): "name" — ім'я як у тексті, "en" — англійською й ЛАТИНИЦЕЮ вид + ім'я для художника (наприклад, "dolphin Splesk", "boat Viterets", "the Great Pearl Shell"), "look" — АНГЛІЙСЬКОЮ точний вигляд: вид істоти, розмір, кольори, прикмети, одяг чи аксесуари, а для речей — УСІ візерунки й знаки на них або прямо "plain, no pattern" (наприклад, "a plain white sail with no emblem") (наприклад: "a small purple octopus with pink spots and big round eyes"). Обов'язково вкажи РОЗМІР відносно дитини і повтори його в кожному описі сцени з цим героєм (наприклад, "palm-sized crab Lolo") (наприклад: "palm-sized", "reaches the child's knee", "a real garbage truck about twice as tall as the child"), і він не змінюється протягом казки. Для груп предметів вкажи точну кількість (не більше 4) і колір кожного (наприклад: "exactly three rubber balls: one red, one green, one blue"). В описах ілюстрацій ("illustration") називай цих героїв точно як у "en", лише латиницею й без лапок (кирилиця й лапки в описі — художник впише їх у малюнок), а не загальними словами на кшталт «тваринка» чи «друг».
 - Назва — коротка, з іменем дитини. Присвята — одне тепле речення до дитини; якщо батьки дали своє звернення, використай його дослівно.`;
 
 function brief(req: StoryRequest) {
