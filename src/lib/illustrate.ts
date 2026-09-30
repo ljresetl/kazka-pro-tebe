@@ -1,6 +1,7 @@
 "use client";
 
 import { deletePhoto, loadImage, loadImages, loadPhoto, saveImage } from "./image-store";
+import { readStory, saveStory } from "./storage";
 import { findTopic } from "./catalog";
 import type { Story } from "./types";
 
@@ -63,7 +64,9 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       style: story.options?.style,
       topic: story.options?.topic && findTopic(story.options.topic) ? story.options.topic : undefined,
       companions: companions(story),
-      cast: story.cast?.slice(0, 6).map((c) => `${c.name}: ${c.look}`.slice(0, 200)),
+      cast: story.cast?.slice(0, 8).map((c) => `${c.name}: ${c.look}`.slice(0, 200)),
+      setting: story.setting?.slice(0, 400),
+      heroLook: part.kind === "page" ? story.heroLook?.slice(0, 600) : undefined,
       hasPhoto: part.kind === "cover" && Boolean(reference) && part.photo,
       kind: part.kind,
       page: part.page,
@@ -72,7 +75,7 @@ async function draw(story: Story, part: Part, reference?: Img): Promise<Img> {
       reference,
     }),
   });
-  const data = (await res.json()) as Img & { error?: string };
+  const data = (await res.json()) as Img & { error?: string; heroLook?: string };
   // Ліміт чи потрібна оплата — повтори не допоможуть, зупиняємося одразу.
   if (res.status === 402 || res.status === 403) throw new StopError(data.error || "Ілюстрації зараз недоступні.");
   if (!res.ok || !data.data) throw new Error(data.error || "Не вдалося намалювати ілюстрацію.");
@@ -148,6 +151,13 @@ export async function illustrateStory(
     // Обіцяли батькам: фото не зберігаємо довше, ніж потрібно.
     if (photo) await deletePhoto(story.id);
     await saveImage(story.id, -1, cover.data, cover.mimeType);
+    // Опис героя з обкладинки — для всіх сторінок (одяг, візерунки не губляться).
+    const heroLook = (cover as Img & { heroLook?: string }).heroLook;
+    if (heroLook) {
+      story = { ...story, heroLook };
+      const saved = readStory(story.id);
+      if (saved) saveStory({ ...saved, heroLook });
+    }
     onProgress(++done, total);
   }
 
