@@ -4,6 +4,7 @@ import { Palette, Printer } from "lucide-react";
 import { useState } from "react";
 import { aiColoring, canAiColor } from "@/lib/coloring";
 import { lineArt } from "@/lib/line-art";
+import { textSize } from "@/lib/text-size";
 import type { Illustration, SceneId, Story } from "@/lib/types";
 import Scene from "./Scene";
 
@@ -44,7 +45,7 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
       {pages.map((p, i) => (
         <section key={i} className="print-page print-story-page">
           <Art scene={p.scene} image={p.image} idx={i} />
-          <p className="story-text">{p.text}</p>
+          <p className={`story-text ${textSize(p.text)}`}>{p.text}</p>
           <span className="page-no">{3 + i}</span>
           {mark}
         </section>

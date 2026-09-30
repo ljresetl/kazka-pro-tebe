@@ -178,7 +178,8 @@ export async function illustrateStory(
   const main: Refs = sheet ? { a: sheet, aRole: "sheet" } : cover ? { a: cover, aRole: "cover" } : {};
 
   if (!cover) {
-    const drawn = await drawWithRetry(story, { kind: "cover", pageText: first.text, illustration: first.illustration }, main);
+    // Обкладинка — своя сцена (герой у світі казки), а не 1-ша сторінка.
+    const drawn = await drawWithRetry(story, { kind: "cover", pageText: first.text }, main);
     cover = { data: drawn.data, mimeType: drawn.mimeType };
     await saveImage(story.id, -1, cover.data, cover.mimeType);
     if (!sheet) story = rememberHero(story, drawn.heroLook);

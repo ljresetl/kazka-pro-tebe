@@ -7,6 +7,7 @@ import type { PageFlip } from "page-flip";
 import type { Illustration, SceneId } from "@/lib/types";
 import { Kvitka } from "./Ornament";
 import { printPageCount } from "./PrintBook";
+import { textSize } from "@/lib/text-size";
 import Scene from "./Scene";
 
 type Props = {
@@ -166,7 +167,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
         <div className="flip-art">
           <Art scene={page.scene} image={page.image} eager={n < 2} />
         </div>
-        <div className="flip-text">
+        <div className={`flip-text ${textSize(page.text)}`}>
           <p className="story-text">{page.text}</p>
         </div>
         <span className="page-no">{i + 1}</span>
