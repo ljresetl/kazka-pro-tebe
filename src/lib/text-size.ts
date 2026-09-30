@@ -1,4 +1,5 @@
 /** Клас розміру шрифту за довжиною тексту сторінки — малюнок лишається однакової висоти. */
 export function textSize(text: string) {
-  return text.length > 420 ? "len-l" : text.length > 330 ? "len-m" : "";
+  // Короткий текст (книжки для найменших) — більший шрифт, як у справжніх книжках для малечі.
+  return text.length > 420 ? "len-l" : text.length > 330 ? "len-m" : text.length < 160 ? "len-s" : "";
 }
