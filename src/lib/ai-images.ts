@@ -157,7 +157,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
   const outer = r.outerwear
     ? r.kind === "sheet"
       ? `Outerwear for the cold outdoors: ${r.outerwear}.`
-      : `Outdoors in the cold the child also wears the outerwear from the reference sheet (${r.outerwear}) over the outfit; indoors — at home, in rooms and buildings — the child wears the outfit without it.`
+      : `Outdoors in the cold the child also wears the outerwear from the reference sheet (${r.outerwear}) over the outfit; in warm places indoors — at home, in heated rooms — without it; in cold unheated places (a snowy barn, an old mill in winter) it stays on.`
     : null;
 
   const what =
