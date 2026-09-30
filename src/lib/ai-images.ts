@@ -150,7 +150,8 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
-          ? `This moment of the story: ${r.illustration}`
+          ? `This moment of the story (a storyboard note: draw exactly who and what is listed under "In the picture" — nobody and nothing else — doing exactly the "Action", with faces showing the "Feeling"):
+${r.illustration}`
           : `This page of a Ukrainian children's fairy tale (the text is in Ukrainian, draw exactly what happens in it): «${r.pageText}»`;
 
   return [
@@ -276,7 +277,7 @@ async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationReque
           role: "user",
           parts: [
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). Ignore small decorations, patterns, embroidery and tiny accessories. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). Ignore small decorations, patterns, embroidery and tiny accessories. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],

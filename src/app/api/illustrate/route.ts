@@ -21,7 +21,7 @@ const Schema = z.object({
   title: z.string().trim().min(1).max(120),
   kind: z.enum(["sheet", "cover", "page"]),
   pageText: z.string().trim().min(1).max(1500),
-  illustration: z.string().trim().max(600).optional(),
+  illustration: z.string().trim().max(1200).optional(),
   friend: z.string().trim().max(40).optional(),
   style: z.string().max(40).optional(),
   topic: z.string().max(40).optional(),
