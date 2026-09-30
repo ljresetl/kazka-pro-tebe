@@ -72,6 +72,7 @@ async function draw(story: Story, part: Part, refs: Refs = {}): Promise<Img & { 
       companions: companions(story),
       cast: story.cast?.slice(0, 8).map((c) => `${c.en || c.name}: ${c.look}`.slice(0, 200)),
       outfit: story.outfit?.slice(0, 300),
+      outerwear: story.outerwear?.slice(0, 300) || undefined,
       setting: story.setting?.slice(0, 400),
       heroLook: part.kind === "sheet" ? undefined : story.heroLook?.slice(0, 600),
       hasPhoto: refs.aRole === "photo",

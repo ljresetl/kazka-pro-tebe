@@ -80,6 +80,8 @@ export type IllustrationRequest = {
   heroLook?: string;
   /** Одяг дитини на всю казку від ШІ-автора — для листа персонажів. */
   outfit?: string;
+  /** Верхній одяг лише надворі в холод. */
+  outerwear?: string;
   /** Батьки завантажили фото дитини (передається разом із запитом). */
   hasPhoto?: boolean;
   /** Номер сторінки (0–11) — щоб чергувати плани кадру. */
@@ -151,9 +153,16 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
           ? `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed).replace(/, wearing .*$/, "").replace(/ with an? (yellow hairband|pink bow)$/, "")}, wearing ${r.outfit} — this outfit for the whole book.`
           : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
 
+  // Куртка й шапка — лише надворі в холод; удома, як у житті, без них.
+  const outer = r.outerwear
+    ? r.kind === "sheet"
+      ? `Outerwear for the cold outdoors: ${r.outerwear}.`
+      : `Outdoors in the cold the child also wears the outerwear from the reference sheet (${r.outerwear}) over the outfit; indoors — at home, in rooms and buildings — the child wears the outfit without it.`
+    : null;
+
   const what =
     r.kind === "sheet"
-      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story exactly once, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only."
+      ? `Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up${r.outerwear ? ", plus one more full-body front view of the child wearing the outerwear over the outfit" : ""}; beside them each recurring character and object of the story exactly once, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only.`
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
@@ -166,14 +175,16 @@ ${r.illustration}`
     `Art style: ${styleText.replace(/\.+$/, "")}.`,
     ...refs,
     child,
+    outer,
     r.cast?.length
       ? r.kind === "sheet"
         ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
           `Exactly ${r.cast.length} recurring characters and objects, each drawn once: ${r.cast.map((c, i) => `${i + 1}) ${c.split(":").slice(1).join(":").trim() || c}`).join("; ")}.`
         : `Recurring characters and objects, each always drawn identically (same species, count, colours, features, patterns and emblems — nothing added or removed — and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
-    r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
-    !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
+    // Є паспорти від автора — герої батьків уже там латиницею; кирилиця з конструктора художник вписував підписами.
+    !r.cast?.length && r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
+    !r.cast?.length && !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
     `World of the story: ${world}.`,
     r.setting && r.kind !== "sheet"
       ? `Time, weather and light of the whole story: ${r.setting.replace(/\.+$/, "")}. Every picture keeps this sky, moon shape and colour palette, but the time of day named in this moment wins: daytime pictures have a sunny sky with no moon and no stars; the moon and stars appear only at twilight or night.`
@@ -235,7 +246,7 @@ async function describeHero(ai: GoogleGenAI, cover: GeneratedImage): Promise<str
         {
           role: "user",
           parts: [
-            { text: "Describe the main child character in this picture for an illustrator in one English sentence (max 45 words): hair colour and style, skin tone, every piece of clothing with its colours and patterns, shoes, accessories. No background, no names." },
+            { text: "Describe the main child character in this picture (if several views, the first full-body front view) for an illustrator in one English sentence (max 45 words): hair colour and style, skin tone, every piece of clothing with its colours and patterns, shoes, accessories. No background, no names." },
             { inlineData: { mimeType: cover.mimeType, data: cover.data } },
           ],
         },
@@ -279,6 +290,7 @@ export async function review(
     r.kind === "page" && r.pageText ? `Page text (Ukrainian): ${r.pageText}` : null,
     r.setting ? `Time and light of the story: ${r.setting}` : null,
     r.heroLook ? `Main child: ${r.heroLook}` : null,
+    r.outerwear ? `Outdoors in the cold the child and other people may also wear their outerwear from the reference sheet (${r.outerwear}); indoors they wear it only if the scene says so.` : null,
     r.cast?.length ? `Recurring characters/objects: ${r.cast.join("; ")}` : null,
   ]
     .filter(Boolean)

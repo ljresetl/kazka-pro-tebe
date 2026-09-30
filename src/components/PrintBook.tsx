@@ -4,7 +4,7 @@ import { Palette, Printer } from "lucide-react";
 import { useState } from "react";
 import { aiColoring, canAiColor } from "@/lib/coloring";
 import { lineArt } from "@/lib/line-art";
-import { textSize } from "@/lib/text-size";
+import { bookTextSize } from "@/lib/text-size";
 import type { Illustration, SceneId, Story } from "@/lib/types";
 import Scene from "./Scene";
 
@@ -29,6 +29,7 @@ function Art({ scene, image, idx }: { scene: SceneId; image?: Illustration; idx:
 // на ~70% аркуша й текст під нею. Для 12 сторінок історії виходить 14 сторінок.
 export default function PrintBook({ title, dedication, cover, coverImage, pages, watermark, fontClass = "" }: Props) {
   const mark = watermark ? <span className="watermark">{watermark}</span> : null;
+  const sizeClass = bookTextSize(pages.map((p) => p.text));
   return (
     <div className={`print-book ${fontClass}`} aria-hidden="true">
       <section className="print-page print-cover">
@@ -45,7 +46,7 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
       {pages.map((p, i) => (
         <section key={i} className="print-page print-story-page">
           <Art scene={p.scene} image={p.image} idx={i} />
-          <p className={`story-text ${textSize(p.text)}`}>{p.text}</p>
+          <p className={`story-text ${sizeClass}`}>{p.text}</p>
           <span className="page-no">{3 + i}</span>
           {mark}
         </section>
