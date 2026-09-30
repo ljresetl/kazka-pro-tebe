@@ -91,7 +91,7 @@ const SHOTS = [
   "low angle looking up at the child and something big",
   "view from behind the child looking at what they discover",
   "bird's-eye view from above",
-  "over-the-shoulder shot from the companion's point of view",
+  "over-the-shoulder shot from behind the child",
   "dynamic diagonal composition, the child mid-action",
 ];
 
@@ -140,13 +140,13 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       ? null
       : refA
         ? r.heroLook
-          ? `The child, named "the child": ${r.heroLook}. The outfit stays the same on every page; a coat or jacket is added only when the scene says so.`
+          ? `The child, named "the child": ${r.heroLook}. This outfit stays the same on every page, even if the scene mentions other clothes; only when the scene says the child puts something on (a coat, a raincoat, pyjamas at bedtime) is that item added.`
           : null
         : `The child, named "the child": ${heroDescription(r.gender, r.age, r.heroSeed)}.`;
 
   const what =
     r.kind === "sheet"
-      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, shown at its true size next to the child, in the same art style; the sheet is unlabeled, pictures only."
+      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style; a wordless model sheet made of pictures only."
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
@@ -168,6 +168,9 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
       ? `Time, weather and light of the whole story: ${r.setting}. Every picture keeps this time of day, sky, moon shape and colour palette unless this moment happens at another time.`
       : null,
     what,
+    r.cast?.length && r.kind !== "sheet"
+      ? `Sizes relative to the child, kept in every shot: ${r.cast.map((c) => c.split(":")[0]).join(", ")} — exactly as sized in their descriptions above; small characters stay small even in the foreground or in close-ups.`
+      : null,
     r.kind === "page" && r.page !== undefined ? `Camera: ${SHOTS[r.page % SHOTS.length]}. The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
     "Square 1:1 composition with the main character clearly visible.",
     "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
