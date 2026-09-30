@@ -198,13 +198,25 @@ ${r.illustration}`
       ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures that this moment does not mention. Furniture, lamps, night-lights, stars, the sky and other objects are plain, without faces, unless they are listed characters."
       : null,
     "Square 1:1 composition with the main character clearly visible.",
-    "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.",
+    // Будова окремо для кожного героя: загальне «дві руки» художник переносив і на тварин.
+    anatomy(r),
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
     "Pure visual storytelling: all signs, books, banners, clothes and vehicles are blank or decorated only with simple shapes and pictures, without any letters or numbers.",
     "Gentle, safe and joyful for young children.",
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+/** Будова тіла з числами для кожного героя з паспорта; без паспортів — загальне правило. */
+function anatomy(r: IllustrationRequest) {
+  const bodies = (r.cast ?? [])
+    .filter((c) => c.includes(" Body: "))
+    .map((c) => `${c.split(":")[0]} — ${c.split(" Body: ")[1].trim().replace(/\.+$/, "")}`);
+  if (!bodies.length) {
+    return "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.";
+  }
+  return `Exact anatomy, counted, for each character separately: the child — two arms, two legs, five fingers on each hand, two eyes, one mouth; ${bodies.join("; ")}; any other person — two arms, two legs, five fingers on each hand.`;
 }
 
 /** Токени кожного запиту — у журнал Vercel, щоб рахувати собівартість казки (рядки «[usage]»). */
@@ -314,7 +326,7 @@ export async function review(
             // Попередня сторінка — щоб те саме місце й ті самі речі не змінювалися між сусідніми сторінками.
             ...(prev ? [{ text: "Previous page of the book (for continuity of places and objects):" }, { inlineData: { mimeType: prev.mimeType, data: prev.data } }] : []),
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that clearly contradicts the page text (ignore small differences in where exactly the child holds or puts things when the text allows both), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. ${prev ? "If this page happens in the same place as the previous page, the same big objects there (a sundial, a clock, an arch, furniture) must look the same; a clearly different design is a serious problem. " : ""}First count, for every person and animal in the illustration to check, the visible hands or paws and the arms; a person with more than two hands or arms, or a hand without an arm, is a serious problem. Answer JSON {"hands": [{"who": "short name", "hands": number}], "ok": true} or {"hands": [...], "ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: any character whose body does not match its exact anatomy (count arms, legs, paws, wings, fingers and eyes against "Body:" in the descriptions; the child and other people: two arms, two legs, five fingers on each hand, two eyes); any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that clearly contradicts the page text (ignore small differences in where exactly the child holds or puts things when the text allows both), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. ${prev ? "If this page happens in the same place as the previous page, the same big objects there (a sundial, a clock, an arch, furniture) must look the same; a clearly different design is a serious problem. " : ""}First count, for every person and animal in the illustration to check, the visible hands or paws and the arms; a person with more than two hands or arms, or a hand without an arm, is a serious problem. Answer JSON {"hands": [{"who": "short name", "hands": number}], "ok": true} or {"hands": [...], "ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],

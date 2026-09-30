@@ -26,7 +26,7 @@ const Schema = z.object({
   style: z.string().max(40).optional(),
   topic: z.string().max(40).optional(),
   companions: z.array(z.string().trim().max(120)).max(4).optional(),
-  cast: z.array(z.string().trim().max(200)).max(8).optional(),
+  cast: z.array(z.string().trim().max(400)).max(8).optional(),
   setting: z.string().trim().max(400).optional(),
   heroLook: z.string().trim().max(600).optional(),
   outfit: z.string().trim().max(300).optional(),
