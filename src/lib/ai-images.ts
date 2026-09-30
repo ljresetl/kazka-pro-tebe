@@ -162,7 +162,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const what =
     r.kind === "sheet"
-      ? `Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up${r.outerwear ? ", plus one more full-body front view of the child wearing the outerwear over the outfit" : ""}; beside them each recurring character and object of the story exactly once, full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only.`
+      ? `Layout on a plain white background, evenly lit, in exactly two rows: top row — the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up${r.outerwear ? ", plus one more full-body front view of the child wearing the outerwear over the outfit" : ""}; bottom row — each recurring character and object of the story exactly once, left to right in the numbered order; the child appears only in the top row; empty white space is fine; full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only.`
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
