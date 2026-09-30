@@ -146,7 +146,7 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const what =
     r.kind === "sheet"
-      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, in the same art style."
+      ? "Layout on a plain white background, evenly lit: the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up; beside them each recurring character and object of the story, full-body and clearly separated, shown at its true size next to the child, in the same art style; the sheet is unlabeled, pictures only."
       : r.kind === "cover"
         ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
         : r.illustration
@@ -158,7 +158,9 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
     `Art style: ${styleText}.`,
     ...refs,
     child,
-    r.cast?.length ? `Recurring characters and objects, each always drawn identically (same species, count, colours and features): ${r.cast.join("; ")}.` : null,
+    r.cast?.length
+      ? `Recurring characters and objects, each always drawn identically (same species, count, colours, features and the same size relative to the child): ${r.cast.join("; ")}.`
+      : null,
     r.companions?.length ? `Other characters of the story: ${r.companions.join("; ")}; they appear when they fit the moment.` : null,
     !r.companions?.length && r.friend ? `The child's best friend or pet "${r.friend}" appears as a cute companion when it fits the moment.` : null,
     `World of the story: ${world}.`,
@@ -250,7 +252,7 @@ async function paint(ai: GoogleGenAI, r: IllustrationRequest, refs: Refs, fix?: 
  */
 async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationRequest): Promise<string | undefined> {
   const expected = [
-    r.illustration ? `Scene: ${r.illustration}` : null,
+    r.kind === "page" && r.illustration ? `Scene: ${r.illustration}` : null,
     r.setting ? `Time and light of the story: ${r.setting}` : null,
     r.heroLook ? `Main child: ${r.heroLook}` : null,
     r.cast?.length ? `Recurring characters/objects: ${r.cast.join("; ")}` : null,
@@ -265,7 +267,7 @@ async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationReque
           role: "user",
           parts: [
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only CLEAR problems: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair or outfit clearly different from the description; a recurring character or object from the scene that is missing, replaced by a different one, or has wrong colours. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Ignore small decorations, patterns, embroidery and tiny accessories. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],
