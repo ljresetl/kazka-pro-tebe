@@ -14,6 +14,7 @@ const REQUESTS = [
   { childName: "Тарас", gender: "boy", age: 9, theme: "castle", trait: "чесність", wish: "Пригода взимку, треба знайти загублений ключ від бабусиної скрині",
     characters: [{ type: "person", name: "Бабуся Ганна", relation: "бабуся" }, { type: "pet", name: "Рижик", relation: "котик" }] },
   { childName: "Андрійко", gender: "boy", age: 4, theme: "sea", trait: "дружба", friend: "дельфін Сплеск" },
+  { childName: "Оля", gender: "girl", age: 2, theme: "forest", trait: "доброта", friend: "їжачок" },
 ] as StoryRequest[];
 
 const req = REQUESTS[Number(process.argv[2] ?? 0)];
