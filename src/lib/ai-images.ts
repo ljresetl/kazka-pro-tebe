@@ -260,7 +260,12 @@ async function paint(ai: GoogleGenAI, r: IllustrationRequest, refs: Refs, fix?: 
  * Перевірка готової сторінки дешевою моделлю (~0,05 Kč): зайві очі чи пальці, написи, не та пора доби,
  * інший одяг героя, зниклий або підмінений герой чи предмет. Повертає опис проблем або нічого.
  */
-async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationRequest): Promise<string | undefined> {
+export async function review(
+  ai: GoogleGenAI,
+  img: GeneratedImage,
+  r: IllustrationRequest,
+  ref?: GeneratedImage,
+): Promise<string | undefined> {
   const expected = [
     r.kind === "page" && r.illustration ? `Scene: ${r.illustration}` : null,
     r.setting ? `Time and light of the story: ${r.setting}` : null,
@@ -276,8 +281,16 @@ async function review(ai: GoogleGenAI, img: GeneratedImage, r: IllustrationReque
         {
           role: "user",
           parts: [
+            // Лист персонажів поруч — щоб порівнювати одяг з картинкою, а не лише з текстовим описом.
+            ...(ref
+              ? [
+                  { text: "Reference sheet of this book (how the child and every recurring character look on every page):" },
+                  { inlineData: { mimeType: ref.mimeType, data: ref.data } },
+                  { text: "Illustration to check:" },
+                ]
+              : []),
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). Ignore small decorations, patterns, embroidery and tiny accessories. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],
@@ -309,7 +322,7 @@ export async function drawIllustration(
 
   let result = await paint(ai, r, refs);
   if (r.kind !== "sheet") {
-    const problems = await review(ai, result, r);
+    const problems = await review(ai, result, r, refs.aRole === "photo" ? undefined : refs.a);
     if (problems) {
       console.log(`[review] ${r.kind} ${r.page ?? ""}: ${problems}`);
       result = await paint(ai, r, refs, problems).catch(() => result);
