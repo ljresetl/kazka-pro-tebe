@@ -284,6 +284,7 @@ export async function review(
   img: GeneratedImage,
   r: IllustrationRequest,
   ref?: GeneratedImage,
+  prev?: GeneratedImage,
 ): Promise<string | undefined> {
   const expected = [
     r.kind === "page" && r.illustration ? `Scene: ${r.illustration}` : null,
@@ -310,8 +311,10 @@ export async function review(
                   { text: "Illustration to check:" },
                 ]
               : []),
+            // Попередня сторінка — щоб те саме місце й ті самі речі не змінювалися між сусідніми сторінками.
+            ...(prev ? [{ text: "Previous page of the book (for continuity of places and objects):" }, { inlineData: { mimeType: prev.mimeType, data: prev.data } }] : []),
             {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that clearly contradicts the page text (ignore small differences in where exactly the child holds or puts things when the text allows both), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. Answer JSON {"ok": true} or {"ok": false, "problems": "short English description"}.`,
+              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: a person, animal, toy or vehicle with more or fewer than two eyes; extra or missing limbs or fingers; any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that clearly contradicts the page text (ignore small differences in where exactly the child holds or puts things when the text allows both), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. ${prev ? "If this page happens in the same place as the previous page, the same big objects there (a sundial, a clock, an arch, furniture) must look the same; a clearly different design is a serious problem. " : ""}First count, for every person and animal in the illustration to check, the visible hands or paws and the arms; a person with more than two hands or arms, or a hand without an arm, is a serious problem. Answer JSON {"hands": [{"who": "short name", "hands": number}], "ok": true} or {"hands": [...], "ok": false, "problems": "short English description"}.`,
             },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],
@@ -320,7 +323,10 @@ export async function review(
       config: { responseMimeType: "application/json" },
     });
     logUsage("review", res.modelVersion, res.usageMetadata);
-    const v = JSON.parse(res.text ?? "{}") as { ok?: boolean; problems?: string };
+    const v = JSON.parse(res.text ?? "{}") as { ok?: boolean; problems?: string; hands?: { who?: string; hands?: number }[] };
+    // Модель інколи рахує три руки, але все одно відповідає «ok» — довіряємо підрахунку.
+    const extra = (v.hands ?? []).filter((h) => typeof h.hands === "number" && h.hands > 2 && !/cat|dog|paw|animal|bunny|hare|octopus|spider|insect/i.test(h.who ?? ""));
+    if (extra.length) return `${extra.map((h) => `${h.who} has ${h.hands} hands`).join("; ")} — draw every person with exactly two arms and two hands.${v.problems ? " " + v.problems : ""}`.slice(0, 400);
     return v.ok === false && v.problems ? String(v.problems).slice(0, 400) : undefined;
   } catch {
     return undefined;
@@ -343,7 +349,7 @@ export async function drawIllustration(
 
   let result = await paint(ai, r, refs);
   if (r.kind !== "sheet") {
-    const problems = await review(ai, result, r, refs.aRole === "photo" ? undefined : refs.a);
+    const problems = await review(ai, result, r, refs.aRole === "photo" ? undefined : refs.a, refs.b);
     if (problems) {
       console.log(`[review] ${r.kind} ${r.page ?? ""}: ${problems}`);
       result = await paint(ai, r, refs, problems).catch(() => result);
