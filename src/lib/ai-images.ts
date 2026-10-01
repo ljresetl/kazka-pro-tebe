@@ -415,12 +415,20 @@ export async function drawIllustration(
   if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
 
   let result = await paint(ai, r, refs);
-  // Перевіряємо все: лист персонажів, обкладинку й сторінки — і один раз перемальовуємо з підказкою.
+  // Перевіряємо все: лист персонажів, обкладинку й сторінки. Перемальований малюнок теж перевіряємо —
+  // перемальовування інколи приносить нову ваду (другий папуга). Не більше двох спроб і в межах часу запиту.
   {
-    const problems = await review(ai, result, r, refs.aRole === "photo" ? undefined : refs.a, refs.b);
-    if (problems) {
-      console.log(`[review] ${r.kind} ${r.page ?? ""}: ${problems}`);
-      result = await paint(ai, r, refs, problems).catch(() => result);
+    const started = Date.now();
+    const sheetRef = refs.aRole === "photo" ? undefined : refs.a;
+    let problems = await review(ai, result, r, sheetRef, refs.b);
+    for (let attempt = 1; problems && attempt <= 2; attempt++) {
+      console.log(`[review] ${r.kind} ${r.page ?? ""} #${attempt}: ${problems}`);
+      const next = await paint(ai, r, refs, problems).catch(() => undefined);
+      if (!next) break;
+      result = next;
+      // Остання спроба або вже мало часу до ліміту функції — приймаємо як є.
+      if (attempt === 2 || Date.now() - started > 60_000) break;
+      problems = await review(ai, result, r, sheetRef, refs.b);
     }
   }
   // Опис героя — з листа персонажів (або з обкладинки старих казок), для всіх наступних сторінок.
