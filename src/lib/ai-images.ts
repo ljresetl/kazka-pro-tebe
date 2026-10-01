@@ -220,7 +220,9 @@ ${r.illustration}`
           "- light comes from one clear source and every shadow falls away from it; nothing glows without a reason; the horizon is level;",
           "- clear depth: foreground, middle and background; everyday objects have a believable size next to people (a cup fits a hand, a door is taller than an adult); walls, windows, boats and furniture are straight and whole, nothing melts or merges into something else;",
           "- pairs match: two shoes of the same pair, two eyes of the same colour, both sleeves the same;",
-          "- the main characters are not cut by the picture edge and keep a little space around them; the picture is not overcrowded — the main action reads at a glance;",
+          "- the main characters are not cut by the picture edge or at the joints (neck, wrists, knees) and keep a little space around them; the picture is not overcrowded — one clear focal point (the main character's face or the key action) reads at a glance, the hero stands out from the background by light and contrast, and gazes and gestures lead the eye into the picture;",
+          "- every colour, pattern and part belongs to the right thing (the red sail is on the boat, not on the parrot); left, right, on, under, behind and inside are exactly as the scene says; when the scene has a cause and effect (a wave pushes the boat back), the effect is visible;",
+          "- a fresh scene with its own poses — not a copy of the reference sheet's standing line-up; the art style, line and colour palette are the same as on the other pages of the book;",
           "- everything is safe and gentle for a young child: no weapons, blood, scary monsters or dangerous acts; a child near deep water or heights has an adult or safety gear nearby when the story allows; all characters, objects and brands are original — no known cartoon characters or logos.",
         ].join("\n"),
   ]
@@ -357,7 +359,7 @@ export async function review(
     '"problems" — other SERIOUS problems a parent would notice at a glance, or "" if none: anatomy that does not match "Body:" (wrong number of legs, paws, wings, fingers, eyes; faces on objects that are not characters); a recurring character or object with clearly wrong colours, design or size relative to the child; the main child\'s skin tone, hair or main outfit different from the description (the skin tone must be the same on every page); a relative described as the child\'s twin, or with the child\'s skin tone, who does not match the child' +
       (ref ? " and from the reference sheet (same garments and colours; outdoor clothes only outdoors in the cold)" : "") +
       (r.kind === "page"
-        ? '; impossible physics — one hand holding two or more objects, objects floating in the air, a liquid poured past the cup, things passing through each other; more copies of an object than the scene needs (two cups when one person drinks); light and shadows that contradict each other or glowing areas without a light source; objects that melt or merge into each other, broken walls, windows or furniture; everyday objects with an absurd size next to people; mismatched pairs (two different shoes, eyes of different colours); a main character cut by the picture edge; known cartoon characters, brands, logos or watermarks; anything scary or unsafe for a young child (weapons, blood, monsters, a child alone in danger); a character in a different place than the scene and the page text say (on the pier vs in the boat, in front of vs behind, inside vs outside — check where every listed character stands, sits or is); the main action of the scene not shown (who gives, holds, hugs or does what); the child\'s face showing a clearly different feeling than the scene; a character that the scene\'s "In the picture" list does not name, even one from the reference sheet; anything that clearly contradicts the page text (ignore small differences where the text allows both); a clearly wrong time of day'
+        ? '; impossible physics — one hand holding two or more objects, objects floating in the air, a liquid poured past the cup, things passing through each other; more copies of an object than the scene needs (two cups when one person drinks); light and shadows that contradict each other or glowing areas without a light source; objects that melt or merge into each other, broken walls, windows or furniture; everyday objects with an absurd size next to people; mismatched pairs (two different shoes, eyes of different colours); a main character cut by the picture edge or at the neck, wrists or knees; a colour or part on the wrong object (attribute mix-up); left/right, on/under, in front/behind different from the scene; the characters standing in a line copied from the reference sheet instead of acting in the scene; a different art style or colour palette than the reference sheet; known cartoon characters, brands, logos or watermarks; anything scary or unsafe for a young child (weapons, blood, monsters, a child alone in danger); a character in a different place than the scene and the page text say (on the pier vs in the boat, in front of vs behind, inside vs outside — check where every listed character stands, sits or is); the main action of the scene not shown (who gives, holds, hugs or does what); the child\'s face showing a clearly different feeling than the scene; a character that the scene\'s "In the picture" list does not name, even one from the reference sheet; anything that clearly contradicts the page text (ignore small differences where the text allows both); a clearly wrong time of day'
         : "") +
       (prev ? "; the same place as the previous page but the same big objects there (a sundial, a clock, an arch, furniture) clearly redesigned" : "") +
       ". Ignore tiny decorations and embroidery.",
@@ -482,7 +484,7 @@ async function mockImage(r: IllustrationRequest): Promise<GeneratedImage> {
 }
 
 const COLORING_PROMPT =
-  "Turn this children's book illustration into a clean coloring page for a child: the same scene, the same characters with the same faces, hairstyles and clothes, and the same composition, drawn only with clean, smooth, closed black outlines of even medium thickness on a pure white background. Everything is outline only and white inside — dark hair (draw the curls or strands as outlines), dark clothes, shadows, water, rocks and night sky are NOT filled with black or grey. No shading, no grey, no gradients, no hatching, no solid black areas, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
+  "Turn this children's book illustration into a clean coloring page for a child: the same scene, the same characters with the same faces, hairstyles and clothes, and the same composition, drawn only with clean, smooth, fully closed black outlines on a pure white background, with nothing important near the page edges. Everything is outline only and white inside — dark hair (draw the curls or strands as outlines), dark clothes, shadows, water, rocks and night sky are NOT filled with black or grey. No shading, no grey, no gradients, no hatching, no solid black areas, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
 
 /** Частка чорного на розмальовці: більше — значить, ШІ залив ділянки чорним, і розфарбувати їх не можна. */
 const MAX_BLACK = 0.06;
@@ -491,7 +493,15 @@ const MAX_BLACK = 0.06;
  * Розмальовка з готової ілюстрації: ШІ перемальовує сцену чистими контурами (дешевша модель —
  * кольори тут не потрібні), а потім лінії робимо чорними й товщими, щоб добре друкувались.
  */
-export async function drawColoring(image: GeneratedImage): Promise<GeneratedImage> {
+/** Розмальовка за віком (практики видавців): товщина ліній, кількість дрібних деталей. */
+function coloringByAge(age?: number) {
+  if (age !== undefined && age <= 4) return { hint: " The child is a toddler: very thick bold outlines, only a few big simple shapes, no small details or background clutter, plenty of white space.", thick: 2 };
+  if (age !== undefined && age <= 8) return { hint: " The child is 5–8: bold outlines, medium-sized shapes, a simple background with few small details.", thick: 1 };
+  return { hint: " The child is 9 or older: clean medium outlines, more details are fine, but every area stays closed and large enough to colour.", thick: 1 };
+}
+
+export async function drawColoring(image: GeneratedImage, age?: number): Promise<GeneratedImage> {
+  const byAge = coloringByAge(age);
   let raw: Buffer;
   if (process.env.MOCK_IMAGES === "1" && process.env.NODE_ENV !== "production") {
     raw = Buffer.from(image.data, "base64");
@@ -503,7 +513,7 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
     // Автоматична перевірка: якщо після обробки забагато чорного (заливки) — ще одна спроба з підказкою.
     let best: { img: GeneratedImage; black: number } | null = null;
     for (let attempt = 0; attempt < 2; attempt++) {
-      const hint = attempt ? " The previous attempt had large solid black areas — this time draw absolutely everything as thin outlines with white inside." : "";
+      const hint = byAge.hint + (attempt ? " The previous attempt had large solid black areas — this time draw absolutely everything as thin outlines with white inside." : "");
       const response = await ai.models.generateContent({
         model: process.env.GEMINI_COLORING_MODEL || "gemini-2.5-flash-image",
         contents: [{ role: "user", parts: [{ text: COLORING_PROMPT + hint }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
@@ -512,7 +522,7 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
       logUsage("coloring", response.modelVersion, response.usageMetadata);
       const out = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
       if (!out?.data) continue;
-      const done = await boldLines(Buffer.from(out.data, "base64"));
+      const done = await boldLines(Buffer.from(out.data, "base64"), byAge.thick);
       if (!best || done.black < best.black) best = done;
       if (done.black <= MAX_BLACK) break;
       console.log(`[coloring] solid black areas: ${(done.black * 100).toFixed(0)}%`);
@@ -520,7 +530,7 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
     if (!best) throw new Error("Gemini не повернув розмальовку");
     return best.img;
   }
-  return (await boldLines(raw)).img;
+  return (await boldLines(raw, byAge.thick)).img;
 }
 
 /**
@@ -528,7 +538,7 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
  * (волосся, тіні, темне небо) → лише обвідка з білим усередині, щоб їх можна було розфарбувати.
  * "black" — частка заливок до чищення: багато — ШІ намалював не розмальовку, варто спробувати ще раз.
  */
-export async function boldLines(input: Buffer): Promise<{ img: GeneratedImage; black: number }> {
+export async function boldLines(input: Buffer, thick = 1): Promise<{ img: GeneratedImage; black: number }> {
   const sharp = (await import("sharp")).default;
   const { data, info } = await sharp(input).resize(1024, 1024, { fit: "inside" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const w = info.width;
@@ -570,12 +580,13 @@ export async function boldLines(input: Buffer): Promise<{ img: GeneratedImage; b
           }
   const lines = new Uint8Array(n);
   for (let i = 0; i < n; i++) lines[i] = ink[i] && !fill[i] ? 1 : 0;
-  // Трохи потовщуємо лінії (3×3), щоб добре друкувались.
+  // Потовщуємо лінії за віком (малечі — товщі), щоб добре друкувались і було легко розфарбовувати.
   const out = Buffer.alloc(n, 255);
-  for (let y = 1; y < h - 1; y++)
-    for (let x = 1; x < w - 1; x++) {
+  const t = Math.max(1, Math.min(3, thick));
+  for (let y = t; y < h - t; y++)
+    for (let x = t; x < w - t; x++) {
       let dark = false;
-      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (lines[(y + dy) * w + x + dx]) { dark = true; break; }
+      for (let dy = -t; dy <= t && !dark; dy++) for (let dx = -t; dx <= t; dx++) if (lines[(y + dy) * w + x + dx]) { dark = true; break; }
       if (dark) out[y * w + x] = 0;
     }
   const png = await sharp(out, { raw: { width: w, height: h, channels: 1 } }).png({ compressionLevel: 9 }).toBuffer();

@@ -10,6 +10,8 @@ const Schema = z.object({
   storyId: z.string().max(40),
   ticket: z.string().max(64),
   paidTicket: z.string().max(64),
+  /** Вік дитини — від нього товщина ліній і кількість деталей. */
+  age: z.number().int().min(0).max(16).optional(),
   image: z.object({ mimeType: z.enum(["image/png", "image/jpeg", "image/webp"]), data: z.string().max(3_000_000) }),
 });
 
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
   if (!imagesConfigured()) return Response.json({ error: "Розмальовки ще не налаштовані." }, { status: 503 });
   const parsed = Schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Неправильний запит." }, { status: 400 });
-  const { storyId, ticket, paidTicket, image } = parsed.data;
+  const { storyId, ticket, paidTicket, image, age } = parsed.data;
   if (!validTicket(storyId, ticket)) return Response.json({ error: "Казку не знайдено." }, { status: 403 });
   const quota = await takeColoring(storyId, paidTicket);
   if (!quota.ok) {
@@ -27,7 +29,7 @@ export async function POST(request: Request) {
     );
   }
   try {
-    return Response.json(await drawColoring(image));
+    return Response.json(await drawColoring(image, age));
   } catch (err) {
     console.error("Coloring failed:", err);
     return Response.json({ error: "Не вдалося зробити розмальовку. Спробуйте ще раз." }, { status: 502 });

@@ -38,7 +38,7 @@ export async function aiColoring(story: Story, onProgress: (done: number, total:
     const res = await fetch("/api/coloring", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ storyId: story.id, ticket: story.ticket, paidTicket: story.paidTicket, image: await shrinkReference(original) }),
+      body: JSON.stringify({ storyId: story.id, ticket: story.ticket, paidTicket: story.paidTicket, age: story.age, image: await shrinkReference(original) }),
     });
     const data = (await res.json().catch(() => ({}))) as { data?: string; mimeType?: string; error?: string };
     if (!res.ok || !data.data || !data.mimeType) throw new Error(data.error || "Не вдалося зробити розмальовку.");
