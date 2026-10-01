@@ -150,7 +150,7 @@ export async function takeImage(storyId: string, ticket?: string) {
 /** Розмальовка (контури від ШІ) — лише для оплачених книжок і не більше 30 сторінок на книжку. */
 export async function takeColoring(storyId: string, ticket?: string) {
   if (!validPaidTicket(storyId, ticket)) return { ok: false as const, reason: "unpaid" as const };
-  if ((await get(`q:coloring:${storyId}`)) >= 30) return { ok: false as const, reason: "limit" as const };
+  if ((await get(`q:coloring:${storyId}`)) >= 60) return { ok: false as const, reason: "limit" as const };
   await incr(`q:coloring:${storyId}`, MONTH);
   return { ok: true as const };
 }
