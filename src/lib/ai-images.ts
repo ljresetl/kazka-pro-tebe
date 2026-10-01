@@ -206,6 +206,18 @@ ${r.illustration}`
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
     "Pure visual storytelling: all signs, books, banners, clothes and vehicles are blank or decorated only with simple shapes and pictures, without any letters or numbers.",
     "Gentle, safe and joyful for young children.",
+    // Ті самі пункти, що перевіряє автоперевірка (review): художник одразу малює правильно, а не після перемальовування.
+    r.kind === "sheet"
+      ? "Before finishing, check yourself: every listed character and object is drawn exactly once (the child only in the top row); no letters, numbers or labels anywhere; every body matches its exact anatomy."
+      : [
+          "Before finishing, check yourself against this list and fix anything that does not match:",
+          "- every character and object listed for this picture is present, each exactly once; nobody and nothing else (no extra animals, no second copy, no faces on objects or the sky);",
+          "- each character is exactly where the scene says (on the pier or in the boat, inside or outside, in front or behind) and does exactly the action of the scene;",
+          "- every person has exactly two arms and two hands with five fingers; animals and toys match their anatomy; each hand holds at most one object; nothing floats in the air;",
+          "- the child has the same face, skin tone, hair and clothes as on the reference sheet; relatives look like the child as described; everyone keeps their colours, markings and size;",
+          "- the time of day, sky and light match this moment; the same place looks the same as on the previous page;",
+          "- the faces show the feeling of the moment; there are no letters, numbers or words anywhere.",
+        ].join("\n"),
   ]
     .filter(Boolean)
     .join("\n");
