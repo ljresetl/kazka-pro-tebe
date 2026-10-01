@@ -44,11 +44,11 @@ describe("підпис оплати", () => {
 });
 
 describe("розмальовка від ШІ", () => {
-  it("лише для оплачених книжок і не більше 30 сторінок", async () => {
+  it("лише для оплачених книжок і не більше 60 малюнків (з повторами)", async () => {
     const { paidTicket, takeColoring } = await import("@/lib/quota");
     expect((await takeColoring("c1", undefined)).ok).toBe(false);
     expect((await takeColoring("c1", paidTicket("c2"))).ok).toBe(false);
-    for (let i = 0; i < 30; i++) expect((await takeColoring("c1", paidTicket("c1"))).ok).toBe(true);
+    for (let i = 0; i < 60; i++) expect((await takeColoring("c1", paidTicket("c1"))).ok).toBe(true);
     expect(await takeColoring("c1", paidTicket("c1"))).toEqual({ ok: false, reason: "limit" });
   });
 });
