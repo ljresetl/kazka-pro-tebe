@@ -468,7 +468,7 @@ const COLORING_PROMPT =
   "Turn this children's book illustration into a clean coloring page for a child: the same scene, the same characters with the same faces, hairstyles and clothes, and the same composition, drawn only with clean, smooth, closed black outlines of even medium thickness on a pure white background. Everything is outline only and white inside — dark hair (draw the curls or strands as outlines), dark clothes, shadows, water, rocks and night sky are NOT filled with black or grey. No shading, no grey, no gradients, no hatching, no solid black areas, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
 
 /** Частка чорного на розмальовці: більше — значить, ШІ залив ділянки чорним, і розфарбувати їх не можна. */
-const MAX_BLACK = 0.16;
+const MAX_BLACK = 0.06;
 
 /**
  * Розмальовка з готової ілюстрації: ШІ перемальовує сцену чистими контурами (дешевша модель —
@@ -498,7 +498,7 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
       const done = await boldLines(Buffer.from(out.data, "base64"));
       if (!best || done.black < best.black) best = done;
       if (done.black <= MAX_BLACK) break;
-      console.log(`[coloring] too much black: ${(done.black * 100).toFixed(0)}%`);
+      console.log(`[coloring] solid black areas: ${(done.black * 100).toFixed(0)}%`);
     }
     if (!best) throw new Error("Gemini не повернув розмальовку");
     return best.img;
@@ -507,24 +507,60 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
 }
 
 /**
- * Темні лінії → чисто чорні й трохи товщі; усе інше, зокрема сірі тіні й заливки, — біле.
- * Повертає й частку чорного, щоб відсіяти розмальовки з заливками.
+ * Розмальовка з картинки ШІ: усі лінії (навіть сірі) → чорні й трохи товщі; суцільні чорні заливки
+ * (волосся, тіні, темне небо) → лише обвідка з білим усередині, щоб їх можна було розфарбувати.
+ * "black" — частка заливок до чищення: багато — ШІ намалював не розмальовку, варто спробувати ще раз.
  */
-async function boldLines(input: Buffer): Promise<{ img: GeneratedImage; black: number }> {
+export async function boldLines(input: Buffer): Promise<{ img: GeneratedImage; black: number }> {
   const sharp = (await import("sharp")).default;
   const { data, info } = await sharp(input).resize(1024, 1024, { fit: "inside" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const w = info.width;
   const h = info.height;
-  const out = Buffer.alloc(w * h, 255);
-  for (let y = 1; y < h - 1; y++) {
-    for (let x = 1; x < w - 1; x++) {
-      let dark = false;
-      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (data[(y + dy) * w + x + dx] < 110) { dark = true; break; }
-      if (dark) out[y * w + x] = 0;
+  const n = w * h;
+  const ink = new Uint8Array(n);
+  for (let i = 0; i < n; i++) ink[i] = data[i] < 200 ? 1 : 0;
+  // Ерозія квадратом 9×9: лишаються лише товсті суцільні ділянки (лінії тонші — зникають).
+  const R = 4;
+  const rows = new Uint8Array(n);
+  for (let y = 0; y < h; y++) {
+    let run = 0;
+    for (let x = 0; x < w; x++) {
+      run = ink[y * w + x] ? run + 1 : 0;
+      rows[y * w + x] = run >= 2 * R + 1 ? 1 : 0; // кінець горизонтального відрізка довжиною 9
     }
   }
-  let blackCount = 0;
-  for (let i = 0; i < out.length; i++) if (out[i] === 0) blackCount++;
+  const solid = new Uint8Array(n);
+  for (let x = 0; x < w; x++) {
+    let run = 0;
+    for (let y = 0; y < h; y++) {
+      run = rows[y * w + x] ? run + 1 : 0;
+      if (run >= 2 * R + 1) solid[(y - R) * w + (x - R)] = 1; // центр квадрата 9×9 повністю чорний
+    }
+  }
+  let solidCount = 0;
+  for (let i = 0; i < n; i++) if (solid[i]) solidCount++;
+  // Розширюємо «серцевину» назад, лишаючи від заливки обвідку завтовшки ~3 px.
+  const fill = new Uint8Array(n);
+  const G = R - 3;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++)
+      if (solid[y * w + x])
+        for (let dy = -G; dy <= G; dy++)
+          for (let dx = -G; dx <= G; dx++) {
+            const yy = y + dy;
+            const xx = x + dx;
+            if (yy >= 0 && yy < h && xx >= 0 && xx < w) fill[yy * w + xx] = 1;
+          }
+  const lines = new Uint8Array(n);
+  for (let i = 0; i < n; i++) lines[i] = ink[i] && !fill[i] ? 1 : 0;
+  // Трохи потовщуємо лінії (3×3), щоб добре друкувались.
+  const out = Buffer.alloc(n, 255);
+  for (let y = 1; y < h - 1; y++)
+    for (let x = 1; x < w - 1; x++) {
+      let dark = false;
+      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (lines[(y + dy) * w + x + dx]) { dark = true; break; }
+      if (dark) out[y * w + x] = 0;
+    }
   const png = await sharp(out, { raw: { width: w, height: h, channels: 1 } }).png({ compressionLevel: 9 }).toBuffer();
-  return { img: { data: png.toString("base64"), mimeType: "image/png" }, black: blackCount / out.length };
+  return { img: { data: png.toString("base64"), mimeType: "image/png" }, black: solidCount / n };
 }
