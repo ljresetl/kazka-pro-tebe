@@ -1401,6 +1401,82 @@ textarea.field-input {
 }
 .flip-back {
   color: #fff;
+  padding: 0;
+  display: block;
+  position: relative;
+}
+/* Задня обкладинка: розмитий фон, полиця з книжками сайту, знак, де замовити. */
+.back-cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7% 6% 6%;
+  color: #fff;
+  text-align: center;
+  background: var(--sky-deep, #1d3557);
+  container-type: inline-size;
+}
+.back-cover .back-bg {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  filter: blur(14px) brightness(0.5) saturate(1.1);
+  border-radius: 0;
+}
+.back-shelf,
+.back-mark,
+.back-order {
+  position: relative;
+}
+.back-shelf {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3cqw 2.4cqw;
+  width: 100%;
+}
+.back-book {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2cqw;
+}
+.back-book img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 1.4cqw;
+  box-shadow: 0 1cqw 2.5cqw rgba(0, 0, 0, 0.45);
+  border: 0.4cqw solid rgba(255, 255, 255, 0.85);
+}
+.back-book figcaption {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: max(7px, 2.2cqw);
+  line-height: 1.15;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.back-mark {
+  width: 14cqw;
+  height: 14cqw;
+}
+.back-order p {
+  margin: 0;
+  font-size: max(9px, 3.6cqw);
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.back-order .back-url {
+  margin-top: 1cqw;
+  font-size: max(8px, 3cqw);
+  font-weight: 400;
+  opacity: 0.9;
 }
 .flip-back .cover-title {
   font-size: clamp(20px, 8cqw, 40px);
@@ -2239,6 +2315,10 @@ textarea.field-input {
 @page :first {
   margin: 0;
 }
+/* Задня обкладинка — теж без полів. */
+@page bleed {
+  margin: 0;
+}
 
 @media print {
   .site-header,
@@ -2297,6 +2377,26 @@ textarea.field-input {
     height: 100%;
     object-fit: cover;
     border-radius: 0;
+  }
+  .print-page.print-back {
+    page: bleed;
+    height: 296mm;
+    width: 210mm;
+    overflow: hidden;
+    display: block;
+  }
+  .print-back .back-book img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 1.4cqw;
+  }
+  .print-back .back-cover .back-bg {
+    height: 120%;
+    filter: blur(5mm) brightness(0.5) saturate(1.1);
+  }
+  .print-coloring .print-back {
+    display: none;
   }
   .print-cover .cover-title {
     position: absolute;

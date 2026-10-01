@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import type { PageFlip } from "page-flip";
 import type { Illustration, SceneId } from "@/lib/types";
 import { Kvitka } from "./Ornament";
+import BackCover from "./BackCover";
 import { printPageCount } from "./PrintBook";
 import { bookTextSize } from "@/lib/text-size";
 import Scene from "./Scene";
@@ -154,9 +155,7 @@ export default function BookReader({ title, dedication, cover, coverImage, pages
     if (i === last) {
       return (
         <div className="flip-back">
-          <Kvitka size={40} />
-          <p className="cover-title">Кінець</p>
-          <p className="cover-dedication">Казкарня</p>
+          <BackCover background={coverImage?.src} />
         </div>
       );
     }
