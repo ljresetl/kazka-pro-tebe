@@ -47,3 +47,6 @@ next-env.d.ts
 scripts/ai-images/raw/
 scripts/ai-images/raw-log.txt
 __pycache__/
+
+# Усі фото сайту зібрані в одну папку (копія, не для git)
+/foto-saitu/
