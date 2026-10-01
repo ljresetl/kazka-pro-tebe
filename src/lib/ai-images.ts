@@ -217,9 +217,9 @@ function anatomy(r: IllustrationRequest) {
     .filter((c) => c.includes(" Body: "))
     .map((c) => `${c.split(":")[0]} — ${c.split(" Body: ")[1].trim().replace(/\.+$/, "")}`);
   if (!bodies.length) {
-    return "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth.";
+    return "Clean anatomy: every person has two eyes, one mouth and hands with five fingers; animals, toys and vehicles with faces have two eyes and one mouth. Each hand holds at most one object.";
   }
-  return `Exact anatomy, counted, for each character separately: the child — two arms, two legs, five fingers on each hand, two eyes, one mouth; ${bodies.join("; ")}; any other person — two arms, two legs, five fingers on each hand.`;
+  return `Exact anatomy, counted, for each character separately: the child — two arms, two legs, five fingers on each hand, two eyes, one mouth; ${bodies.join("; ")}; any other person — two arms, two legs, five fingers on each hand. Each hand holds at most one object, and objects rest on something or are held — nothing floats.`;
 }
 
 /** Токени кожного запиту — у журнал Vercel, щоб рахувати собівартість казки (рядки «[usage]»). */
@@ -340,7 +340,7 @@ export async function review(
     '"problems" — other SERIOUS problems a parent would notice at a glance, or "" if none: anatomy that does not match "Body:" (wrong number of legs, paws, wings, fingers, eyes; faces on objects that are not characters); a recurring character or object with clearly wrong colours, design or size relative to the child; the main child\'s skin tone, hair or main outfit different from the description (the skin tone must be the same on every page); a relative described as the child\'s twin, or with the child\'s skin tone, who does not match the child' +
       (ref ? " and from the reference sheet (same garments and colours; outdoor clothes only outdoors in the cold)" : "") +
       (r.kind === "page"
-        ? '; a character in a different place than the scene and the page text say (on the pier vs in the boat, in front of vs behind, inside vs outside — check where every listed character stands, sits or is); the main action of the scene not shown (who gives, holds, hugs or does what); the child\'s face showing a clearly different feeling than the scene; a character that the scene\'s "In the picture" list does not name, even one from the reference sheet; anything that clearly contradicts the page text (ignore small differences where the text allows both); a clearly wrong time of day'
+        ? '; impossible physics — one hand holding two or more objects, objects floating in the air, a liquid poured past the cup, things passing through each other; more copies of an object than the scene needs (two cups when one person drinks); a character in a different place than the scene and the page text say (on the pier vs in the boat, in front of vs behind, inside vs outside — check where every listed character stands, sits or is); the main action of the scene not shown (who gives, holds, hugs or does what); the child\'s face showing a clearly different feeling than the scene; a character that the scene\'s "In the picture" list does not name, even one from the reference sheet; anything that clearly contradicts the page text (ignore small differences where the text allows both); a clearly wrong time of day'
         : "") +
       (prev ? "; the same place as the previous page but the same big objects there (a sundial, a clock, an arch, furniture) clearly redesigned" : "") +
       ". Ignore tiny decorations and embroidery.",
