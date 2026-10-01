@@ -1,4 +1,5 @@
 import "server-only";
+import { z } from "zod";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { findTopic, ILLUSTRATION_STYLES } from "./catalog";
 
@@ -162,9 +163,9 @@ export function buildPrompt(r: IllustrationRequest, { refA, prev = false }: { re
 
   const what =
     r.kind === "sheet"
-      ? `Layout on a plain white background, evenly lit, in exactly two rows: top row — the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up${r.outerwear ? ", plus one more full-body front view of the child wearing the outerwear over the outfit" : ""}; bottom row — each recurring character and object of the story exactly once, left to right in the numbered order; the child appears only in the top row; empty white space is fine; full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only.`
+      ? `Layout on a plain white background, evenly lit, in exactly two rows: top row — the child full-body in front view, side view and back view in the same outfit, plus a smiling face close-up${r.outerwear ? ", plus one more full-body front view of the child wearing the outerwear over the outfit" : ""}; bottom row — each recurring character and object of the story exactly once, left to right in the listed order, with no numbers or labels; the child appears only in the top row; empty white space is fine; full-body and clearly separated, all shown side by side at their true size relative to the child, in the same art style, exactly as described with no extra patterns, emblems or decorations; a wordless model sheet made of pictures only.`
       : r.kind === "cover"
-        ? "The child happily in the world of the story with the main companions, a joyful inviting scene."
+        ? "The child happily in the world of the story with the main companions, a joyful inviting scene; every character appears exactly once — one of each, no second dog, robot or look-alike, nobody holds a small copy of another character."
         : r.illustration
           ? `This moment of the story (a storyboard note: draw exactly who and what is listed under "In the picture" — nobody and nothing else — doing exactly the "Action", with faces showing the "Feeling"):
 ${r.illustration}`
@@ -179,7 +180,7 @@ ${r.illustration}`
     r.cast?.length
       ? r.kind === "sheet"
         ? // Українські імена на листі модель підписує (ще й з помилками) — даємо лише опис.
-          `Exactly ${r.cast.length} recurring characters and objects, each drawn once (a person whose description has outdoor clothes gets a second small view in them, side by side): ${r.cast.map((c, i) => `${i + 1}) ${c.split(":").slice(1).join(":").trim() || c}`).join("; ")}.`
+          `Exactly ${r.cast.length} recurring characters and objects, each drawn once, nothing else (a person whose description has outdoor clothes gets a second small view in them, side by side): ${r.cast.map((c) => c.split(":").slice(1).join(":").trim() || c).join(" | ")}.`
         : `Recurring characters and objects, each always drawn identically (same species, count, colours, features, patterns and emblems — nothing added or removed — and the same size relative to the child): ${r.cast.join("; ")}.`
       : null,
     // Є паспорти від автора — герої батьків уже там латиницею; кирилиця з конструктора художник вписував підписами.
@@ -291,6 +292,19 @@ async function paint(ai: GoogleGenAI, r: IllustrationRequest, refs: Refs, fix?: 
  * Перевірка готової сторінки дешевою моделлю (~0,05 Kč): зайві очі чи пальці, написи, не та пора доби,
  * інший одяг героя, зниклий або підмінений герой чи предмет. Повертає опис проблем або нічого.
  */
+const ReviewSchema = z.object({
+  counts: z.array(z.object({ who: z.string(), count: z.number() })),
+  hands: z.array(z.object({ who: z.string(), hands: z.number() })),
+  text: z.boolean(),
+  problems: z.string(),
+});
+
+/**
+ * Автоматична перевірка КОЖНОГО малюнка (лист, обкладинка, сторінка) за загальними категоріями вад.
+ * Модель мусить порахувати (скільки разів кожен герой, скільки рук, чи є букви/цифри), а рішення
+ * «перемалювати» приймає код за цими числами — так нові вади тих самих типів ловляться самі,
+ * без окремого правила під кожну.
+ */
 export async function review(
   ai: GoogleGenAI,
   img: GeneratedImage,
@@ -298,16 +312,36 @@ export async function review(
   ref?: GeneratedImage,
   prev?: GeneratedImage,
 ): Promise<string | undefined> {
+  const names = (r.cast ?? []).map((c) => c.split(":")[0].trim()).filter(Boolean);
   const expected = [
     r.kind === "page" && r.illustration ? `Scene: ${r.illustration}` : null,
     r.kind === "page" && r.pageText ? `Page text (Ukrainian): ${r.pageText}` : null,
-    r.setting ? `Time and light of the story: ${r.setting}` : null,
-    r.heroLook ? `Main child: ${r.heroLook}` : null,
-    r.outerwear ? `Outdoors in the cold the child and other people may also wear their outerwear from the reference sheet (${r.outerwear}); indoors they wear it only if the scene says so.` : null,
+    r.kind !== "sheet" && r.setting ? `Time and light of the story: ${r.setting}` : null,
+    r.kind !== "sheet" && r.heroLook ? `Main child: ${r.heroLook}` : null,
+    r.kind !== "sheet" && r.outerwear ? `Outdoors in the cold the child and other people may also wear their outerwear from the reference sheet (${r.outerwear}); indoors they wear it only if the scene says so.` : null,
     r.cast?.length ? `Recurring characters/objects: ${r.cast.join("; ")}` : null,
   ]
     .filter(Boolean)
     .join("\n");
+  const task =
+    r.kind === "sheet"
+      ? "This is the character reference sheet: the child in several views in the top row (that is expected), and below it each recurring character and object exactly once (a person may also have one small view in outdoor clothes)."
+      : r.kind === "cover"
+        ? "This is the book cover: the child with the main companions, each character at most once."
+        : "This is a page illustration.";
+  const rules = [
+    "Fill the JSON honestly by counting what you see:",
+    `"counts" — for the main child and for each of these names, how many times it appears in the image: ${["the child", ...names].join(", ")}; also add an entry "other: <what>" for every creature or character that is not in this list.`,
+    '"hands" — for every person: the number of visible hands (count carefully; a person holding three things may have a third hand).',
+    '"text" — true if there are ANY letters, words, numbers, digits or labels anywhere in the image (runes and simple symbols that look like letters count too).',
+    '"problems" — other SERIOUS problems a parent would notice at a glance, or "" if none: anatomy that does not match "Body:" (wrong number of legs, paws, wings, fingers, eyes; faces on objects that are not characters); a recurring character or object with clearly wrong colours, design or size relative to the child; the main child\'s hair or main outfit different from the description' +
+      (ref ? " and from the reference sheet (same garments and colours; outdoor clothes only outdoors in the cold)" : "") +
+      (r.kind === "page"
+        ? '; the main action of the scene not shown (who gives, holds, hugs or does what); the child\'s face showing a clearly different feeling than the scene; a character that the scene\'s "In the picture" list does not name, even one from the reference sheet; anything that clearly contradicts the page text (ignore small differences where the text allows both); a clearly wrong time of day'
+        : "") +
+      (prev ? "; the same place as the previous page but the same big objects there (a sundial, a clock, an arch, furniture) clearly redesigned" : "") +
+      ". Ignore tiny decorations and embroidery.",
+  ].join("\n");
   try {
     const res = await ai.models.generateContent({
       model: process.env.GEMINI_TEXT_MODEL || "gemini-flash-latest",
@@ -316,30 +350,48 @@ export async function review(
           role: "user",
           parts: [
             // Лист персонажів поруч — щоб порівнювати одяг з картинкою, а не лише з текстовим описом.
-            ...(ref
+            ...(ref && r.kind !== "sheet"
               ? [
                   { text: "Reference sheet of this book (how the child and every recurring character look on every page):" },
                   { inlineData: { mimeType: ref.mimeType, data: ref.data } },
-                  { text: "Illustration to check:" },
                 ]
               : []),
             // Попередня сторінка — щоб те саме місце й ті самі речі не змінювалися між сусідніми сторінками.
             ...(prev ? [{ text: "Previous page of the book (for continuity of places and objects):" }, { inlineData: { mimeType: prev.mimeType, data: prev.data } }] : []),
-            {
-              text: `You check an illustration for a children's picture book page.\n${expected}\nReport only SERIOUS problems that a parent would notice at a glance: any character whose body does not match its exact anatomy (count arms, legs, paws, wings, fingers and eyes against "Body:" in the descriptions; the child and other people: two arms, two legs, five fingers on each hand, two eyes); any letters or numbers; a clearly wrong time of day; the main child's hair colour, hairstyle or main outfit (garment type or main colour) different from the description; a recurring character or object from the scene that is missing, replaced by a different one, has clearly wrong colours or a clearly wrong size relative to the child. Also serious: the main action of the scene is not shown (who gives, holds, hugs or does what), or the child's face clearly shows a different feeling than the scene says, or a character or object that the scene's "In the picture" list does not name — even one from the reference sheet (a companion who stayed elsewhere, a chest or map carried over from an earlier page) — or anything that clearly contradicts the page text (ignore small differences in where exactly the child holds or puts things when the text allows both), or extra characters that the scene does not mention (a second copy of a recurring animal or vehicle, extra creatures, faces on stars or objects). ${ref ? "Compare with the reference sheet: the child wears the same outfit — every visible garment (top, trousers, skirt or dress, shoes, hair accessory) of the same type and colour — unless the scene says the child puts something on; recurring characters keep the same colours and markings. A different garment or a clearly different colour is a serious problem. " : ""}Ignore tiny decorations and embroidery. ${prev ? "If this page happens in the same place as the previous page, the same big objects there (a sundial, a clock, an arch, furniture) must look the same; a clearly different design is a serious problem. " : ""}First count, for every person and animal in the illustration to check, the visible hands or paws and the arms; a person with more than two hands or arms, or a hand without an arm, is a serious problem. Answer JSON {"hands": [{"who": "short name", "hands": number}], "ok": true} or {"hands": [...], "ok": false, "problems": "short English description"}.`,
-            },
+            { text: `You check an illustration for a children's picture book. ${task}\n${expected}\n${rules}\nImage to check:` },
             { inlineData: { mimeType: img.mimeType, data: img.data } },
           ],
         },
       ],
-      config: { responseMimeType: "application/json" },
+      config: { responseMimeType: "application/json", responseJsonSchema: z.toJSONSchema(ReviewSchema) },
     });
     logUsage("review", res.modelVersion, res.usageMetadata);
-    const v = JSON.parse(res.text ?? "{}") as { ok?: boolean; problems?: string; hands?: { who?: string; hands?: number }[] };
-    // Модель інколи рахує три руки, але все одно відповідає «ok» — довіряємо підрахунку.
-    const extra = (v.hands ?? []).filter((h) => typeof h.hands === "number" && h.hands > 2 && !/cat|dog|paw|animal|bunny|hare|octopus|spider|insect/i.test(h.who ?? ""));
-    if (extra.length) return `${extra.map((h) => `${h.who} has ${h.hands} hands`).join("; ")} — draw every person with exactly two arms and two hands.${v.problems ? " " + v.problems : ""}`.slice(0, 400);
-    return v.ok === false && v.problems ? String(v.problems).slice(0, 400) : undefined;
+    const parsed = ReviewSchema.safeParse(JSON.parse(res.text ?? "{}"));
+    if (!parsed.success) return undefined;
+    const v = parsed.data;
+    const found: string[] = [];
+    // Рішення за підрахунком, а не за «ok» моделі: вона інколи рахує правильно, але все одно пише «все добре».
+    if (v.text) found.push("there are letters, numbers or labels in the image — remove all of them, pictures only");
+    const isChild = (w: string) => /^the child$/i.test(w.trim());
+    const inPicture = (/^\s*In the picture:(.*)$/im.exec(r.illustration ?? "")?.[1] ?? "").toLowerCase();
+    for (const c of v.counts) {
+      const who = c.who.trim();
+      if (/^other:/i.test(who)) {
+        if (r.kind !== "sheet" && c.count > 0 && !/people|crowd|passer|villager|bird in the sky/i.test(who)) found.push(`an extra character that does not belong here: ${who.slice(6).trim()}`);
+        continue;
+      }
+      if (isChild(who)) {
+        if (r.kind !== "sheet" && c.count > 1) found.push("the main child appears more than once — draw the child exactly once");
+        continue;
+      }
+      if (c.count > 1) found.push(`${who} appears ${c.count} times — draw it exactly once`);
+      if (r.kind === "sheet" && c.count === 0) found.push(`${who} is missing from the sheet`);
+      // Герой є в списку «In the picture» цієї сторінки, а на малюнку його немає.
+      if (r.kind === "page" && c.count === 0 && inPicture.includes(who.toLowerCase())) found.push(`${who} is missing — the scene needs it`);
+    }
+    for (const h of v.hands) if (h.hands > 2) found.push(`${h.who} has ${h.hands} hands — every person has exactly two arms and two hands`);
+    if (v.problems.trim()) found.push(v.problems.trim());
+    return found.length ? found.join("; ").slice(0, 500) : undefined;
   } catch {
     return undefined;
   }
@@ -360,7 +412,8 @@ export async function drawIllustration(
   if (r.kind === "page" && !r.illustration) r = { ...r, illustration: await describeScene(ai, r.pageText) };
 
   let result = await paint(ai, r, refs);
-  if (r.kind !== "sheet") {
+  // Перевіряємо все: лист персонажів, обкладинку й сторінки — і один раз перемальовуємо з підказкою.
+  {
     const problems = await review(ai, result, r, refs.aRole === "photo" ? undefined : refs.a, refs.b);
     if (problems) {
       console.log(`[review] ${r.kind} ${r.page ?? ""}: ${problems}`);
