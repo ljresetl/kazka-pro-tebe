@@ -2398,6 +2398,16 @@ textarea.field-input {
   .print-coloring .print-back {
     display: none;
   }
+  /* Розмальовка без задньої обкладинки: остання сторінка казки — без зайвого розриву. */
+  .print-coloring .print-story-page:nth-last-child(2) {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  .print-coloring .print-cover .cover-title {
+    color: #000;
+    text-shadow: none;
+    background: #fff;
+  }
   .print-cover .cover-title {
     position: absolute;
     inset: 0 0 auto;
