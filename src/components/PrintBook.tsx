@@ -6,6 +6,7 @@ import { aiColoring, canAiColor } from "@/lib/coloring";
 import { lineArt } from "@/lib/line-art";
 import { bookTextSize } from "@/lib/text-size";
 import type { Illustration, SceneId, Story } from "@/lib/types";
+import BackCover from "./BackCover";
 import Scene from "./Scene";
 
 type Props = {
@@ -51,6 +52,9 @@ export default function PrintBook({ title, dedication, cover, coverImage, pages,
           {mark}
         </section>
       ))}
+      <section className="print-page print-back">
+        <BackCover background={coverImage?.src} />
+      </section>
     </div>
   );
 }
@@ -95,7 +99,7 @@ export function PrintButtons({
         }
         setProgress(null);
       }
-      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(".print-book img"));
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(".print-book img[data-idx]"));
       await Promise.all(
         imgs.map(async (img) => {
           try {
