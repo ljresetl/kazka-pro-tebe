@@ -196,7 +196,7 @@ ${r.illustration}`
       : null,
     r.kind === "page" && r.page !== undefined ? `${/Place and shot:/i.test(r.illustration ?? "") ? "Camera: as in the storyboard note." : `Camera: ${SHOTS[r.page % SHOTS.length]}.`} The child's pose and action fit this exact moment; when the child travels, the movement goes from left to right.` : null,
     r.kind !== "sheet"
-      ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures that this moment does not mention. Furniture, lamps, night-lights, stars, the sky and other objects are plain, without faces, unless they are listed characters."
+      ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures that this moment does not mention. Furniture, lamps, night-lights, stars, the sky and other objects are plain, without faces, unless they are listed characters. Stars in the sky are small distant points of light, clearly different from any star-shaped object of the story."
       : null,
     "Square 1:1 composition with the main character clearly visible.",
     // Будова окремо для кожного героя: загальне «дві руки» художник переносив і на тварин.
