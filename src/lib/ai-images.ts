@@ -465,7 +465,10 @@ async function mockImage(r: IllustrationRequest): Promise<GeneratedImage> {
 }
 
 const COLORING_PROMPT =
-  "Turn this children's book illustration into a clean coloring page for a 3–6 year old: the same scene, characters and composition, drawn only with clean, smooth, closed black outlines of even medium thickness on a pure white background. No shading, no grey, no gradients, no hatching, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
+  "Turn this children's book illustration into a clean coloring page for a child: the same scene, the same characters with the same faces, hairstyles and clothes, and the same composition, drawn only with clean, smooth, closed black outlines of even medium thickness on a pure white background. Everything is outline only and white inside — dark hair (draw the curls or strands as outlines), dark clothes, shadows, water, rocks and night sky are NOT filled with black or grey. No shading, no grey, no gradients, no hatching, no solid black areas, no colour, no textures, no text. Simplify tiny details into larger areas that are easy to colour.";
+
+/** Частка чорного на розмальовці: більше — значить, ШІ залив ділянки чорним, і розфарбувати їх не можна. */
+const MAX_BLACK = 0.16;
 
 /**
  * Розмальовка з готової ілюстрації: ШІ перемальовує сцену чистими контурами (дешевша модель —
@@ -480,21 +483,34 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
     // Той самий формат, що й оригінал: вертикальна обкладинка лишається вертикальною.
     const meta = await (await import("sharp")).default(Buffer.from(image.data, "base64")).metadata().catch(() => null);
     const aspectRatio = meta?.width && meta.height && meta.height / meta.width > 1.15 ? "3:4" : "1:1";
-    const response = await ai.models.generateContent({
-      model: process.env.GEMINI_COLORING_MODEL || "gemini-2.5-flash-image",
-      contents: [{ role: "user", parts: [{ text: COLORING_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
-      config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio } },
-    });
-    logUsage("coloring", response.modelVersion, response.usageMetadata);
-    const out = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
-    if (!out?.data) throw new Error("Gemini не повернув розмальовку");
-    raw = Buffer.from(out.data, "base64");
+    // Автоматична перевірка: якщо після обробки забагато чорного (заливки) — ще одна спроба з підказкою.
+    let best: { img: GeneratedImage; black: number } | null = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const hint = attempt ? " The previous attempt had large solid black areas — this time draw absolutely everything as thin outlines with white inside." : "";
+      const response = await ai.models.generateContent({
+        model: process.env.GEMINI_COLORING_MODEL || "gemini-2.5-flash-image",
+        contents: [{ role: "user", parts: [{ text: COLORING_PROMPT + hint }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
+        config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio } },
+      });
+      logUsage("coloring", response.modelVersion, response.usageMetadata);
+      const out = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+      if (!out?.data) continue;
+      const done = await boldLines(Buffer.from(out.data, "base64"));
+      if (!best || done.black < best.black) best = done;
+      if (done.black <= MAX_BLACK) break;
+      console.log(`[coloring] too much black: ${(done.black * 100).toFixed(0)}%`);
+    }
+    if (!best) throw new Error("Gemini не повернув розмальовку");
+    return best.img;
   }
-  return boldLines(raw);
+  return (await boldLines(raw)).img;
 }
 
-/** Сірі тонкі лінії → чорні, трохи товщі; усе інше — чисто біле. */
-async function boldLines(input: Buffer): Promise<GeneratedImage> {
+/**
+ * Темні лінії → чисто чорні й трохи товщі; усе інше, зокрема сірі тіні й заливки, — біле.
+ * Повертає й частку чорного, щоб відсіяти розмальовки з заливками.
+ */
+async function boldLines(input: Buffer): Promise<{ img: GeneratedImage; black: number }> {
   const sharp = (await import("sharp")).default;
   const { data, info } = await sharp(input).resize(1024, 1024, { fit: "inside" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const w = info.width;
@@ -503,10 +519,12 @@ async function boldLines(input: Buffer): Promise<GeneratedImage> {
   for (let y = 1; y < h - 1; y++) {
     for (let x = 1; x < w - 1; x++) {
       let dark = false;
-      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (data[(y + dy) * w + x + dx] < 200) { dark = true; break; }
+      for (let dy = -1; dy <= 1 && !dark; dy++) for (let dx = -1; dx <= 1; dx++) if (data[(y + dy) * w + x + dx] < 110) { dark = true; break; }
       if (dark) out[y * w + x] = 0;
     }
   }
+  let blackCount = 0;
+  for (let i = 0; i < out.length; i++) if (out[i] === 0) blackCount++;
   const png = await sharp(out, { raw: { width: w, height: h, channels: 1 } }).png({ compressionLevel: 9 }).toBuffer();
-  return { data: png.toString("base64"), mimeType: "image/png" };
+  return { img: { data: png.toString("base64"), mimeType: "image/png" }, black: blackCount / out.length };
 }
