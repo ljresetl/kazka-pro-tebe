@@ -252,7 +252,7 @@ export default function StoryView({ id }: { id: string }) {
 
         {canIllustrate && (
           <div style={{ marginTop: 24 }}>
-            <IllustrationsPanel story={story} hasImages={hasAiImages} missing={missingImages} paid={paid} upTo={drawUpTo} />
+            <IllustrationsPanel story={story} hasImages={hasAiImages} missing={missingImages} paid={paid} upTo={drawUpTo} pageImages={images.pages} />
           </div>
         )}
 
