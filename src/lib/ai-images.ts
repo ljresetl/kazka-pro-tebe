@@ -477,10 +477,13 @@ export async function drawColoring(image: GeneratedImage): Promise<GeneratedImag
     raw = Buffer.from(image.data, "base64");
   } else {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    // Той самий формат, що й оригінал: вертикальна обкладинка лишається вертикальною.
+    const meta = await (await import("sharp")).default(Buffer.from(image.data, "base64")).metadata().catch(() => null);
+    const aspectRatio = meta?.width && meta.height && meta.height / meta.width > 1.15 ? "3:4" : "1:1";
     const response = await ai.models.generateContent({
       model: process.env.GEMINI_COLORING_MODEL || "gemini-2.5-flash-image",
       contents: [{ role: "user", parts: [{ text: COLORING_PROMPT }, { inlineData: { mimeType: image.mimeType, data: image.data } }] }],
-      config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio: "1:1" } },
+      config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio } },
     });
     logUsage("coloring", response.modelVersion, response.usageMetadata);
     const out = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
