@@ -198,7 +198,9 @@ ${r.illustration}`
     r.kind !== "sheet"
       ? "Each recurring character and object appears at most once in a picture — no second copy or look-alike in the background — and no extra creatures that this moment does not mention. Furniture, lamps, night-lights, stars, the sky and other objects are plain, without faces, unless they are listed characters. Stars in the sky are small distant points of light, clearly different from any star-shaped object of the story."
       : null,
-    "Square 1:1 composition with the main character clearly visible.",
+    r.kind === "cover"
+      ? "Portrait 3:4 composition filling the whole picture edge to edge: the top quarter is a calm, simple area (sky or soft background) where the book title will be placed; the characters stand in the middle and lower part, clearly visible."
+      : "Square 1:1 composition with the main character clearly visible.",
     // Будова окремо для кожного героя: загальне «дві руки» художник переносив і на тварин.
     anatomy(r),
     // Модель любить писати назву казки на машинах і вивісках — і з помилками. Назву сайт додає сам.
@@ -280,7 +282,8 @@ async function paint(ai: GoogleGenAI, r: IllustrationRequest, refs: Refs, fix?: 
   const response = await ai.models.generateContent({
     model: process.env.GEMINI_IMAGE_MODEL || "gemini-2.5-flash-image",
     contents: [{ role: "user", parts: [{ text: prompt }, ...images.map((img) => ({ inlineData: { mimeType: img.mimeType, data: img.data } }))] }],
-    config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio: "1:1" } },
+    // Обкладинка — вертикальна, майже як аркуш A4: у друці вона на весь аркуш без полів.
+    config: { responseModalities: [Modality.IMAGE], imageConfig: { aspectRatio: r.kind === "cover" ? "3:4" : "1:1" } },
   });
   logUsage(fix ? `${r.kind}-redraw` : r.kind, response.modelVersion, response.usageMetadata);
   const image = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
